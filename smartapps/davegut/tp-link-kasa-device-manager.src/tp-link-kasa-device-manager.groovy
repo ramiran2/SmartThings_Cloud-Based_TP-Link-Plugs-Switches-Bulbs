@@ -41,6 +41,8 @@ definition(
 	iconX2Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
 	iconX3Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
 	singleInstance: true
+	)
+	
 	def appVersion() { "2.1.1" }
 	def appVerDate() { "08-11-2018" }
 	def minVersions() {
@@ -56,7 +58,6 @@ definition(
 			"tunablewhitebulb":["val":211, "desc":"2.1.1"]
 		]
 	}
-)
 
 preferences {
 	page(name: "cloudLogin", title: "TP-Link Cloud Login", nextPage:"", content:"cloudLogin", uninstall: true)
