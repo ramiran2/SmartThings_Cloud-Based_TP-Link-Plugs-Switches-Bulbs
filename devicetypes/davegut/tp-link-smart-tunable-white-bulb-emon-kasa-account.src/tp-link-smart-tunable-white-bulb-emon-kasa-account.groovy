@@ -49,7 +49,7 @@ TP-Link devices; primarily various users on GitHub.com.
 def devVer() { return "2.1.1" }
 
 metadata {
-	definition (name: "(TP-Link Smart ${deviceType} Emon - ${installType}",
+	definition (name: "TP-Link Smart ${deviceType} Emon - ${installType}",
 				namespace: "davegut",
 				author: "Dave Gutheinz",
 				deviceType: "${deviceType}",
