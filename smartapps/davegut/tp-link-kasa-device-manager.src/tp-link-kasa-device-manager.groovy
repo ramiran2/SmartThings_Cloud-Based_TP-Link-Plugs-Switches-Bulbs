@@ -193,11 +193,11 @@ def getDevices() {
 def addDevices() {
 	def tpLinkModel = [:]
 	//	Plug-Switch Devices (no energy monitor capability)
-	tpLinkModel << ["HS100" : "TP-Link Smart Plug + Switch - Kasa Account"]				//	HS100
-	tpLinkModel << ["HS105" : "TP-Link Smart Plug + Switch - Kasa Account"]				//	HS105
-	tpLinkModel << ["HS200" : "TP-Link Smart Plug + Switch - Kasa Account"]				//	HS200
-	tpLinkModel << ["HS210" : "TP-Link Smart Plug + Switch - Kasa Account"]				//	HS210
-	tpLinkModel << ["KP100" : "TP-Link Smart Plug + Switch - Kasa Account"]				//	KP100
+	tpLinkModel << ["HS100" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS100
+	tpLinkModel << ["HS105" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS105
+	tpLinkModel << ["HS200" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS200
+	tpLinkModel << ["HS210" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS210
+	tpLinkModel << ["KP100" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	KP100
 	//	Dimming Plug Devices
 	tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Kasa Account"]			//	HS220
 	//	Energy Monitor Plugs
