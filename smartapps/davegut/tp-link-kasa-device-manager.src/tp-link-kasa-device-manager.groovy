@@ -17,7 +17,7 @@ permissions and limitations under the License.
 
 ##### Discalimer:  This Service Manager and the associated Device 
 Handlers are in no way sanctioned or supported by TP-Link.  All  
-development is based upon open-source data on the TP-Link devices; 
+development is based upon open-source data on the TP-Link Kasa Devices; 
 primarily various users on GitHub.com.
 
 ##### Notes #####
@@ -35,7 +35,7 @@ definition(
 	name: "TP-Link Kasa Device Manager",
 	namespace: "davegut",
 	author: "Dave Gutheinz",
-	description: "A Service Manager for the TP-Link devices connecting through the TP-Link Kasa Accounts",
+	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Kasa Accounts",
 	category: "SmartThings Labs",
 	iconUrl: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
 	iconX2Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
@@ -60,8 +60,8 @@ definition(
 	}
 
 preferences {
-	page(name: "cloudLogin", title: "TP-Link Cloud Login", nextPage:"", content:"cloudLogin", uninstall: true)
-	page(name: "selectDevices", title: "Select TP-Link Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
+	page(name: "cloudLogin", title: "TP-Link Kasa Login", nextPage:"", content:"cloudLogin", uninstall: true)
+	page(name: "selectDevices", title: "Select TP-Link Kasa Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
 def setInitialStates() {
@@ -88,14 +88,14 @@ def cloudLogin() {
 		}
 	return dynamicPage(
 		name: "cloudLogin", 
-		title: "TP-Link Device Service Manager", 
+		title: "TP-Link Kasa Device Manager", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
 		section(errorMsg)
 		section(cloudLoginText) {
 			input( 
 				"userName", "string", 
-				title:"Your TP-Link Email Address", 
+				title:"Your TP-Link Kasa Email Address", 
 				required:true, 
 				displayDuringSetup: true
 			)
@@ -150,13 +150,13 @@ def selectDevices() {
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below.  TAP below to see the list of " +
-		"TP-Link devices available select the ones you want to connect to " +
+		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r\n\rPress DONE when you have selected the devices you " +
 		"wish to add, thenpress DONE again to install the devices.  Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices", 
-		title: "Select Your TP-Link Devices", 
+		title: "Select Your TP-Link Kasa Devices", 
 		install: true,
 		uninstall: true) {
 		section(errorMsg)

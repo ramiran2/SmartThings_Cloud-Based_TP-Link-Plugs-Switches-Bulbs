@@ -18,7 +18,7 @@ License.
 Discalimer:  This Service Manager and the associated Device 
 Handlers are in no way sanctioned or supported by TP-Link.  
 All development is based upon open-source data on the 
-TP-Link devices; primarily various users on GitHub.com.
+TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
 2018-08-11	Update to Version 2.1.1
@@ -49,8 +49,8 @@ metadata {
 	definition (name: "TP-Link Smart Energy Monitor Plug - ${installType}",
 				namespace: "davegut",
 				author: "Dave Gutheinz",
-				deviceType: "EnergyMonitor Plug",
-				energyMonitor: "EnergyMonitor",
+				deviceType: "energyMonitorMode Plug",
+				energyMonitorMode: "Energy Monitor",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
@@ -129,7 +129,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes"]
 
 	preferences {
-		if (installType == "Hub") {
+		if (installType == "Node.js Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -149,7 +149,7 @@ def updated() {
 def update() {
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
-	state.emon = metadata.definition.energyMonitor
+	state.emon = metadata.definition.energyMonitorMode
 	state.emeterText = "emeter"
 	state.getTimeText = "time"
 	unschedule()
@@ -178,7 +178,7 @@ def update() {
 }
 
 void uninstalled() {
-	if (state.installType == "Cloud") {
+	if (state.installType == "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -421,7 +421,7 @@ def currentDateResponse(cmdResponse) {
 
 //	----- SEND COMMAND TO CLOUD VIA SM -----
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType == "Hub") {
+	if (state.installType == "Node.js Applet") {
 		sendCmdtoHub(command, hubCommand, action)
 	} else {
 		sendCmdtoCloud(command, hubCommand, action)

@@ -17,7 +17,7 @@ License.
 Discalimer:  This Service Manager and the associated Device 
 Handlers are in no way sanctioned or supported by TP-Link.  
 All  development is based upon open-source data on the 
-TP-Link devices; primarily various users on GitHub.com.
+TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
 2018-08-11	Update to Version 2.1.1
@@ -45,7 +45,7 @@ metadata {
 				namespace: "davegut",
 				author: "Dave Gutheinz",
 				deviceType: "${deviceType}",
-				energyMonitor: "Standard",
+				energyMonitorMode: "Standard",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"
@@ -54,7 +54,7 @@ metadata {
 		capability "Sensor"
 		capability "Actuator"
 		attribute "devVer", "string"
-		if (deviceType == "TunableWhite Bulb" || "Color Bulb") {
+		if (deviceType == "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"
 			command "setModeNormal"
 			command "setModeCircadian"
@@ -93,7 +93,7 @@ metadata {
 			state "default", label:"Refresh", action:"refresh.refresh"
 		}
 		
-		if (deviceType == "TunableWhite Bulb") {
+		if (deviceType == "Tunable White Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
 			range:"(2500..6500)") {
 				state "colorTemperature", action:"color temperature.setColorTemperature"
@@ -115,7 +115,7 @@ metadata {
 		}
 
 		main("switch")
-		if (deviceType == "SoftWhite Bulb") {
+		if (deviceType == "Soft White Bulb") {
 			details("switch", "refresh")
 		} else {
 				details("switch", "colorTemp", "bulbMode", "refresh", 
@@ -130,7 +130,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes"]
 
 	preferences {
-		if (installType == "Hub") {
+		if (installType == "Node.js Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -178,7 +178,7 @@ def update() {
 }
 
 void uninstalled() {
-	if (state.installType == "Cloud") {
+	if (state.installType == "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -249,7 +249,7 @@ def commandResponse(cmdResponse){
 	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "switch", value: onOff)
  	sendEvent(name: "level", value: level)
-	if (state.deviceType == "TunableWhite Bulb" || "Color Bulb") {
+	if (state.deviceType == "Tunable White Bulb" || "Color Bulb") {
 		sendEvent(name: "bulbMode", value: mode)
 		sendEvent(name: "colorTemperature", value: color_temp)
 	}
@@ -262,7 +262,7 @@ def commandResponse(cmdResponse){
 
 //	===== Send the Command =====
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType == "Cloud") {
+	if (state.installType == "Kasa Account") {
 		sendCmdtoCloud(command, hubCommand, action)
 	} else {
 		sendCmdtoHub(command, hubCommand, action)
