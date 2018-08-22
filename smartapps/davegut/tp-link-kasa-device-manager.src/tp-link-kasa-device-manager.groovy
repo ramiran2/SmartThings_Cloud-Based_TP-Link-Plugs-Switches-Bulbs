@@ -88,9 +88,12 @@ def mainPage() {
 		}
 	return dynamicPage(
 		name: "mainPage", 
-		title: "", 
+		title: "TP-Link Kasa Device Manager", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png", true)
+		}
 		def hideBrowDesc = ()
         section("Browser Type Description:", hideable: hideBrowDesc, hidden: hideBrowDesc) {
 			paragraph title: "", errorMsg
