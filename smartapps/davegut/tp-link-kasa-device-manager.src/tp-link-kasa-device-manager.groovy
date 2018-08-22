@@ -37,9 +37,9 @@ definition(
 	author: "Dave Gutheinz",
 	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers (Cloud)",
 	category: "SmartThings Labs",
-	iconUrl: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
-	iconX2Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
-	iconX3Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
+	iconUrl: "${getAppImg("kasa_logo.png")}",
+	iconX2Url: "${getAppImg("kasa_logo.png")}",
+	iconX3Url: "${getAppImg("kasa_logo.png")}",
 	singleInstance: true
 	)
 	
@@ -88,7 +88,7 @@ def cloudLogin() {
 		}
 	return dynamicPage(
 		name: "cloudLogin",
-		image: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png", 
+		image: getAppImg("kasa_logo.png"), 
 		title: "TP-Link Kasa Device Manager", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
