@@ -92,10 +92,6 @@ def mainPage() {
 		nextPage: "selectDevices", 
 		uninstall: true) {
 		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png", true)
-		}
-
-		section("") {
 			input( 
 				"userName", "string", 
 				title:"Your TP-Link Kasa Email Address", 
