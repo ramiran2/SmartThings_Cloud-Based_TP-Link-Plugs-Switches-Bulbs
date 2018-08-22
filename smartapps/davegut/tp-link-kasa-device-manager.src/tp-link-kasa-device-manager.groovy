@@ -88,7 +88,7 @@ def cloudLogin() {
 		}
 	return dynamicPage(
 		name: "cloudLogin",
-		image: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png"
+		image: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png", 
 		title: "TP-Link Kasa Device Manager", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
