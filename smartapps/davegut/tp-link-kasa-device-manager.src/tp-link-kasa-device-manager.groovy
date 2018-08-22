@@ -27,6 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-08-22  Improved UI Elements and updated the app logo
 2018-08-11  Updated for support for update from a repo on smartthings website + Improved app name + Added app version
 2018-01-31	Updated for new release of Device Handlers
 */
@@ -43,8 +44,8 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.1.1" }
-	def appVerDate() { "08-11-2018" }
+	def appVersion() { "2.2.0" }
+	def appVerDate() { "08-22-2018" }
 	def minVersions() {
 		return [
 			"colorbulbemon":["val":211, "desc":"2.1.1"],
@@ -60,7 +61,7 @@ definition(
 	}
 
 preferences {
-	page(name: "mainPage", title: "TP-Link Kasa Login", nextPage:"", content:"mainPage", uninstall: true)
+	page(name: "mainPage", title: "TP-Link Smart Things Control Panel - Kasa Enabled", nextPage:"", content:"mainPage", uninstall: true)
 	page(name: "selectDevices", title: "Select TP-Link Kasa Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
@@ -74,7 +75,7 @@ def setInitialStates() {
 //	----- LOGIN PAGE -----
 def mainPage() {
 	setInitialStates()
-	def mainPageText = "If possible, open the IDE and select Live Logging.  THEN, " +
+	def mainPageText = "If possible, open the IDE and select Live Logging.  Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete.  Your current token:\n\r\n\r${state.TpLinkToken}" +
 		"\n\r\n\rAvailable actions:\n\r" +
@@ -88,18 +89,18 @@ def mainPage() {
 		}
 	return dynamicPage(
 		name: "mainPage", 
-		title: "", 
+		title: "TP-Link Smart Things Control Panel - Kasa Enabled", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		def hideBrowDesc = (true)
-        section("Browser Type Description:", hideable: hideBrowDesc, hidden: hideBrowDesc) {
+		def hideInfoDiagDesc = (true)
+        section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
 			paragraph title: "", errorMsg
 			paragraph title: "Information", mainPageText
 		}
-		section("") {
+		section("Login Page:") {
 			input( 
 				"userName", "string", 
 				title:"Your TP-Link Kasa Email Address", 
@@ -427,7 +428,7 @@ def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
-	str += "\n• Version: 2.1.1"
-	str += "\n• Updated: 08-21-2018"
+	str += "\n• Version: ${appVersion()}"
+	str += "\n• Updated: ${appVerDate()}"
 	return str
 }
