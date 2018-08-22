@@ -415,3 +415,6 @@ def removeChildDevice(alias, deviceNetworkId) {
 		sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
 	}
 }
+
+def gitBranch() { return "master" }
+def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
