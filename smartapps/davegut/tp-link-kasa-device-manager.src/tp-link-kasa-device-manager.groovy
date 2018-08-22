@@ -35,7 +35,7 @@ definition(
 	name: "TP-Link Kasa Device Manager",
 	namespace: "davegut",
 	author: "Dave Gutheinz",
-	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Kasa Accounts",
+	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers (Cloud)",
 	category: "SmartThings Labs",
 	iconUrl: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
 	iconX2Url: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png",
@@ -101,7 +101,7 @@ def cloudLogin() {
 			)
 			input(
 				"userPassword", "password", 
-				title:"TP-Link account password", 
+				title:"TP-Link Kasa Account Password", 
 				required: true, 
 				displayDuringSetup: true
 			)
@@ -131,9 +131,9 @@ def selectDevices() {
 	}
 	def errorMsg = ""
 	if (devices == [:]) {
-		errorMsg = "There were no devices from TP-Link.  This usually means "+
-			"that all devices are in 'Local Control Only'.  Correct then " +
-			"rerun.\n\r\n\r"
+		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
+			"that all devices are in 'Local Control Only'.  Correct them then " +
+			"rerun the application.\n\r\n\r"
 	}
 	def newDevices = [:]
 	devices.each {
