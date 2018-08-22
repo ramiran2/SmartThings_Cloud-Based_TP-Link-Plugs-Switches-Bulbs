@@ -87,7 +87,8 @@ def cloudLogin() {
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
 	return dynamicPage(
-		name: "cloudLogin", 
+		name: "cloudLogin",
+		image: "http://ecx.images-amazon.com/images/I/51S8gO0bvZL._SL210_QL95_.png"
 		title: "TP-Link Kasa Device Manager", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
