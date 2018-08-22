@@ -48,7 +48,7 @@ definition(
 	def appVerDate() { "08-22-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
-	def driverVersions() {
+	def driverVersionsMin() {
 		return [
 			"colorbulbenergymonitor":["val":211, "desc":"2.1.1"],
 			"colorbulb":["val":211, "desc":"2.1.1"],
@@ -84,7 +84,7 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
-	def driverVerionText = "Smart Things TP-Link Kasa Drivers: ${driverVersions()}\nNote: Drivers from the old the original repository will not work with this version of the application"
+	def driverVerionText = "Smart Things TP-Link Kasa Drivers: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
@@ -439,7 +439,7 @@ def appInfoDesc()	{
 	str += "TP-Link Kasa Device Manager"
 	str += "\n• Version: ${appVersion()}"
 	str += "\n• Updated: ${appVerDate()}"
-	str += "\n• Author: https://avatars1.githubusercontent.com/u/25202227?s=460&v=4 ${appAuthor()}"
-	str += "\n• Modifier: https://avatars1.githubusercontent.com/u/34761734?s=460&v=4 ${appModifier()}"
+	str += "\n• Author: ${appAuthor()}"
+	str += "\n• Modifier: ${appModifier()}"
 	return str
 }
