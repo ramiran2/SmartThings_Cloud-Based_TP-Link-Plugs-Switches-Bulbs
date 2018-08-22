@@ -94,11 +94,7 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png", true)
 		}
-		def hideBrowDesc = ()
-        section("Browser Type Description:", hideable: hideBrowDesc, hidden: hideBrowDesc) {
-			paragraph title: "", errorMsg
-			paragraph title: "Information", mainPageText
-		}
+
 		section("") {
 			input( 
 				"userName", "string", 
