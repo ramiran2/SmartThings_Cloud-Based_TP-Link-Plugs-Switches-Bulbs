@@ -60,7 +60,7 @@ definition(
 	}
 
 preferences {
-	page(name: "cloudLogin", title: "TP-Link Kasa Login", nextPage:"", content:"cloudLogin", uninstall: true)
+	page(name: "mainPage", title: "TP-Link Kasa Login", nextPage:"", content:"mainPage", uninstall: true)
 	page(name: "selectDevices", title: "Select TP-Link Kasa Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
@@ -72,9 +72,9 @@ def setInitialStates() {
 }
 
 //	----- LOGIN PAGE -----
-def cloudLogin() {
+def mainPage() {
 	setInitialStates()
-	def cloudLoginText = "If possible, open the IDE and select Live Logging.  THEN, " +
+	def mainPageText = "If possible, open the IDE and select Live Logging.  THEN, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete.  Your current token:\n\r\n\r${state.TpLinkToken}" +
 		"\n\r\n\rAvailable actions:\n\r" +
@@ -87,13 +87,19 @@ def cloudLogin() {
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
 	return dynamicPage(
-		name: "cloudLogin",
-		image: getAppImg("kasa_logo.png"), 
-		title: "TP-Link Kasa Device Manager", 
+		name: "mainPage", 
+		title: "", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
-		section(errorMsg)
-		section(cloudLoginText) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png", true)
+		}
+		def hideBrowDesc = ()
+        section("Browser Type Description:", hideable: hideBrowDesc, hidden: hideBrowDesc) {
+			paragraph title: "", errorMsg
+			paragraph title: "Information", mainPageText
+		}
+		section("") {
 			input( 
 				"userName", "string", 
 				title:"Your TP-Link Kasa Email Address", 
@@ -123,12 +129,12 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null || updateToken == "Update Token") {
-		return cloudLogin()
+		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
 	if (state.currentError != null) {
-		return cloudLogin()
+		return mainPage()
 	}
 	def errorMsg = ""
 	if (devices == [:]) {
@@ -418,3 +424,10 @@ def removeChildDevice(alias, deviceNetworkId) {
 
 def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
+def appInfoDesc()	{
+	def str = ""
+	str += "TP-Link Kasa Device Manager"
+	str += "\n• Version: 2.1.1"
+	str += "\n• Updated: 08-21-2018"
+	return str
+}
