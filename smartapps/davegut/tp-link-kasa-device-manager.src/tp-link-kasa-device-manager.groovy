@@ -27,7 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
-2018-08-22  Improved UI Elements and updated the app logo
+2018-08-22  Improved UI Elements and updated the app logo plus other changes
 2018-08-11  Updated for support for update from a repo on smartthings website + Improved app name + Added app version
 2018-01-31	Updated for new release of Device Handlers
 */
@@ -48,16 +48,16 @@ definition(
 	def appVerDate() { "08-22-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
-	def minVersions() {
+	def driverVersions() {
 		return [
-			"colorbulbemon":["val":211, "desc":"2.1.1"],
+			"colorbulbenergymonitor":["val":211, "desc":"2.1.1"],
 			"colorbulb":["val":211, "desc":"2.1.1"],
 			"dimmingswitch":["val":211, "desc":"2.1.1"],
 			"energymonitorplug":["val":211, "desc":"2.1.1"],
 			"plugswitch":["val":211, "desc":"2.1.1"],
-			"softwhitebulbemon":["val":211, "desc":"2.1.1"],
+			"softwhitebulbenergymonitor":["val":211, "desc":"2.1.1"],
 			"softwhitebulb":["val":211, "desc":"2.1.1"],
-			"tunablewhitebulbemon":["val":211, "desc":"2.1.1"],
+			"tunablewhitebulbenergymonitor":["val":211, "desc":"2.1.1"],
 			"tunablewhitebulb":["val":211, "desc":"2.1.1"]
 		]
 	}
@@ -84,7 +84,7 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
-	def driverVerionText = "${minVersions()}"
+	def driverVerionText = "Smart Things TP-Link Kasa Drivers: ${driverVersions()}\nNote: Drivers from the old the original repository will not work with this version of the application"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
@@ -439,6 +439,7 @@ def appInfoDesc()	{
 	str += "TP-Link Kasa Device Manager"
 	str += "\n• Version: ${appVersion()}"
 	str += "\n• Updated: ${appVerDate()}"
-	str += "\n• Author/Modifier: ${appAuthor()} + ${appModifier()}"
+	str += "\n• Author: https://avatars1.githubusercontent.com/u/25202227?s=460&v=4 ${appAuthor()}"
+	str += "\n• Modifier: https://avatars1.githubusercontent.com/u/34761734?s=460&v=4 ${appModifier()}"
 	return str
 }
