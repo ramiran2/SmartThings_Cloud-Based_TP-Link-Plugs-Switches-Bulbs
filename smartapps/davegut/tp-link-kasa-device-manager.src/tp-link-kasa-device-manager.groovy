@@ -84,7 +84,7 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
-	def driverVerionText = "${minVersions(colorbulbemon)} + ${minVersions(colorbulb)} + ${minVersions(dimmingswitch)} + ${minVersions(energymonitorplug)} + ${minVersions(plugswitch)} + ${minVersions(softwhitebulbemon)} + ${minVersions(softwhitebulb)} + ${minVersions(tunablewhitebulbemon)} + ${minVersions(tunablewhitebulb)}"
+	def driverVerionText = "${minVersions()}"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
