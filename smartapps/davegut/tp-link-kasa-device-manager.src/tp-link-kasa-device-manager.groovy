@@ -46,6 +46,8 @@ definition(
 	
 	def appVersion() { "2.2.0" }
 	def appVerDate() { "08-22-2018" }
+	def appAuthor() { "Dave Gutheinz" }
+	def appModifier() { "xKillerMaverick" }
 	def minVersions() {
 		return [
 			"colorbulbemon":["val":211, "desc":"2.1.1"],
@@ -61,7 +63,7 @@ definition(
 	}
 
 preferences {
-	page(name: "mainPage", title: "TP-Link Smart Things Control Panel - Kasa Enabled", nextPage:"", content:"mainPage", uninstall: true)
+	page(name: "mainPage", title: "TP-Link Control Panel - Kasa Enabled", nextPage:"", content:"mainPage", uninstall: true)
 	page(name: "selectDevices", title: "Select TP-Link Kasa Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
@@ -82,6 +84,7 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
+	def driverVerionText = "${minVersions(colorbulbemon)} + ${minVersions(colorbulb)} + ${minVersions(dimmingswitch)} + ${minVersions(energymonitorplug)} + ${minVersions(plugswitch)} + ${minVersions(softwhitebulbemon)} + ${minVersions(softwhitebulb)} + ${minVersions(tunablewhitebulbemon)} + ${minVersions(tunablewhitebulb)}"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
@@ -89,7 +92,7 @@ def mainPage() {
 		}
 	return dynamicPage(
 		name: "mainPage", 
-		title: "TP-Link Smart Things Control Panel - Kasa Enabled", 
+		title: "TP-Link Control Panel - Kasa Enabled", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
 		section("") {
@@ -97,8 +100,14 @@ def mainPage() {
 		}
 		def hideInfoDiagDesc = (true)
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
-			paragraph title: "", errorMsg
-			paragraph title: "Information", mainPageText
+			if (state.currentError != null){
+				paragraph title: "Communication Error:", errorMsg
+			}
+			paragraph title: "Information:", mainPageText
+			
+			if (state.currentError != null){
+			paragraph title: "Driver Version:", driverVerionText
+			}
 		}
 		section("Login Page:") {
 			input( 
@@ -430,5 +439,6 @@ def appInfoDesc()	{
 	str += "TP-Link Kasa Device Manager"
 	str += "\n• Version: ${appVersion()}"
 	str += "\n• Updated: ${appVerDate()}"
+	str += "\n• Author/Modifier: ${appAuthor()} + ${appModifier()}"
 	return str
 }
