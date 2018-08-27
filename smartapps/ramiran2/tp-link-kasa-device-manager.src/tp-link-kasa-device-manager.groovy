@@ -96,8 +96,8 @@ def mainPage() {
 		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		hideInfoDiagDescStat = (true)
-		returnToMainPage = "false"
+		def hideInfoDiagDescStat = (true)
+		def returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "mainPage", 
@@ -200,8 +200,8 @@ def selectDevices() {
 		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		hideInfoDiagDescStat = (true)
-		returnToMainPage = "false"
+		def hideInfoDiagDescStat = (true)
+		def returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "selectDevices", 
