@@ -163,8 +163,8 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null) {
-		return mainPage()
 		def returnToMainPage = (true)
+		return mainPage()
 	} else {
 		def returnToMainPage = (false)
 	}
@@ -189,8 +189,8 @@ def selectDevices() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDesc = (false)
-		} else {
-			def hideInfoDiagDesc = (true)
+	} else {
+		def hideInfoDiagDesc = (true)
 		}
 	settings.selectedDevices = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
