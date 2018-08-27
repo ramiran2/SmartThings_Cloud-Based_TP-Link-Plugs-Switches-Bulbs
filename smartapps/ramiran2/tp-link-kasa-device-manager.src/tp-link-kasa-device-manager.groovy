@@ -91,6 +91,13 @@ def mainPage() {
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
+	if (state.currentError != null){
+		def hideInfoDiagDescStat = (false),
+		def returnToMainPage = "true"
+	} else {
+		def hideInfoDiagDescStat = (true),
+		def returnToMainPage = "false"
+	}
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
@@ -187,7 +194,13 @@ def selectDevices() {
 		"SmartThings.\n\r\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
-	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
+	if (state.currentError != null){
+		def hideInfoDiagDescStat = (false),
+		def returnToMainPage = "true"
+	} else {
+		def hideInfoDiagDescStat = (true),
+		def returnToMainPage = "false"
+	}
 	return dynamicPage(
 		name: "selectDevices", 
 		title: "TP-Link Control Panel - Device Configuration", 
@@ -460,15 +473,6 @@ def removeChildDevice(alias, deviceNetworkId) {
 	} catch (Exception e) {
 		sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
 	}
-}
-
-// ----- CHECKING FOR ERRORS -----
-if (state.currentError != null){
-	def hideInfoDiagDescStat = (false),
-	def returnToMainPage = "true"
-} else {
-	def hideInfoDiagDescStat = (true),
-	def returnToMainPage = "false"
 }
 
 def gitBranch() { return "master" }
