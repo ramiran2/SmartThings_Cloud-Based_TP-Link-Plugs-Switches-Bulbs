@@ -214,7 +214,7 @@ def selectDevices() {
 		install: true,
 		uninstall: true) {
 		section("") {
-			paragraph appSmallInfoDescInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
 			if (state.currentError != null){
