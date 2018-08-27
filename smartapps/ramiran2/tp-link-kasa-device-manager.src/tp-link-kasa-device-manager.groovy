@@ -92,10 +92,10 @@ def mainPage() {
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
 	if (state.currentError != null){
-		def hideInfoDiagDescStat = (false),
+		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		def hideInfoDiagDescStat = (true),
+		def hideInfoDiagDescStat = (true)
 		def returnToMainPage = "false"
 	}
 	return dynamicPage(
@@ -195,10 +195,10 @@ def selectDevices() {
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
 	if (state.currentError != null){
-		def hideInfoDiagDescStat = (false),
+		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		def hideInfoDiagDescStat = (true),
+		def hideInfoDiagDescStat = (true)
 		def returnToMainPage = "false"
 	}
 	return dynamicPage(
