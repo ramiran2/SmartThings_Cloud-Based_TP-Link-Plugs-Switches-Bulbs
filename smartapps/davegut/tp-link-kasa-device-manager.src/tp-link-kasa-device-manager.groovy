@@ -103,7 +103,9 @@ def mainPage() {
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
+		if (state.currentError != null) {
 		nextPage: "selectDevices", 
+		}
 		uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
@@ -162,7 +164,7 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null) {
+	if (state.currentError != null || updateToken == "Update Token") {
 		def returnToMainPage = (true)
 		return mainPage()
 	} else {
@@ -170,6 +172,12 @@ def selectDevices() {
 	}
 	getDevices()
 	def devices = state.devices
+	if (state.currentError != null) {
+		def returnToMainPage = (true)
+		return mainPage()
+	} else {
+		def returnToMainPage = (false)
+	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
