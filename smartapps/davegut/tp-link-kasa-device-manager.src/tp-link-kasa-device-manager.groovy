@@ -162,19 +162,13 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null || updateToken == "Update Token") {
-		return mainPage()
-		def returnToMainPage = (true)
-	} else {
-		def returnToMainPage = (false)
-	}
-	getDevices()
 	if (state.currentError != null) {
 		return mainPage()
 		def returnToMainPage = (true)
 	} else {
 		def returnToMainPage = (false)
 	}
+	getDevices()
 	def devices = state.devices
 	def errorMsg = ""
 	if (devices == [:]) {
