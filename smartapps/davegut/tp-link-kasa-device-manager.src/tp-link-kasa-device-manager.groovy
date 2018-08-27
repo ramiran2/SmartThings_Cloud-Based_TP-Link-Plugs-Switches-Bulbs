@@ -139,7 +139,7 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Do Not Continue"]
+				options: ["Initial Install", "Add Devices", "Update Token"]
 				)
 		} else {
 			input(
