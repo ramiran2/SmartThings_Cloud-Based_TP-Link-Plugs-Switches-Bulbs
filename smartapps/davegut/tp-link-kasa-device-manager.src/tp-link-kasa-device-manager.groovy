@@ -179,8 +179,8 @@ def selectDevices() {
 			"that all devices are in 'Local Control Only'.  Correct them then " +
 			"rerun the application.\n\r\n\r"
 	}
-	if (state.currentError == null) {
 	def newDevices = [:]
+	if (state.currentError == null) {
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (!isChild) {
