@@ -96,8 +96,8 @@ def mainPage() {
 		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "false"
+		hideInfoDiagDescStat = (true)
+		returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "mainPage", 
@@ -188,6 +188,7 @@ def selectDevices() {
 			"Control Mode?\n\r\n\r"
 		}
 	settings.selectedDevices = null
+	def hideInfoDiagDescCont = (true)
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -199,8 +200,8 @@ def selectDevices() {
 		def hideInfoDiagDescStat = (false)
 		def returnToMainPage = "true"
 	} else {
-		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "false"
+		hideInfoDiagDescStat = (true)
+		returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "selectDevices", 
