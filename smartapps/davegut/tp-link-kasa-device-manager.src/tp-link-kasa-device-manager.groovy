@@ -159,7 +159,7 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null || userSelectedOption != null) {
+	if (state.currentError != null) {
 		return mainPage()
 	}
 	getDevices()
@@ -205,7 +205,7 @@ def selectDevices() {
 		install: true,
 		uninstall: true) {
 		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
 			if (state.currentError != null){
