@@ -105,12 +105,11 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		def hideInfoDiagDesc = (true)
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (returnToMainPage == true){
+			if (returnToMainPage == "true"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			paragraph title: "Information:", mainPageText
@@ -211,7 +210,7 @@ def selectDevices() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (returnToMainPage == true){
+			if (returnToMainPage == "true"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			paragraph title: "Information:", TPLinkDevicesMsg
@@ -489,4 +488,3 @@ def appSmallInfoDesc()	{
 	return strTwo
 }
 def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
-def returnToMainPage = (false)
