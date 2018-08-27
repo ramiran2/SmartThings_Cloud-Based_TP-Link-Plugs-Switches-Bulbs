@@ -99,13 +99,12 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		def hideInfoDiagDescCont = (true)
 		if (state.currentError != null){
-			def hideInfoDiagDescStat = (false)
-			def returnToMainPage = "true"
+			hideInfoDiagDescStat = (false)
+			returnToMainPage = "true"
 			} else {
-				def hideInfoDiagDescStat = (true)
-				def returnToMainPage = "false"
+				hideInfoDiagDescStat = (true)
+				returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
@@ -202,13 +201,12 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		def hideInfoDiagDescCont = (true)
 		if (state.currentError != null){
-			def hideInfoDiagDescStat = (false)
-			def returnToMainPage = "true"
+			hideInfoDiagDescStat = (false)
+			returnToMainPage = "true"
 			} else {
-				def hideInfoDiagDescStat = (true)
-				def returnToMainPage = "false"
+				hideInfoDiagDescStat = (true)
+				returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
@@ -476,6 +474,9 @@ def removeChildDevice(alias, deviceNetworkId) {
 
 def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
+def hideInfoDiagDescCont = (true)
+def hideInfoDiagDescStat = (true)
+def returnToMainPage = "false"
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
