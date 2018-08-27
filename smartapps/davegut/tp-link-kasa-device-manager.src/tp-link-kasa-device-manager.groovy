@@ -44,8 +44,8 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.0" }
-	def appVerDate() { "08-22-2018" }
+	def appVersion() { "2.2.1" }
+	def appVerDate() { "08-27-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
 	def driverVersionsMin() {
@@ -64,7 +64,7 @@ definition(
 
 preferences {
 	page(name: "mainPage", title: "TP-Link Control Panel - Kasa Enabled", nextPage:"", content:"mainPage", uninstall: true)
-	page(name: "selectDevices", title: "Select TP-Link Kasa Devices", nextPage:"", content:"selectDevices", uninstall: true, install: true)
+	page(name: "selectDevices", title: "TP-Link Control Panel - Device Configuration", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
 def setInitialStates() {
@@ -84,11 +84,16 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
-	def driverVerionText = "Smart Things TP-Link Kasa Drivers: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
+	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
+		}
+	if (state.currentError != null){
+		def hideInfoDiagDesc = (false)
+		} else {
+			def hideInfoDiagDesc = (true)
 		}
 	return dynamicPage(
 		name: "mainPage", 
@@ -122,8 +127,10 @@ def mainPage() {
 				required: true, 
 				displayDuringSetup: true
 			)
+		}
+		section("Configuration Page:") {
 			input(
-				"updateToken", "enum",
+				"userSelectedOption", "enum",
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
@@ -135,17 +142,11 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (updateToken != "Add Devices") {
+	if (userSelectedOption != "Add Devices") {
 		getToken()
-	}
-	if (state.currentError != null || updateToken == "Update Token") {
-		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
-	if (state.currentError != null) {
-		return mainPage()
-	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
@@ -163,21 +164,34 @@ def selectDevices() {
 		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
 			"Control Mode?\n\r\n\r"
 		}
+	if (state.currentError != null){
+		def hideInfoDiagDesc = (false)
+		} else {
+			def hideInfoDiagDesc = (true)
+		}
 	settings.selectedDevices = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
-		"WiFi control only' will appear below.  TAP below to see the list of " +
+		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
-		"SmartThings.\n\r\n\rPress DONE when you have selected the devices you " +
-		"wish to add, thenpress DONE again to install the devices.  Press	<	" +
+		"SmartThings.\n\r\n\rPress Done when you have selected the devices you " +
+		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices", 
-		title: "Select Your TP-Link Kasa Devices", 
+		title: "TP-Link Control Panel - Device Configuration", 
 		install: true,
 		uninstall: true) {
-		section(errorMsg)
-		section(TPLinkDevicesMsg) {
+		section("") {
+			paragraph appSmallInfoDescInfoDesc(), image: getAppImg("kasa_logo.png")
+		}
+        section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
+			if (state.currentError != null){
+				paragraph title: "Communication Error:", errorMsg
+			}
+			paragraph title: "Information:", TPLinkDevicesMsg
+		}
+		section("Device Configuration Page:") {
 			input "selectedDevices", "enum",
 			required:false, 
 			multiple:true, 
@@ -441,5 +455,11 @@ def appInfoDesc()	{
 	str += "\n• Updated: ${appVerDate()}"
 	str += "\n• Author: ${appAuthor()}"
 	str += "\n• Modifier: ${appModifier()}"
+	return str
+}
+def appSmallInfoDesc()	{
+	def str = ""
+	str += "TP-Link Kasa Device Manager"
+	str += "\n• Version: ${appVersion()}"
 	return str
 }
