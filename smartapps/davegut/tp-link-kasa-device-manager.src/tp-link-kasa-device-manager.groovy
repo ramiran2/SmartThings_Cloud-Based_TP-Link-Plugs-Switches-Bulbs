@@ -108,8 +108,10 @@ def mainPage() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
+			if (returnToMainPage == true){
+				paragraph title: "Loading Error:", errorRetuInfo
+			}
 			paragraph title: "Information:", mainPageText
-			
 			if (state.currentError != null){
 			paragraph title: "Driver Version:", driverVerionText
 			}
@@ -129,13 +131,23 @@ def mainPage() {
 			)
 		}
 		section("Configuration Page:") {
+		if (state.currentError != null) {
+			input(
+				"userSelectedOption", "enum",
+				title: "What do you want to do?",
+				required: true, 
+				multiple: false,
+				options: ["Initial Install"]
+				)
+		} else {
 			input(
 				"userSelectedOption", "enum",
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
 				options: ["Initial Install", "Add Devices", "Update Token"]
-			)
+				)
+			}
 		}
 	}
 }
@@ -145,7 +157,17 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
+	if (state.currentError != null || updateToken == "Update Token") {
+		returnToMainPage = (true)
+	} else {
+		returnToMainPage = (false)
+	}
 	getDevices()
+	if (state.currentError != null) {
+		returnToMainPage = (true)
+	} else {
+		returnToMainPage = (false)
+	}
 	def devices = state.devices
 	def errorMsg = ""
 	if (devices == [:]) {
@@ -153,6 +175,7 @@ def selectDevices() {
 			"that all devices are in 'Local Control Only'.  Correct them then " +
 			"rerun the application.\n\r\n\r"
 	}
+	if (state.currentError != null) {
 	def newDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
@@ -160,6 +183,7 @@ def selectDevices() {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
+}
 	if (newDevices == [:]) {
 		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
 			"Control Mode?\n\r\n\r"
@@ -174,7 +198,7 @@ def selectDevices() {
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
-		"SmartThings.\n\r\n\rPress Done when you have selected the devices you " +
+		"SmartThings.\n\r\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
@@ -188,6 +212,9 @@ def selectDevices() {
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDesc, hidden: hideInfoDiagDesc) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
+			}
+			if (returnToMainPage == true){
+				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			paragraph title: "Information:", TPLinkDevicesMsg
 		}
@@ -451,15 +478,17 @@ def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
-	str += "\n• Version: ${appVersion()}"
-	str += "\n• Updated: ${appVerDate()}"
-	str += "\n• Author: ${appAuthor()}"
-	str += "\n• Modifier: ${appModifier()}"
+	str += "\n" + "• Version: ${appVersion()}"
+	str += "\n" + "• Updated: ${appVerDate()}"
+	str += "\n" + "• Author: ${appAuthor()}"
+	str += "\n" + "• Modifier: ${appModifier()}"
 	return str
 }
 def appSmallInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
-	str += "\n• Version: ${appVersion()}"
+	str += "\n" + "• Version: ${appVersion()}"
 	return str
 }
+def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
+def returnToMainPage = (false)
