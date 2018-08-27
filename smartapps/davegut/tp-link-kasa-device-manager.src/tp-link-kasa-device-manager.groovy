@@ -483,10 +483,10 @@ def appInfoDesc()	{
 	return str
 }
 def appSmallInfoDesc()	{
-	def str = ""
-	str += "TP-Link Kasa Device Manager"
-	str += "\n" + "• Version: ${appVersion()}"
-	return str
+	def strTwo = ""
+	strTwo += "TP-Link Kasa Device Manager"
+	strTwo += "\n" + "• Version: ${appVersion()}"
+	return strTwo
 }
 def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 def returnToMainPage = (false)
