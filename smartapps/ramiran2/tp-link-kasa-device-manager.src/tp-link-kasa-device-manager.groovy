@@ -94,10 +94,8 @@ def mainPage() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDescStat = (false)
-		def returnToMainPage = "true"
 	} else {
 		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "mainPage", 
@@ -198,10 +196,8 @@ def selectDevices() {
 		"to return to the previous page."
 	if (state.currentError != null){
 		def hideInfoDiagDescStat = (false)
-		def returnToMainPage = "true"
 	} else {
 		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "false"
 	}
 	return dynamicPage(
 		name: "selectDevices", 
