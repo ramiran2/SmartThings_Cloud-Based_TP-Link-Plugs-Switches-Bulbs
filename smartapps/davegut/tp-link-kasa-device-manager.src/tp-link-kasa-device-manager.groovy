@@ -34,7 +34,7 @@ primarily various users on GitHub.com.
 
 definition(
 	name: "TP-Link Kasa Device Manager",
-	namespace: "davegut",
+	namespace: "ramiran2",
 	author: "Dave Gutheinz",
 	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers (Cloud)",
 	category: "SmartThings Labs",
@@ -91,13 +91,6 @@ def mainPage() {
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
-	if (state.currentError != null){
-		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "true"
-		} else {
-			def hideInfoDiagDescStat = (false)
-			def returnToMainPage = "false"
-		}
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
@@ -107,6 +100,13 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		def hideInfoDiagDescCont = (true)
+		if (state.currentError != null){
+			def hideInfoDiagDescStat = (true)
+			def returnToMainPage = "true"
+			} else {
+				def hideInfoDiagDescStat = (false)
+				def returnToMainPage = "false"
+			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
@@ -185,13 +185,6 @@ def selectDevices() {
 		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
 			"Control Mode?\n\r\n\r"
 		}
-	if (state.currentError != null){
-		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = "true"
-	} else {
-		def hideInfoDiagDescStat = (false)
-		def returnToMainPage = "false"
-		}
 	settings.selectedDevices = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
@@ -210,6 +203,13 @@ def selectDevices() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		def hideInfoDiagDescCont = (true)
+		if (state.currentError != null){
+			def hideInfoDiagDescStat = (true)
+			def returnToMainPage = "true"
+			} else {
+				def hideInfoDiagDescStat = (false)
+				def returnToMainPage = "false"
+			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
