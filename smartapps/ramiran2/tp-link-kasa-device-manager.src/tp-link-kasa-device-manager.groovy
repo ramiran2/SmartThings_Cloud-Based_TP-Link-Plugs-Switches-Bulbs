@@ -99,13 +99,6 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		if (state.currentError != null){
-			def hideInfoDiagDescStat = (false),
-			returnToMainPage = "true"
-			} else {
-				def hideInfoDiagDescStat = (true),
-				returnToMainPage = "false"
-			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
@@ -113,9 +106,11 @@ def mainPage() {
 			if (returnToMainPage == "true"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
-			paragraph title: "Information:", mainPageText
+			if (state.currentError == null){
+				paragraph title: "Information:", mainPageText
+			}
 			if (state.currentError != null){
-			paragraph title: "Driver Version:", driverVerionText
+				paragraph title: "Driver Version:", driverVerionText
 			}
 		}
 		section("Login Page:") {
@@ -201,13 +196,6 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		if (state.currentError != null){
-			def hideInfoDiagDescStat = (false),
-			returnToMainPage = "true"
-			} else {
-				def hideInfoDiagDescStat = (true),
-				returnToMainPage = "false"
-			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
@@ -215,7 +203,9 @@ def selectDevices() {
 			if (returnToMainPage == "true"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
-			paragraph title: "Information:", TPLinkDevicesMsg
+			if (state.currentError == null){
+				paragraph title: "Information:", TPLinkDevicesMsg
+			}
 		}
 		section("Device Configuration Page:") {
 			input "selectedDevices", "enum",
@@ -472,11 +462,18 @@ def removeChildDevice(alias, deviceNetworkId) {
 	}
 }
 
+// ----- CHECKING FOR ERRORS -----
+if (state.currentError != null){
+	def hideInfoDiagDescStat = (false),
+	def returnToMainPage = "true"
+} else {
+	def hideInfoDiagDescStat = (true),
+	def returnToMainPage = "false"
+}
+
 def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
 def hideInfoDiagDescCont = (true)
-def hideInfoDiagDescStat = (true)
-def returnToMainPage = "false"
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
