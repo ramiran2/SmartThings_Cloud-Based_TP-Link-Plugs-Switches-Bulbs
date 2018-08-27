@@ -169,7 +169,7 @@ def selectDevices() {
 		returnToMainPage = (false)
 	}
 	getDevices()
-	if (state.currentError != null) 
+	if (state.currentError != null) {
 		return mainPage()
 		returnToMainPage = (true)
 	} else {
