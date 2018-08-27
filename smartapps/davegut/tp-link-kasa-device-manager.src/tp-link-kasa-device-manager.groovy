@@ -139,7 +139,7 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Initial Install", "Add Devices", "Update Token"]
+				options: ["Do Not Continue"]
 				)
 		} else {
 			input(
@@ -159,7 +159,10 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null || userSelectedOption == "Update Token") {
+		if (userSelectedOption == "Do Not Continue") {
+		return mainPage()
+	}
+	if (state.currentError != null) {
 		return mainPage()
 	}
 	getDevices()
