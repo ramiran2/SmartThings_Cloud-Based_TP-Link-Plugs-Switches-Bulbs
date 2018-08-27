@@ -162,7 +162,7 @@ def selectDevices() {
 	} else {
 		returnToMainPage = (false)
 	}
-	if (state.currentError != null) {
+	if (state.currentError == null) {
 	getDevices()
 	}
 	if (state.currentError != null) {
@@ -170,7 +170,7 @@ def selectDevices() {
 	} else {
 		returnToMainPage = (false)
 	}
-	if (state.currentError != null) {
+	if (state.currentError == null) {
 	def devices = state.devices
 	}
 	def errorMsg = ""
@@ -179,7 +179,7 @@ def selectDevices() {
 			"that all devices are in 'Local Control Only'.  Correct them then " +
 			"rerun the application.\n\r\n\r"
 	}
-	if (state.currentError != null) {
+	if (state.currentError == null) {
 	def newDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
