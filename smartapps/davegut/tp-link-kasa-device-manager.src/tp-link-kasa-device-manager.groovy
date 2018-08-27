@@ -142,7 +142,7 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: []
+				options: ["Do Not Continue"]
 				)
 		} else {
 			input(
@@ -163,12 +163,14 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null || updateToken == "Update Token") {
+		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
 	}
 	getDevices()
-	if (state.currentError != null) {
+	if (state.currentError != null) 
+		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
