@@ -96,9 +96,9 @@ def mainPage() {
 			def hideInfoDiagDesc = (true)
 		}
 	if (state.currentError != null) {
-		returnToMainPage = (true)
+		def returnToMainPage = (true)
 		} else {
-			returnToMainPage = (false)
+			def returnToMainPage = (false)
 		}
 	return dynamicPage(
 		name: "mainPage", 
@@ -164,16 +164,16 @@ def selectDevices() {
 	}
 	if (state.currentError != null || updateToken == "Update Token") {
 		return mainPage()
-		returnToMainPage = (true)
+		def returnToMainPage = (true)
 	} else {
-		returnToMainPage = (false)
+		def returnToMainPage = (false)
 	}
 	getDevices()
 	if (state.currentError != null) {
 		return mainPage()
-		returnToMainPage = (true)
+		def returnToMainPage = (true)
 	} else {
-		returnToMainPage = (false)
+		def returnToMainPage = (false)
 	}
 	def devices = state.devices
 	def errorMsg = ""
