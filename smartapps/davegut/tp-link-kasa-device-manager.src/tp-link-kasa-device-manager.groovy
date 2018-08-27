@@ -158,17 +158,23 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null || updateToken == "Update Token") {
+		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
 	}
-	getDevices()
 	if (state.currentError != null) {
+	getDevices()
+	}
+	if (state.currentError != null) {
+		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
 	}
+	if (state.currentError != null) {
 	def devices = state.devices
+	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
