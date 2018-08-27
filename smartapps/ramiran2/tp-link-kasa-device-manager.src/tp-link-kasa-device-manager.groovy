@@ -100,10 +100,10 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		if (state.currentError != null){
-			hideInfoDiagDescStat = (false)
+			def hideInfoDiagDescStat = (false)
 			returnToMainPage = "true"
 			} else {
-				hideInfoDiagDescStat = (true)
+				def hideInfoDiagDescStat = (true)
 				returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
@@ -202,10 +202,10 @@ def selectDevices() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		if (state.currentError != null){
-			hideInfoDiagDescStat = (false)
+			def hideInfoDiagDescStat = (false)
 			returnToMainPage = "true"
 			} else {
-				hideInfoDiagDescStat = (true)
+				def hideInfoDiagDescStat = (true)
 				returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
