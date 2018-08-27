@@ -101,10 +101,10 @@ def mainPage() {
 		}
 		def hideInfoDiagDescCont = (true)
 		if (state.currentError != null){
-			def hideInfoDiagDescStat = (true)
+			def hideInfoDiagDescStat = (false)
 			def returnToMainPage = "true"
 			} else {
-				def hideInfoDiagDescStat = (false)
+				def hideInfoDiagDescStat = (true)
 				def returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
@@ -204,10 +204,10 @@ def selectDevices() {
 		}
 		def hideInfoDiagDescCont = (true)
 		if (state.currentError != null){
-			def hideInfoDiagDescStat = (true)
+			def hideInfoDiagDescStat = (false)
 			def returnToMainPage = "true"
 			} else {
-				def hideInfoDiagDescStat = (false)
+				def hideInfoDiagDescStat = (true)
 				def returnToMainPage = "false"
 			}
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
