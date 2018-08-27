@@ -85,6 +85,7 @@ def mainPage() {
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
+	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
@@ -92,10 +93,10 @@ def mainPage() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = (true)
+		def returnToMainPage = "true"
 		} else {
 			def hideInfoDiagDescStat = (false)
-			def returnToMainPage = (false)
+			def returnToMainPage = "false"
 		}
 	return dynamicPage(
 		name: "mainPage", 
@@ -186,10 +187,10 @@ def selectDevices() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDescStat = (true)
-		def returnToMainPage = (true)
+		def returnToMainPage = "true"
 	} else {
 		def hideInfoDiagDescStat = (false)
-		def returnToMainPage = (false)
+		def returnToMainPage = "false"
 		}
 	settings.selectedDevices = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
@@ -199,6 +200,7 @@ def selectDevices() {
 		"SmartThings.\n\r\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
+	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 	return dynamicPage(
 		name: "selectDevices", 
 		title: "TP-Link Control Panel - Device Configuration", 
@@ -489,4 +491,3 @@ def appSmallInfoDesc()	{
 	strTwo += "\n" + "• Version: ${appVersion()}"
 	return strTwo
 }
-def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
