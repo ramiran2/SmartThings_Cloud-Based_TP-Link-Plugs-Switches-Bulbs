@@ -92,12 +92,9 @@ def mainPage() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDesc = (false)
-		} else {
-			def hideInfoDiagDesc = (true)
-		}
-	if (state.currentError != null) {
 		def returnToMainPage = (true)
 		} else {
+			def hideInfoDiagDesc = (true)
 			def returnToMainPage = (false)
 		}
 	return dynamicPage(
@@ -162,19 +159,13 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null || updateToken == "Update Token") {
-		def returnToMainPage = (true)
+	if (state.currentError != null || userSelectedOption == "Update Token") {
 		return mainPage()
-	} else {
-		def returnToMainPage = (false)
 	}
 	getDevices()
 	def devices = state.devices
 	if (state.currentError != null) {
-		def returnToMainPage = (true)
 		return mainPage()
-	} else {
-		def returnToMainPage = (false)
 	}
 	def errorMsg = ""
 	if (devices == [:]) {
@@ -195,8 +186,10 @@ def selectDevices() {
 		}
 	if (state.currentError != null){
 		def hideInfoDiagDesc = (false)
+		def returnToMainPage = (true)
 	} else {
 		def hideInfoDiagDesc = (true)
+		def returnToMainPage = (false)
 		}
 	settings.selectedDevices = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
