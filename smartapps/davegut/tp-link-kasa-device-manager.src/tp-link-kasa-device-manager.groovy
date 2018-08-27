@@ -95,6 +95,11 @@ def mainPage() {
 		} else {
 			def hideInfoDiagDesc = (true)
 		}
+	if (state.currentError != null) {
+		returnToMainPage = (true)
+		} else {
+			returnToMainPage = (false)
+		}
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
@@ -137,7 +142,7 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Initial Install"]
+				options: []
 				)
 		} else {
 			input(
@@ -162,17 +167,13 @@ def selectDevices() {
 	} else {
 		returnToMainPage = (false)
 	}
-	if (state.currentError == null) {
 	getDevices()
-	}
 	if (state.currentError != null) {
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
 	}
-	if (state.currentError == null) {
 	def devices = state.devices
-	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
@@ -180,14 +181,12 @@ def selectDevices() {
 			"rerun the application.\n\r\n\r"
 	}
 	def newDevices = [:]
-	if (state.currentError == null) {
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-}
 	if (newDevices == [:]) {
 		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
 			"Control Mode?\n\r\n\r"
