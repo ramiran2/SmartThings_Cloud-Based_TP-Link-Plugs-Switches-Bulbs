@@ -158,7 +158,6 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null || updateToken == "Update Token") {
-		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
@@ -167,7 +166,6 @@ def selectDevices() {
 	getDevices()
 	}
 	if (state.currentError != null) {
-		return mainPage()
 		returnToMainPage = (true)
 	} else {
 		returnToMainPage = (false)
