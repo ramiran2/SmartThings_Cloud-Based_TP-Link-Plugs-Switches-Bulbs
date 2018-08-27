@@ -91,10 +91,10 @@ def mainPage() {
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
 	if (state.currentError != null){
-		def hideInfoDiagDesc = (false)
+		def hideInfoDiagDesc = (true)
 		def returnToMainPage = (true)
 		} else {
-			def hideInfoDiagDesc = (true)
+			def hideInfoDiagDesc = (false)
 			def returnToMainPage = (false)
 		}
 	return dynamicPage(
@@ -184,10 +184,10 @@ def selectDevices() {
 			"Control Mode?\n\r\n\r"
 		}
 	if (state.currentError != null){
-		def hideInfoDiagDesc = (false)
+		def hideInfoDiagDesc = (true)
 		def returnToMainPage = (true)
 	} else {
-		def hideInfoDiagDesc = (true)
+		def hideInfoDiagDesc = (false)
 		def returnToMainPage = (false)
 		}
 	settings.selectedDevices = null
