@@ -86,6 +86,7 @@ def mainPage() {
 		"	Update Token:  Updates the token.\n\r"
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
 	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
+	def hideInfoDiagDescCont = (true)
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
@@ -477,7 +478,6 @@ def removeChildDevice(alias, deviceNetworkId) {
 
 def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
-def hideInfoDiagDescCont = (true)
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
