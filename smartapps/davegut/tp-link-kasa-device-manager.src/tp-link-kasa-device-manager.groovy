@@ -103,9 +103,7 @@ def mainPage() {
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
-		if (state.currentError != null) {
 		nextPage: "selectDevices", 
-		}
 		uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
