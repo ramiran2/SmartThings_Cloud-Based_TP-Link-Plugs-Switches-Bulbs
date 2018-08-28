@@ -145,7 +145,9 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Initial Install", "Add Devices", "Update Token"]
+				submitOnChange: true,
+				options: ["Initial Install", "Add Devices", "Update Token"],
+				image: getAppImg("settings.png")
 				)
 			}
 		}
@@ -154,11 +156,11 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
-		return mainPage()
-	}
 	if (userSelectedOption != "Add Devices") {
 		getToken()
+	}
+	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
+		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
