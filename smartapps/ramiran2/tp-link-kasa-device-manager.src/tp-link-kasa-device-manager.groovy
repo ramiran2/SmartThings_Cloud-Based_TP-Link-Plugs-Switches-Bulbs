@@ -27,6 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-08-27  Improved UI Elements with other changes
 2018-08-22  Improved UI Elements and updated the app logo plus other changes
 2018-08-11  Updated for support for update from a repo on smartthings website + Improved app name + Added app version
 2018-01-31	Updated for new release of Device Handlers
@@ -44,7 +45,7 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.1" }
+	def appVersion() { "2.2.3" }
 	def appVerDate() { "08-27-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
@@ -63,8 +64,8 @@ definition(
 	}
 
 preferences {
-	page(name: "mainPage", title: "TP-Link Control Panel - Kasa Enabled", nextPage:"", content:"mainPage", uninstall: true)
-	page(name: "selectDevices", title: "TP-Link Control Panel - Device Configuration", nextPage:"", content:"selectDevices", uninstall: true, install: true)
+	page(name: "mainPage", title: "TP-Link Kasa - Settings Page", nextPage:"", content:"mainPage", uninstall: true)
+	page(name: "selectDevices", title: "TP-Link Kasa - Device Settings Page", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
 def setInitialStates() {
@@ -79,23 +80,23 @@ def mainPage() {
 	setInitialStates()
 	def mainPageText = "If possible, open the IDE and select Live Logging.  Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete.  Your current token:\n\r\n\r${state.TpLinkToken}" +
-		"\n\r\n\rAvailable actions:\n\r" +
+		"action you want to complete.  Your current token:\n\r" + "${state.TpLinkToken}" +
+		"\n\rAvailable actions:\n\r" +
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token:  Updates the token.\n\r"
-	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
+	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application"
 	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
 	if (state.currentError != null){
-		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
-			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
+		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
+			"\n\rPlease resolve the error and try again."
 		}
 	return dynamicPage(
 		name: "mainPage", 
-		title: "TP-Link Control Panel - Kasa Enabled", 
+		title: "TP-Link Kasa - Settings Page", 
 		nextPage: "selectDevices", 
 		uninstall: true) {
 		section("") {
@@ -165,7 +166,7 @@ def selectDevices() {
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
 			"that all devices are in 'Local Control Only'.  Correct them then " +
-			"rerun the application.\n\r\n\r"
+			"rerun the application.\n\r"
 	}
 	def newDevices = [:]
 	devices.each {
@@ -176,7 +177,7 @@ def selectDevices() {
 	}
 	if (newDevices == [:]) {
 		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
-			"Control Mode?\n\r\n\r"
+			"Control Mode?\n\r"
 		}
 	settings.selectedDevices = null
 	def hideInfoDiagDescCont = (true)
@@ -185,12 +186,12 @@ def selectDevices() {
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
-		"SmartThings.\n\r\n\r" + "Press Done when you have selected the devices you " +
+		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices", 
-		title: "TP-Link Control Panel - Device Configuration", 
+		title: "TP-Link Kasa - Device Settings Page", 
 		install: true,
 		uninstall: true) {
 		section("") {
