@@ -102,7 +102,7 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-        section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+        section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
@@ -164,28 +164,30 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	getDevices()
-	def devices = state.devices
-	def errorMsg = ""
-	if (devices == [:]) {
-		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+	if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
+		getDevices()
+		def devices = state.devices
+		def errorMsg = ""
+		} else if (devices == [:]) {
+			errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 			"that all devices are in 'Local Control Only'. Correct them then " +
 			"rerun the application."
-	}
-	def newDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
-	}
-	if (newDevices == [:]) {
-		errorMsg = "No new devices to add. Are you sure they are in Remote " +
-			"Control Mode?"
+		def newDevices = [:]
+		devices.each {
+			def isChild = getChildDevice(it.value.deviceMac)
+			if (!isChild) {
+				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
 		}
-	settings.selectedDevices = null
+		} else if (newDevices == [:]) {
+			errorMsg = "No new devices to add. Are you sure they are in Remote " +
+				"Control Mode?"
+		}
+		settings.selectedDevices = null
+	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null || newDevices == [:])
+	def hideInfoDiagDescStat = (state.currentError == null || newDevices != [:]|| devices != [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -201,14 +203,14 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-        section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+        section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
 			if (newDevices == [:]){
 				paragraph title: "Device Error:", errorMsg
 			}
-			if (state.currentError == null && newDevices != [:]){
+			if (state.currentError == null && newDevices != [:] || state.currentError == null && devices != [:] ){
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
