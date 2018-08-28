@@ -105,7 +105,7 @@ def mainPage() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (returnToMainPage == "true"){
+			if (userSelectedOption == "Communication Error"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			if (state.currentError == null){
