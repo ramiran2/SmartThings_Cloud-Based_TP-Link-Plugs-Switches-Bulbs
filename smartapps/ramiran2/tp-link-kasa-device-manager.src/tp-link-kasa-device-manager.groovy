@@ -164,19 +164,17 @@ def selectDevices() {
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
 		getToken()
 	}
-	if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
-		getDevices()
-		def devices = state.devices
-		def errorMsg = ""
-		def newDevices = [:]
-		devices.each {
-			def isChild = getChildDevice(it.value.deviceMac)
-			if (!isChild) {
-				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
+	getDevices()
+	def devices = state.devices
+	def errorMsg = ""
+	def newDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
-		settings.selectedDevices = null
 	}
+	settings.selectedDevices = null
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
