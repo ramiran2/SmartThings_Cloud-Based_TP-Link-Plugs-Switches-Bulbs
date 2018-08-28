@@ -187,6 +187,7 @@ def selectDevices() {
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def hideInfoDiagDescStatTwo = (devices == [:])
+	def hideInfoDiagDescStatThree = (newDevices == [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -202,24 +203,23 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		if (devices != [:]) {
+		if (devices != [:] || newDevices != [:]) {
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (devices == [:]){
+			if (devices == [:] || newDevices == [:]){
 				if (userSelectedOption != "Update Token") {
 					paragraph title: "Device Error:", errorMsg
 				}
 			}
 			if (state.currentError == null){
-				if (devices != [:]) {
-					paragraph title: "Information:", TPLinkDevicesMsg
-				}
-			}
-			if (state.currentError == null){
 				if (userSelectedOption == "Update Token") {
-					paragraph title: "Information:", TPLinkDevicesMsg
+				paragraph title: "Information:", TPLinkDevicesMsg
+				} else {
+					if (devices != [:] || newDevices != [:]) {
+						paragraph title: "Information:", TPLinkDevicesMsg
+					}
 				}
 			}}
 		} else {
@@ -227,19 +227,18 @@ def selectDevices() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (devices == [:]){
+			if (devices == [:] || newDevices == [:]){
 				if (userSelectedOption != "Update Token") {
 					paragraph title: "Device Error:", errorMsg
 				}
 			}
 			if (state.currentError == null){
-				if (devices != [:]) {
-					paragraph title: "Information:", TPLinkDevicesMsg
-				}
-			}
-			if (state.currentError == null){
 				if (userSelectedOption == "Update Token") {
-					paragraph title: "Information:", TPLinkDevicesMsg
+				paragraph title: "Information:", TPLinkDevicesMsg
+				} else {
+					if (devices != [:] || newDevices != [:]) {
+						paragraph title: "Information:", TPLinkDevicesMsg
+					}
 				}
 			}}
 		}
