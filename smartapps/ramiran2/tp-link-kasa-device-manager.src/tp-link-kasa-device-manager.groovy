@@ -85,8 +85,8 @@ def mainPage() {
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
 		"	Update Token: Updates the token."
-	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application"
-	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
+	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
@@ -167,6 +167,7 @@ def selectDevices() {
 	getDevices()
 	def devices = state.devices
 	def errorMsg = ""
+	def hideInfoDiagDescStat = (state.currentError == null)
 	def newDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
@@ -176,16 +177,17 @@ def selectDevices() {
 	}
 	settings.selectedDevices = null
 	if (devices == [:]) {
+		def hideInfoDiagDescStat = (devices != [:])
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 		}
 	if (newDevices == [:]) {
+		def hideInfoDiagDescStat = (newDevices != [:])
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 		}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null || newDevices != [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -205,10 +207,16 @@ def selectDevices() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (newDevices == [:] && userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install"){
+			if (newDevices == [:] || devices == [:]){
+			} else if (userSelectedOption != "Update Token") {
 				paragraph title: "Device Error:", errorMsg
 			}
-			if (state.currentError == null && newDevices != [:]){
+			if (state.currentError == null){
+			} else if (devices != [:] || newDevices != [:]) {
+				paragraph title: "Information:", TPLinkDevicesMsg
+			}
+			if (state.currentError == null){
+			} else if (userSelectedOption == "Update Token") {
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
