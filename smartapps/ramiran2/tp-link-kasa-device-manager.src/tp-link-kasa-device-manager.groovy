@@ -87,16 +87,12 @@ def mainPage() {
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\nNote: Drivers from the old the original repository will not work with this version of the application"
 	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r\n\r${state.currentError}" +
 			"\n\r\n\rPlease resolve the error and try again.\n\r\n\r"
 		}
-	if (state.currentError != null){
-		def hideInfoDiagDescStat = (false)
-	} else {
-		def hideInfoDiagDescStat = (true)
-	}
 	return dynamicPage(
 		name: "mainPage", 
 		title: "TP-Link Control Panel - Kasa Enabled", 
@@ -187,6 +183,7 @@ def selectDevices() {
 		}
 	settings.selectedDevices = null
 	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -194,11 +191,6 @@ def selectDevices() {
 		"SmartThings.\n\r\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, thenpress Done again to install the devices.  Press	<	" +
 		"to return to the previous page."
-	if (state.currentError != null){
-		def hideInfoDiagDescStat = (false)
-	} else {
-		def hideInfoDiagDescStat = (true)
-	}
 	return dynamicPage(
 		name: "selectDevices", 
 		title: "TP-Link Control Panel - Device Configuration", 
