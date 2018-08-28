@@ -119,15 +119,17 @@ def mainPage() {
 		section("Login Page:") {
 			input( 
 				"userName", "string", 
-				title:"Your TP-Link Kasa Email Address", 
+				title:"TP-Link Kasa Email Address", 
 				required:true, 
-				displayDuringSetup: true
+				displayDuringSetup: true,
+				image: getAppImg("email.png")
 			)
 			input(
 				"userPassword", "password", 
 				title:"TP-Link Kasa Account Password", 
 				required: true, 
-				displayDuringSetup: true
+				displayDuringSetup: true,
+				image: getAppImg("password.png")
 			)
 		}
 		section("Configuration Page:") {
@@ -137,7 +139,8 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Communication Error"]
+				options: ["Communication Error"],
+				image: getAppImg("error.png")
 				)
 		} else {
 			input(
@@ -206,6 +209,16 @@ def selectDevices() {
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
+		if (userSelectedOption == "Update Token") {
+			input(
+				"userSelectedOption", "enum",
+				title: "What do you want to do?",
+				required: true, 
+				multiple: false,	
+				options: ["Update Token"],
+				image: getAppImg("token.png")
+				)
+			}	
 		if (newDevices != [:]) {
 		} else if (userSelectedOption == "Add Devices") {
 				section("Device Configuration Page:") {
@@ -213,7 +226,7 @@ def selectDevices() {
 				required:true, 
 				multiple:true, 
 				title: "Select Devices (${newDevices.size() ?: 0} found)",
-				options: newDevices
+				options: newDevices,
 				image: getAppImg("devices.png")
 			}
 		}
