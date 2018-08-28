@@ -27,6 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-08-28 Improved UI Elements with other small changes
 2018-08-27 Improved UI Elements with other large changes
 2018-08-22 Improved UI Elements and updated the app logo plus other small changes
 2018-08-11 Updated for support for update from a repo on smartthings website + Improved app name + Added app version
@@ -45,8 +46,8 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.6" }
-	def appVerDate() { "08-27-2018" }
+	def appVersion() { "2.2.9" }
+	def appVerDate() { "08-28-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
 	def driverVersionsMin() {
@@ -133,23 +134,23 @@ def mainPage() {
 			)
 		}
 		section("Configuration Page:") {
-		if (state.currentError != null) {
-			input(
-				"userSelectedOption", "enum",
-				title: "What do you want to do?",
-				required: true, 
-				multiple: false,
-				options: ["Communication Error"],
-				image: getAppImg("error.png")
+			if (state.currentError != null) {
+				input(
+					"userSelectedOption", "enum",
+					title: "What do you want to do?",
+					required: true, 
+					multiple: false,
+					options: ["Communication Error"],
+					image: getAppImg("error.png")
 				)
-		} else {
-			input(
-				"userSelectedOption", "enum",
-				title: "What do you want to do?",
-				required: true, 
-				multiple: false,	
-				options: ["Initial Install", "Add Devices", "Update Token"],
-				image: getAppImg("settings.png")
+			} else {
+				input(
+					"userSelectedOption", "enum",
+					title: "What do you want to do?",
+					required: true, 
+					multiple: false,	
+					options: ["Initial Install", "Add Devices", "Update Token"],
+					image: getAppImg("settings.png")
 				)
 			}
 		}
@@ -185,7 +186,7 @@ def selectDevices() {
 		"Control Mode?"
 		}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = (errorMsg != null)
 	def hideInfoDiagDescStatTwo = (devices == [:])
 	def hideInfoDiagDescStatThree = (newDevices == [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
@@ -203,24 +204,21 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat || hideInfoDiagDescStatTwo || hideInfoDiagDescStatThree) {
-			if (state.currentError != null){
-				paragraph title: "Communication Error:", errorMsg
-			}
-			if (devices == [:] || newDevices == [:]){
-				if (userSelectedOption != "Update Token") {
-					paragraph title: "Device Error:", errorMsg
+		if (devices != [:] || newDevices != [:]) {
+			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+				if (devices == [:] || newDevices == [:]){
+					if (userSelectedOption != "Update Token") {
+						paragraph title: "Device Error:", errorMsg
+					}
 				}
-			}
-			if (state.currentError == null){
 				if (userSelectedOption == "Update Token") {
-				paragraph title: "Information:", TPLinkDevicesMsg
+					paragraph title: "Information:", TPLinkDevicesMsg
 				} else {
 					if (devices != [:] || newDevices != [:]) {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
-				}
-			}}
+				}	
+			}
 		}
 		if (userSelectedOption == "Update Token") {
 			section("Account Configuration Page:") {
