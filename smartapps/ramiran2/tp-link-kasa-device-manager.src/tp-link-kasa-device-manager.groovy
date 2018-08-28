@@ -45,7 +45,7 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.3" }
+	def appVersion() { "2.2.4" }
 	def appVerDate() { "08-27-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
@@ -210,24 +210,38 @@ def selectDevices() {
 			}
 		}
 		if (userSelectedOption == "Update Token") {
-			input(
-				"userSelectedOption", "enum",
-				title: "What do you want to do?",
-				required: true, 
-				multiple: false,	
-				options: ["Update Token"],
-				image: getAppImg("token.png")
-				)
-			}	
+			section("Account Configuration Page:") {
+				input(
+					"userSelected", "enum",
+					title: "What do you want to do?",
+					required: true, 
+					multiple: false,	
+					options: ["Update Token"],
+					image: getAppImg("token.png")
+					)
+				}
+			}
 		if (newDevices != [:]) {
-		} else if (userSelectedOption == "Add Devices") {
+			section("Device Configuration Page:") {
+				input(
+					"selectedDevices", "enum",
+					required:false, 
+					multiple:true, 
+					title: "Select Devices (${newDevices.size() ?: 0} found)",
+					options: newDevices,
+					image: getAppImg("devices.png")
+				)
+				}
+		} else if (userSelectedOption == "Add Devices" && userSelectedOption == "Initial Install") {
 				section("Device Configuration Page:") {
-				input "selectedDevices", "enum",
-				required:true, 
-				multiple:true, 
-				title: "Select Devices (${newDevices.size() ?: 0} found)",
-				options: newDevices,
-				image: getAppImg("devices.png")
+					input(
+						"selectedDevices", "enum",
+						required:true, 
+						multiple:true, 
+						title: "Select Devices (${newDevices.size() ?: 0} found)",
+						options: newDevices,
+						image: getAppImg("devices.png")
+					)
 			}
 		}
 	}
