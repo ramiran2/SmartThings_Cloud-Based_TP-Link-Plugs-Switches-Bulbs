@@ -186,9 +186,7 @@ def selectDevices() {
 		"Control Mode?"
 		}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg != null)
-	def hideInfoDiagDescStatTwo = (devices == [:])
-	def hideInfoDiagDescStatThree = (newDevices == [:])
+	def hideInfoDiagDescStat = (errorMsg == "")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -211,12 +209,12 @@ def selectDevices() {
 						paragraph title: "Device Error:", errorMsg
 					}
 				}
-				if (userSelectedOption == "Update Token") {
-					paragraph title: "Information:", TPLinkDevicesMsg
-				} else {
+				if (userSelectedOption != "Update Token") {
 					if (devices != [:] || newDevices != [:]) {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
+				} else {
+					paragraph title: "Information:", TPLinkDevicesMsg
 				}	
 			}
 		}
