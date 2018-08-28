@@ -205,6 +205,9 @@ def selectDevices() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
+			if (newDevices == [:]){
+				paragraph title: "Device Error:", errorMsg
+			}
 			if (state.currentError == null){
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
@@ -231,8 +234,8 @@ def selectDevices() {
 					options: newDevices,
 					image: getAppImg("devices.png")
 				)
-				}
-		} else if (userSelectedOption == "Add Devices" && userSelectedOption == "Initial Install") {
+			}
+		} else if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
 				section("Device Configuration Page:") {
 					input(
 						"selectedDevices", "enum",
@@ -242,7 +245,7 @@ def selectDevices() {
 						options: newDevices,
 						image: getAppImg("devices.png")
 					)
-			}
+				}
 		}
 	}
 }
