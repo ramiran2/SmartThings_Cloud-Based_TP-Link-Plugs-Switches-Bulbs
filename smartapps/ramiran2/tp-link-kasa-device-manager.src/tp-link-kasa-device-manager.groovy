@@ -209,7 +209,7 @@ def selectDevices() {
 					}
 				}
 				if (errorMsg != "") {
-					if (devices != [:] || newDevices != [:]) {
+					if (devices == [:] || newDevices == [:]) {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
 				} else {
