@@ -203,27 +203,7 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		if (devices != [:] || newDevices != [:]) {
-			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError != null){
-				paragraph title: "Communication Error:", errorMsg
-			}
-			if (devices == [:] || newDevices == [:]){
-				if (userSelectedOption != "Update Token") {
-					paragraph title: "Device Error:", errorMsg
-				}
-			}
-			if (state.currentError == null){
-				if (userSelectedOption == "Update Token") {
-				paragraph title: "Information:", TPLinkDevicesMsg
-				} else {
-					if (devices != [:] || newDevices != [:]) {
-						paragraph title: "Information:", TPLinkDevicesMsg
-					}
-				}
-			}}
-		} else {
-			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStatTwo) {
+			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat || hideInfoDiagDescStatTwo || hideInfoDiagDescStatThree) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
