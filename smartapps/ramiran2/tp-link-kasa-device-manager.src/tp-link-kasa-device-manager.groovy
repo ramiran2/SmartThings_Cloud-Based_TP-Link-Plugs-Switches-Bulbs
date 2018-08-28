@@ -156,7 +156,7 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (state.currentError != null) {
+	if (userSelectedOption == "Do Not Continue") {
 		returnToMainPage = "true"
 		return mainPage()
 	}
