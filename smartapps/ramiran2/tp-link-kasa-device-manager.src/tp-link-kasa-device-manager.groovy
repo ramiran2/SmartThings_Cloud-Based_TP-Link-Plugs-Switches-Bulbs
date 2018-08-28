@@ -157,13 +157,11 @@ def selectDevices() {
 		getToken()
 	}
 	if (state.currentError != null) {
+		returnToMainPage = "true"
 		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
-	if (state.currentError != null) {
-		return mainPage()
-	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
@@ -202,9 +200,6 @@ def selectDevices() {
         section("Information/Diagnostics Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
-			}
-			if (returnToMainPage == "true"){
-				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			if (state.currentError == null){
 				paragraph title: "Information:", TPLinkDevicesMsg
