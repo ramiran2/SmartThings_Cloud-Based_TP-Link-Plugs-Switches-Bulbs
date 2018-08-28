@@ -162,7 +162,7 @@ def selectDevices() {
 	}
 	getDevices()
 	def devices = state.devices
-	if (returnToMainPage == "true") {
+	if (userSelectedOption == "Do Not Continue") {
 		returnToMainPage = "true"
 		return mainPage()
 	}
