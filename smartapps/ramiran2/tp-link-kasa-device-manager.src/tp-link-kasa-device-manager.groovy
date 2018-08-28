@@ -168,7 +168,7 @@ def selectDevices() {
 		getDevices()
 		def devices = state.devices
 		def errorMsg = ""
-		} else if (devices == [:]) {
+		if (devices == [:]) {
 			errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 			"that all devices are in 'Local Control Only'. Correct them then " +
 			"rerun the application."
@@ -180,7 +180,7 @@ def selectDevices() {
 				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 			}
 		}
-		} else if (newDevices == [:]) {
+		if (newDevices == [:]) {
 			errorMsg = "No new devices to add. Are you sure they are in Remote " +
 				"Control Mode?"
 		}
@@ -207,7 +207,7 @@ def selectDevices() {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (newDevices == [:]){
+			if (newDevices == [:] && userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install"){
 				paragraph title: "Device Error:", errorMsg
 			}
 			if (state.currentError == null && newDevices != [:] || state.currentError == null && devices != [:] ){
