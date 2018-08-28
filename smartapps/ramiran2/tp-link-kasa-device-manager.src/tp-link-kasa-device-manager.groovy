@@ -27,8 +27,8 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
-2018-08-27 Improved UI Elements with other changes
-2018-08-22 Improved UI Elements and updated the app logo plus other changes
+2018-08-27 Improved UI Elements with other large changes
+2018-08-22 Improved UI Elements and updated the app logo plus other small changes
 2018-08-11 Updated for support for update from a repo on smartthings website + Improved app name + Added app version
 2018-01-31 Updated for new release of Device Handlers
 */
@@ -45,7 +45,7 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.5" }
+	def appVersion() { "2.2.6" }
 	def appVerDate() { "08-27-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
@@ -185,7 +185,7 @@ def selectDevices() {
 		}
 	settings.selectedDevices = null
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = (state.currentError == null || newDevices == [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -208,7 +208,7 @@ def selectDevices() {
 			if (newDevices == [:]){
 				paragraph title: "Device Error:", errorMsg
 			}
-			if (state.currentError == null){
+			if (state.currentError == null && newDevices != [:]){
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
