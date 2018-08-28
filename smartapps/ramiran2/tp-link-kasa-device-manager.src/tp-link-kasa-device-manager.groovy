@@ -203,19 +203,16 @@ def selectDevices() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (devices == [:] || newDevices == [:]){
+				if (errorMsg != "") {
 					if (userSelectedOption != "Update Token") {
 						paragraph title: "Device Error:", errorMsg
 					}
-				}
-				if (errorMsg != "") {
-					if (devices == [:] || newDevices == [:]) {
-						paragraph title: "Information:", TPLinkDevicesMsg
-					}
-				} else {
 					if (userSelectedOption == "Update Token") {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
+				}
+				if (errorMsg == "" && userSelectedOption != "Update Token"){
+					paragraph title: "Information:", TPLinkDevicesMsg
 				}
 			}
 		if (userSelectedOption == "Update Token") {
