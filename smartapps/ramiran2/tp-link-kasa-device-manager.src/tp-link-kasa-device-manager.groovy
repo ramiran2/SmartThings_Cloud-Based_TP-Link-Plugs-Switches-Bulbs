@@ -203,7 +203,7 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		if (devices != [:] && newDevices != [:]) {
+		if (devices != [:] || newDevices != [:]) {
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
@@ -224,7 +224,7 @@ def selectDevices() {
 				}
 			}}
 		}
-		if (state.currentError != null && newDevices != [:]) {
+		if (state.currentError != null || newDevices != [:]) {
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
@@ -245,7 +245,7 @@ def selectDevices() {
 				}
 			}}
 		}
-		if (state.currentError != null && devices != [:]) {
+		if (state.currentError != null || devices != [:]) {
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
