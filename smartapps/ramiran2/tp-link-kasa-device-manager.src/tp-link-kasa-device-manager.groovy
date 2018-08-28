@@ -157,7 +157,7 @@ def selectDevices() {
 		getToken()
 	}
 	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
-		returnToMainPage = "true"
+		def returnToMainPage = "true"
 		return mainPage()
 	}
 	getDevices()
