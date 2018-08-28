@@ -10,13 +10,13 @@ obtain a copy of the License at:
 	http://www.apache.org/licenses/LICENSE-2.0
 		
 Unless required by applicable law or agreed to in writing, software 
-distributed under  the License is distributed on an "AS IS" BASIS, 
+distributed under the License is distributed on an "AS IS" BASIS, 
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
 implied. See the License for the specific language governing 
 permissions and limitations under the License.
 
-##### Discalimer:  This Service Manager and the associated Device 
-Handlers are in no way sanctioned or supported by TP-Link.  All  
+##### Discalimer: This Service Manager and the associated Device 
+Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Kasa Devices; 
 primarily various users on GitHub.com.
 
@@ -27,10 +27,10 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
-2018-08-27  Improved UI Elements with other changes
-2018-08-22  Improved UI Elements and updated the app logo plus other changes
-2018-08-11  Updated for support for update from a repo on smartthings website + Improved app name + Added app version
-2018-01-31	Updated for new release of Device Handlers
+2018-08-27 Improved UI Elements with other changes
+2018-08-22 Improved UI Elements and updated the app logo plus other changes
+2018-08-11 Updated for support for update from a repo on smartthings website + Improved app name + Added app version
+2018-01-31 Updated for new release of Device Handlers
 */
 
 definition(
@@ -45,7 +45,7 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.4" }
+	def appVersion() { "2.2.5" }
 	def appVerDate() { "08-27-2018" }
 	def appAuthor() { "Dave Gutheinz" }
 	def appModifier() { "xKillerMaverick" }
@@ -78,13 +78,13 @@ def setInitialStates() {
 //	----- LOGIN PAGE -----
 def mainPage() {
 	setInitialStates()
-	def mainPageText = "If possible, open the IDE and select Live Logging.  Then, " +
+	def mainPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete.  Your current token:\n\r" + "${state.TpLinkToken}" +
+		"action you want to complete. Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Initial Install: Obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
-		"	Update Token:  Updates the token.\n\r"
+		"	Update Token: Updates the token."
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application"
 	def errorRetuInfo = "We are unable to load that page untill you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen"
 	def hideInfoDiagDescCont = (true)
@@ -168,9 +168,9 @@ def selectDevices() {
 	def devices = state.devices
 	def errorMsg = ""
 	if (devices == [:]) {
-		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
-			"that all devices are in 'Local Control Only'.  Correct them then " +
-			"rerun the application.\n\r"
+		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+			"that all devices are in 'Local Control Only'. Correct them then " +
+			"rerun the application."
 	}
 	def newDevices = [:]
 	devices.each {
@@ -180,8 +180,8 @@ def selectDevices() {
 		}
 	}
 	if (newDevices == [:]) {
-		errorMsg = "No new devices to add.  Are you sure they are in Remote " +
-			"Control Mode?\n\r"
+		errorMsg = "No new devices to add. Are you sure they are in Remote " +
+			"Control Mode?"
 		}
 	settings.selectedDevices = null
 	def hideInfoDiagDescCont = (true)
@@ -191,7 +191,7 @@ def selectDevices() {
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
-		"wish to add, thenpress Done again to install the devices.  Press	<	" +
+		"wish to add, thenpress Done again to install the devices. Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices", 
@@ -224,28 +224,17 @@ def selectDevices() {
 					)
 				}
 			}
-		if (newDevices != [:]) {
+		if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
 			section("Device Configuration Page:") {
 				input(
 					"selectedDevices", "enum",
-					required:false, 
+					required:true, 
 					multiple:true, 
 					title: "Select Devices (${newDevices.size() ?: 0} found)",
 					options: newDevices,
 					image: getAppImg("devices.png")
 				)
 			}
-		} else if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
-				section("Device Configuration Page:") {
-					input(
-						"selectedDevices", "enum",
-						required:true, 
-						multiple:true, 
-						title: "Select Devices (${newDevices.size() ?: 0} found)",
-						options: newDevices,
-						image: getAppImg("devices.png")
-					)
-				}
 		}
 	}
 }
@@ -469,20 +458,20 @@ def checkError() {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
 		if (state.currentError == null) {
-			log.info "getDevices successful.  apiServerUrl updated and token is good."
+			log.info "getDevices successful. apiServerUrl updated and token is good."
 			return
 		}
-		log.error "${errMsg} error while attempting getDevices.  Will attempt getToken"
+		log.error "${errMsg} error while attempting getDevices. Will attempt getToken"
 		getToken()
 		if (state.currentError == null) {
-			log.info "getToken successful.  Token has been updated."
+			log.info "getToken successful. Token has been updated."
 			getDevices()
 			return
 		}
 	} else {
-		log.error "checkError:  No auto-correctable errors or exceeded Token request count."
+		log.error "checkError: No auto-correctable errors or exceeded Token request count."
 	}
-	log.error "checkError residual:  ${state.currentError}"
+	log.error "checkError residual: ${state.currentError}"
 }
 
 //	----- CHILD CALLED TASKS -----
