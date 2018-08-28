@@ -161,7 +161,7 @@ def selectDevices() {
 	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && state.currentError != null) {
 		return mainPage()
 	}
-	if (userSelectedOption != "Add Devices") {
+	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
 		getToken()
 	}
 	if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
