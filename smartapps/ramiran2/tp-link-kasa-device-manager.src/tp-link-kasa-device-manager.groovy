@@ -208,7 +208,7 @@ def selectDevices() {
 			if (newDevices == [:] && userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install"){
 				paragraph title: "Device Error:", errorMsg
 			}
-			if (state.currentError == null && newDevices != [:] || devices != [:] ){
+			if (state.currentError == null && newDevices == [:] || devices == [:]){
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
