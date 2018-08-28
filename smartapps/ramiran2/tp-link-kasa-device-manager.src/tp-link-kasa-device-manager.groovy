@@ -167,7 +167,6 @@ def selectDevices() {
 	getDevices()
 	def devices = state.devices
 	def errorMsg = ""
-	def hideInfoDiagDescStat = (state.currentError == null)
 	def newDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
@@ -177,17 +176,18 @@ def selectDevices() {
 	}
 	settings.selectedDevices = null
 	if (devices == [:]) {
-		def hideInfoDiagDescStat = (devices != [:])
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 		}
 	if (newDevices == [:]) {
-		def hideInfoDiagDescStat = (newDevices != [:])
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 		}
 	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStatTwo = (devices == [:])
+	def hideInfoDiagDescStatThree = (newDevices == [:])
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -203,22 +203,68 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-        section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		if (devices != [:] && newDevices != [:]) {
+			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			if (state.currentError != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
 			if (newDevices == [:] || devices == [:]){
-			} else if (userSelectedOption != "Update Token") {
-				paragraph title: "Device Error:", errorMsg
+				if (userSelectedOption != "Update Token") {
+					paragraph title: "Device Error:", errorMsg
+				}
 			}
 			if (state.currentError == null){
-			} else if (devices != [:] || newDevices != [:]) {
-				paragraph title: "Information:", TPLinkDevicesMsg
+				if (devices != [:] || newDevices != [:]) {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
 			}
 			if (state.currentError == null){
-			} else if (userSelectedOption == "Update Token") {
-				paragraph title: "Information:", TPLinkDevicesMsg
+				if (userSelectedOption == "Update Token") {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+			}}
+		}
+		if (state.currentError != null && newDevices != [:]) {
+			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			if (state.currentError != null){
+				paragraph title: "Communication Error:", errorMsg
 			}
+			if (newDevices == [:] || devices == [:]){
+				if (userSelectedOption != "Update Token") {
+					paragraph title: "Device Error:", errorMsg
+				}
+			}
+			if (state.currentError == null){
+				if (devices != [:] || newDevices != [:]) {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+			}
+			if (state.currentError == null){
+				if (userSelectedOption == "Update Token") {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+			}}
+		}
+		if (state.currentError != null && devices != [:]) {
+			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			if (state.currentError != null){
+				paragraph title: "Communication Error:", errorMsg
+			}
+			if (newDevices == [:] || devices == [:]){
+				if (userSelectedOption != "Update Token") {
+					paragraph title: "Device Error:", errorMsg
+				}
+			}
+			if (state.currentError == null){
+				if (devices != [:] || newDevices != [:]) {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+			}
+			if (state.currentError == null){
+				if (userSelectedOption == "Update Token") {
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+			}}
 		}
 		if (userSelectedOption == "Update Token") {
 			section("Account Configuration Page:") {
