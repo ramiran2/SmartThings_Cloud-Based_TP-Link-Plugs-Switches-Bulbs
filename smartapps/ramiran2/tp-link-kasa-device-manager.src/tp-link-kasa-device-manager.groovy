@@ -208,13 +208,15 @@ def selectDevices() {
 						paragraph title: "Device Error:", errorMsg
 					}
 				}
-				if (userSelectedOption != "Update Token") {
+				if (errorMsg != "") {
 					if (devices != [:] || newDevices != [:]) {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
 				} else {
-					paragraph title: "Information:", TPLinkDevicesMsg
-				}	
+					if (userSelectedOption == "Update Token") {
+						paragraph title: "Information:", TPLinkDevicesMsg
+					}
+				}
 			}
 		if (userSelectedOption == "Update Token") {
 			section("Account Configuration Page:") {
