@@ -144,8 +144,7 @@ def mainPage() {
 				"userSelectedOption", "enum",
 				title: "What do you want to do?",
 				required: true, 
-				multiple: false,
-				submitOnChange: true,
+				multiple: false,	
 				options: ["Initial Install", "Add Devices", "Update Token"],
 				image: getAppImg("settings.png")
 				)
@@ -156,11 +155,11 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
+	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && state.currentError != null) {
+		return mainPage()
+	}
 	if (userSelectedOption != "Add Devices") {
 		getToken()
-	}
-	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
-		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
@@ -207,12 +206,16 @@ def selectDevices() {
 				paragraph title: "Information:", TPLinkDevicesMsg
 			}
 		}
-		section("Device Configuration Page:") {
-			input "selectedDevices", "enum",
-			required:false, 
-			multiple:true, 
-			title: "Select Devices (${newDevices.size() ?: 0} found)",
-			options: newDevices
+		if (newDevices != [:]) {
+		} else if (userSelectedOption == "Add Devices") {
+				section("Device Configuration Page:") {
+				input "selectedDevices", "enum",
+				required:true, 
+				multiple:true, 
+				title: "Select Devices (${newDevices.size() ?: 0} found)",
+				options: newDevices
+				image: getAppImg("devices.png")
+			}
 		}
 	}
 }
