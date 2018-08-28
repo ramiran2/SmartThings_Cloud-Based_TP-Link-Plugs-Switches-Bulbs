@@ -153,12 +153,11 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
+	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
+		return mainPage()
+	}
 	if (userSelectedOption != "Add Devices") {
 		getToken()
-	}
-	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
-		def returnToMainPage = "true"
-		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
@@ -475,5 +474,6 @@ def appSmallInfoDesc()	{
 	def strTwo = ""
 	strTwo += "TP-Link Kasa Device Manager"
 	strTwo += "\n" + "• Version: ${appVersion()}"
+	strTwo += "\n" + "• Updated: ${appVerDate()}"
 	return strTwo
 }
