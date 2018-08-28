@@ -136,7 +136,7 @@ def mainPage() {
 				title: "What do you want to do?",
 				required: true, 
 				multiple: false,
-				options: ["Do Not Continue"]
+				options: ["Communication Error"]
 				)
 		} else {
 			input(
@@ -156,16 +156,12 @@ def selectDevices() {
 	if (userSelectedOption != "Add Devices") {
 		getToken()
 	}
-	if (userSelectedOption == "Do Not Continue") {
+	if (userSelectedOption != "Initial Install" && "Add Devices" && "Update Token") {
 		returnToMainPage = "true"
 		return mainPage()
 	}
 	getDevices()
 	def devices = state.devices
-	if (userSelectedOption == "Do Not Continue") {
-		returnToMainPage = "true"
-		return mainPage()
-	}
 	def errorMsg = ""
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account.  This usually means "+
