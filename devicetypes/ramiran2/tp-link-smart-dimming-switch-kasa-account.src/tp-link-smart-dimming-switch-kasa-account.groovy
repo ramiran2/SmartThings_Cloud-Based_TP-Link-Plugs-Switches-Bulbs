@@ -108,17 +108,8 @@ metadata {
 /**************************************************************************
 |									LOGGING FUNCTIONS			          |
 ***************************************************************************/
-
-def lastN(String input, n) {
-	return n > input?.size() ? null : n ? input[-n..-1] : ''
-}
-
 void Logger(msg, logType = "debug") {
 	def smsg = state?.showLogNamePrefix ? "${device.displayName} (v${devVer()}) | ${msg}" : "${msg}"
-	def theId = lastN(device.getId().toString(),5)
-	if(state?.enRemDiagLogging) {
-		parent.saveLogtoRemDiagStore(smsg, logType, "Thermostat-${theId}")
-	} else {
 		switch (logType) {
 			case "trace":
 				log.trace "|| ${smsg}"
@@ -140,7 +131,6 @@ void Logger(msg, logType = "debug") {
 				break
 		}
 	}
-}
 
 //	===== Update when installed or setting changed =====
 def installed() {
