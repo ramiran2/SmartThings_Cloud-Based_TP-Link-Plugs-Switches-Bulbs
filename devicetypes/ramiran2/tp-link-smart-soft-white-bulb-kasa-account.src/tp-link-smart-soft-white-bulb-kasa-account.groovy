@@ -178,199 +178,7 @@ void Logger(msg, logType = "debug") {
 	}
 }
 
-//	===== Device Health Check =====
-def useTrackedHealth() { return state?.useTrackedHealth ?: false }
-
-def getHcTimeout() {
-	def to = state?.hcTimeout
-	return ((to instanceof Integer) ? to.toInteger() : 45)*60
-}
-
-void verifyHC() {
-	if(useTrackedHealth()) {
-		def timeOut = getHcTimeout()
-		if(!val || val.toInteger() != timeOut) {
-			Logger("verifyHC: Updating Device Health Check Interval to $timeOut")
-			sendEvent(name: "checkInterval", value: timeOut, data: [protocol: "cloud"], displayed: false)
-		}
-	} else {
-		sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
-	}
-	repairHealthStatus(null)
-}
-
-def modifyDeviceStatus(status) {
-	if(status == null) { return }
-	def val = status.toString() == "offline" ? "offline" : "online"
-	if(val != getHealthStatus(true)) {
-		sendEvent(name: "DeviceWatch-DeviceStatus", value: val.toString(), displayed: false, isStateChange: true)
-		Logger("UPDATED: DeviceStatus Event: '$val'")
-	}
-}
-
-def ping() {
-	Logger("ping...")
-	keepAwakeEvent()
-}
-
-def keepAwakeEvent() {
-	def lastDt = state?.lastUpdatedDtFmt
-	if(lastDt) {
-		def ldtSec = getTimeDiffSeconds(lastDt)
-		//log.debug "ldtSec: $ldtSec"
-		if(ldtSec < 1900) {
-			poll()
-		}
-	}
-}
-
-void poll() {
-	Logger("Polling parent...")
-	refresh()
-}
-
-void refresh() {
-	pauseEvent("false")
-	parent.refresh(this)
-}
-
-def healthNotifyOk() {
-	def lastDt = state?.lastHealthNotifyDt
-	if(lastDt) {
-		def ldtSec = getTimeDiffSeconds(lastDt)
-		def t0 = state.healthMsgWait ?: 3600
-		if(ldtSec < t0) {
-			return false
-		}
-	}
-	return true
-}
-
-void repairHealthStatus(data) {
-	Logger("repairHealthStatus($data)")
-	if(state?.hcRepairEnabled != false) {
-		if(data?.flag) {
-			sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
-			state?.healthInRepair = false
-		} else {
-			state.healthInRepair = true
-			sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
-			runIn(7, repairHealthStatus, [data: [flag: true]])
-		}
-	}
-}
-
-def getTimeDiffSeconds(strtDate, stpDate=null, methName=null) {
-	//LogTrace("[GetTimeDiffSeconds] StartDate: $strtDate | StopDate: ${stpDate ?: "Not Sent"} | MethodName: ${methName ?: "Not Sent"})")
-	if(strtDate) {
-		//if(strtDate?.contains("dtNow")) { return 10000 }
-		def now = new Date()
-		def stopVal = stpDate ? stpDate.toString() : formatDt(now)
-		def startDt = Date.parse("E MMM dd HH:mm:ss z yyyy", strtDate)
-		def stopDt = Date.parse("E MMM dd HH:mm:ss z yyyy", stopVal)
-		def start = Date.parse("E MMM dd HH:mm:ss z yyyy", formatDt(startDt)).getTime()
-		def stop = Date.parse("E MMM dd HH:mm:ss z yyyy", stopVal).getTime()
-		def diff = (int) (long) (stop - start) / 1000
-		//LogTrace("[GetTimeDiffSeconds] Results for '$methName': ($diff seconds)")
-		return diff
-	} else { return null }
-}
-
-def checkHealth() {
-	def isOnline = (getHealthStatus() == "ONLINE") ? true : false
-	if(isOnline || state?.healthMsg != true || state?.healthInRepair == true) { return }
-	if(healthNotifyOk()) {
-		def now = new Date()
-		parent?.deviceHealthNotify(this, isOnline)
-		state.lastHealthNotifyDt = getDtNow()
-	}
-}
-
-def getDtNow() {
-	def now = new Date()
-	return formatDt(now)
-}
-
-def getHealthStatus(lowerCase=false) {
-	def res = device?.getStatus()
-	if(lowerCase) { return res.toString().toLowerCase() }
-	return res.toString()
-}
-
-def lastCheckinEvent(checkin, isOnline) {
-	def formatVal = state?.useMilitaryTime ? "MMM d, yyyy - HH:mm:ss" : "MMM d, yyyy - h:mm:ss a"
-	def tf = new SimpleDateFormat(formatVal)
-	tf.setTimeZone(getTimeZone())
-
-	def lastChk = device.currentState("lastConnection")?.value
-	def prevOnlineStat = device.currentState("onlineStatus")?.value
-
-	def hcTimeout = getHcTimeout()
-	def curConn = checkin ? tf.format(Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", checkin)) : "Not Available"
-	def curConnFmt = checkin ? formatDt(Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", checkin)) : "Not Available"
-	def curConnSeconds = (checkin && curConnFmt != "Not Available") ? getTimeDiffSeconds(curConnFmt) : 3000
-
-	def onlineStat = isOnline.toString() == "true" ? "online" : "offline"
-
-	state?.lastConnection = curConn?.toString()
-	if(isStateChange(device, "lastConnection", curConnFmt.toString())) {
-		LogAction("UPDATED | Last Device Check-in was: (${curConnFmt}) | Previous Check-in: (${lastChk})")
-		sendEvent(name: 'lastConnection', value: curConnFmt?.toString(), isStateChange: true)
-	} else { LogAction("Last Device Check-in was: (${curConnFmt}) | Original State: (${lastChk})") }
-
-	lastChk = device.currentState("lastConnection")?.value
-	def lastConnSeconds = (lastChk && lastChk != "Not Available") ? getTimeDiffSeconds(lastChk) : 3000
-
-	if(hcTimeout && isOnline.toString() == "true" && curConnSeconds > hcTimeout && lastConnSeconds > hcTimeout) {
-		onlineStat = "offline"
-		LogAction("lastCheckinEvent: UPDATED onlineStatus: $onlineStat")
-		Logger("lastCheckinEvent($checkin, $isOnline) | onlineStatus: $onlineStat | lastConnSeconds: $lastConnSeconds | hcTimeout: ${hcTimeout} | curConnSeconds: ${curConnSeconds}")
-	} else {
-		LogAction("lastCheckinEvent($checkin, $isOnline) | onlineStatus: $onlineStat | lastConnSeconds: $lastConnSeconds | hcTimeout: ${hcTimeout} | curConnSeconds: ${curConnSeconds}")
-	}
-
-	state?.onlineStatus = onlineStat
-	modifyDeviceStatus(onlineStat)
-	if(isStateChange(device, "onlineStatus", onlineStat?.toString())) {
-		Logger("UPDATED | Online Status is: (${onlineStat}) | Original State: (${prevOnlineStat})")
-		sendEvent(name: "onlineStatus", value: onlineStat, descriptionText: "Online Status is: ${onlineStat}", displayed: true, isStateChange: true, state: onlineStat)
-	} else { LogAction("Online Status is: (${onlineStat}) | Original State: (${prevOnlineStat})") }
-}
-
-def getTimeZone() {
-	def tz = null
-	if(location?.timeZone) { tz = location?.timeZone }
-	} else {
-	if(!tz) { Logger("getTimeZone: Hub TimeZone is not found ...", "warn") }
-	return tz
-}
-
 //	===== Update when installed or setting changed =====
-def initialize() {
-	Logger("Initialized...")
-	if(state?.swVersion != devVer()) {
-		state.swVersion = devVer()
-	}	
-	state?.healthInRepair = false
-	if(!state.updatedLastRanAt || now() >= state.updatedLastRanAt + 2000) {
-		state.updatedLastRanAt = now()
-		verifyHC()
-		state.isInstalled = true
-	} else {
-		log.trace "initialize(): Ran within last 2 seconds - SKIPPING"
-	}
-}
-
-void installed() {
-	Logger("Installed...")
-	runIn( 5, "initialize", [overwrite: true] )
-}
-
-void updated() {
-	Logger("Device Updated...")
-	runIn( 5, "initialize", [overwrite: true] )
-}
-
 def installed() {
 	update()
 }
@@ -506,16 +314,12 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(0,5) == "ERROR"){
-		onlineStat = "offline"
-		LogAction("lastCheckinEvent: UPDATED onlineStatus: $onlineStat")
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
 		sendEvent(name: "switch", value: "commsError", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		action = ""
 	} else {
-		onlineStat = "online"
-		LogAction("lastCheckinEvent: UPDATED onlineStatus: $onlineStat")
 		sendEvent(name: "deviceError", value: "OK")
 	}
 	actionDirector(action, cmdResponse)
@@ -539,14 +343,10 @@ def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse == "TcpTimeout") {
-		onlineStat = "offline"
-		LogAction("lastCheckinEvent: UPDATED onlineStatus: $onlineStat")
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR - OffLine in hubResponseParse")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
 	} else {
-		onlineStat = "online"
-		LogAction("lastCheckinEvent: UPDATED onlineStatus: $onlineStat")
 		actionDirector(action, cmdResponse)
 		sendEvent(name: "deviceError", value: "OK")
 	}
