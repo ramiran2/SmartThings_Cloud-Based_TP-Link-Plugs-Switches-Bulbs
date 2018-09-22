@@ -21,7 +21,7 @@ All  development is based upon open-source data on the
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
-2018-09-20	Update to Version 2.3.0
+2018-09-21	Update to Version 2.3.0
 2018-08-11	Update to Version 2.1.1
 		a.	Support for update from a repo on smartthings website
 		b.	Improved driver names
@@ -105,11 +105,13 @@ metadata {
 	}
 }
 
-/**************************************************************************
-|									LOGGING FUNCTIONS			          |
-***************************************************************************/
+// ===== Logging =====
 void Logger(msg, logType = "debug") {
 	def smsg = state?.showLogNamePrefix ? "${device.displayName} (v${devVer()}) | ${msg}" : "${msg}"
+	def theId = lastN(device.getId().toString(),5)
+	if(state?.enRemDiagLogging) {
+		parent.saveLogtoRemDiagStore(smsg, logType, "${deviceType}-${theId}")
+	} else {
 		switch (logType) {
 			case "trace":
 				log.trace "|| ${smsg}"
@@ -131,17 +133,35 @@ void Logger(msg, logType = "debug") {
 				break
 		}
 	}
+}
+
+// Local Application Logging
+void LogAction(msg, logType = "debug") {
+	if(state?.debug) {
+		Logger(msg, logType)
+	}
+}
+
+// This will Print logs from the parent app when added to parent method that the child calls
+def log(message, level = "trace") {
+	def smsg = "PARENT_Log>> " + message
+	LogAction(smsg, level)
+	return null // always child interface call with a return value
+}
 
 //	===== Update when installed or setting changed =====
 def installed() {
+	Logger("Installed...", "trace")
 	update()
 }
 
 def updated() {
+	Logger("Updated...", "trace")
 	runIn(2, update)
 }
 
 def update() {
+	Logger("Update...", "trace")
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
 	unschedule()
@@ -170,6 +190,7 @@ def update() {
 }
 
 void uninstalled() {
+	Logger("Uninstalled...", "trace")
 	if (state.installType == "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
