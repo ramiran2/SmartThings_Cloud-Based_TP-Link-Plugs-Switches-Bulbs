@@ -446,7 +446,6 @@ def setColor(Map color) {
 def poll() {
 	Logger("Polling parent...")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
-	refresh()
 }
 
 def refresh(){
