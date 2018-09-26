@@ -451,8 +451,6 @@ def poll() {
 
 def refresh(){
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
-	pauseEvent("false")
-	parent.refresh(this)
 }
 
 def commandResponse(cmdResponse){
