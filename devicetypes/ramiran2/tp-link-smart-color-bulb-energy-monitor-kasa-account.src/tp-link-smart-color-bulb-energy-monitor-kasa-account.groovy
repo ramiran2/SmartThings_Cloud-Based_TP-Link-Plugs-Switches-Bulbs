@@ -47,6 +47,9 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 	//def installType = "Node.js Applet"
 //	==========================================================
 
+import java.text.SimpleDateFormat
+import groovy.time.*
+
 def devVer() { return "2.3.0" }
 
 metadata {
@@ -393,7 +396,6 @@ def lastCheckinEvent(checkin, isOnline) {
 def getTimeZone() {
 	def tz = null
 	if(location?.timeZone) { tz = location?.timeZone }
-	} else {
 	if(!tz) { Logger("getTimeZone: Hub TimeZone is not found ...", "warn") }
 	return tz
 }
