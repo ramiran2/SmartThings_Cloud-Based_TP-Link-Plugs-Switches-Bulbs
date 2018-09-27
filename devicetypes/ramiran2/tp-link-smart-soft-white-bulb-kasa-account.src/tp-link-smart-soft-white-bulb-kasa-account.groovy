@@ -62,7 +62,6 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "apiStatus", "string"
 		attribute "onlineStatus", "string"
 		if (deviceType == "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"

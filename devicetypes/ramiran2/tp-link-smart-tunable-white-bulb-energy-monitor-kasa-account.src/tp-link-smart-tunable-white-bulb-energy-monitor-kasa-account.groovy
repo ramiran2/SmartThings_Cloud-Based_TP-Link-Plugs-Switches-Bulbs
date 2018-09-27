@@ -83,7 +83,6 @@ metadata {
 		command "getEnergyStats"
 		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "apiStatus", "string"
 		attribute "onlineStatus", "string"
 		attribute "monthTotalE", "string"
 		attribute "monthAvgE", "string"
