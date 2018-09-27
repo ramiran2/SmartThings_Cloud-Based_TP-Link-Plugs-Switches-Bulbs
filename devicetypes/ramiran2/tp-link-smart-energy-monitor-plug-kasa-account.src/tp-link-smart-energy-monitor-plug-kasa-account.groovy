@@ -203,7 +203,7 @@ def log(message, level = "trace") {
 //	===== Device Health / API Check =====
 def initialize() {
 	Logger("Initialized...")
-	state?.onlineStatus = onlineStat
+	def onlineStat = "online"
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	sendEvent(name: "onlineStatus", value: onlineStat, descriptionText: "Online Status is: ${onlineStat}", displayed: true, isStateChange: true, state: onlineStat)
@@ -212,16 +212,6 @@ def initialize() {
 
 def ping() {
 	Logger("Ping...")
-}
-
-def apiStatusEvent(issue) {
-	def curStat = device.currentState("apiStatus")?.value
-	def newStat = issue ? "Has Issue" : "Good"
-	state?.apiStatus = newStat
-	if(isStateChange(device, "apiStatus", newStat.toString())) {
-		Logger("UPDATED | API Status is: (${newStat.toString().capitalize()}) | Original State: (${curStat.toString().capitalize()})")
-		sendEvent(name: "apiStatus", value: newStat, descriptionText: "API Status is: ${newStat}", displayed: true, isStateChange: true, state: newStat)
-	} else { LogAction("API Status is: (${newStat}) | Original State: (${curStat})") }
 }
 
 //	===== Update when installed or setting changed =====
@@ -527,6 +517,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(0,5) == "ERROR"){
+		def onlineStat = "offline"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
@@ -534,6 +525,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 		sendEvent(name: "deviceError", value: errMsg)
 		action = ""
 	} else {
+		def onlineStat = "online"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		sendEvent(name: "deviceError", value: "OK")
 	}
@@ -558,11 +550,13 @@ def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse == "TcpTimeout") {
+		def onlineStat = "offline"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR at hubResponseParse TCP Timeout")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
 	} else {
+		def onlineStat = "online"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		actionDirector(action, cmdResponse)
 		sendEvent(name: "deviceError", value: "OK")
