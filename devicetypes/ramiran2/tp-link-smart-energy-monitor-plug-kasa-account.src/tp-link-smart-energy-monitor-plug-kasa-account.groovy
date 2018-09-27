@@ -57,6 +57,7 @@ metadata {
 				energyMonitorMode: "Energy Monitor",
 				mnmn: "SmartThings",
 				vid: "generic-switch-power-energy",
+				ocfDeviceType: “oic.d.smartplug”,
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
@@ -400,7 +401,7 @@ def update() {
 	setCurrentDate()
 	runIn(2, refresh)
 	runIn(7, getEnergyStats)
-	runIn( 5, "initialize", [overwrite: true] )
+	runIn( 5, "initialize")
 }
 
 void uninstalled() {

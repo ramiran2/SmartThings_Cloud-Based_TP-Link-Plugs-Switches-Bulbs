@@ -52,6 +52,7 @@ metadata {
 				energyMonitorMode: "Standard",
 				mnmn: "SmartThings",
 				vid: "generic-switch-power",
+				ocfDeviceType: “oic.d.switch”,
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
@@ -363,7 +364,7 @@ def update() {
 			log.info "Refresh Scheduled for every 30 minutes"
 	}
 	runIn(5, refresh)
-	runIn( 5, "initialize", [overwrite: true] )
+	runIn( 5, "initialize")
 }
 
 void uninstalled() {

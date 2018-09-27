@@ -60,6 +60,7 @@ metadata {
 				energyMonitorMode: "Energy Monitor",
 				mnmn: "SmartThings",
 				vid: "generic-rgbw-color-bulb",
+				ocfDeviceType: “oic.d.light”,
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"
@@ -463,7 +464,7 @@ def update() {
 	setCurrentDate()
 	runIn(2, refresh)
 	runIn(7, getEnergyStats)
-	runIn( 5, "initialize", [overwrite: true] )
+	runIn( 5, "initialize")
 }
 
 void uninstalled() {
