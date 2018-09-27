@@ -120,14 +120,12 @@ def mainPage() {
 		}
 		section("Login Page:") {
 			input(
-				"userName", "string",
+				"userName", "email",
 				title: "TP-Link Kasa Email Address",
 				required: true,
 				displayDuringSetup: true,
 				image: getAppImg("email.png")
 			)
-		}
-		section("") {
 			input(
 				"userPassword", "password",
 				title: "TP-Link Kasa Account Password",
@@ -495,17 +493,17 @@ def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
 def appInfoDesc()	{
 	def str = ""
-	str += "TP-Link Kasa Device Manager"
-	str += "\n" + "• Version: ${appVersion()}	"
-	str += "\n" + "• Updated: ${appVerDate()}	"
-	str += "\n" + "• Author: ${appAuthor()}		"
-	str += "\n" + "• Modifier: ${appModifier()}	"
+	str += "TP-Link Kasa Device Manager   "
+	str += "\n" + "• Version: ${appVersion()}   "
+	str += "\n" + "• Updated: ${appVerDate()}  "
+	str += "\n" + "• Author: ${appAuthor()}"
+	str += "\n" + "• Modifier: ${appModifier()}"
 	return str
 }
 def appSmallInfoDesc()	{
 	def strTwo = ""
-	strTwo += "TP-Link Kasa Device Manager"
-	strTwo += "\n" + "• Version: ${appVersion()}	"
-	strTwo += "\n" + "• Updated: ${appVerDate()}	"
+	strTwo += "TP-Link Kasa Device Manager    "
+	strTwo += "\n" + "• Version: ${appVersion()}  "
+	strTwo += "\n" + "• Updated: ${appVerDate()}  "
 	return strTwo
 }
