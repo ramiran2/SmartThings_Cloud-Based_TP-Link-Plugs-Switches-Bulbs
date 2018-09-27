@@ -191,6 +191,11 @@ def log(message, level = "trace") {
 	return null // always child interface call with a return value
 }
 
+def compileForC() {
+	// if using C mode, set this to true so that enums and colors are correct (due to ST issue of compile time evaluation)
+	return false
+}
+
 //	===== Device Health Check =====
 def useTrackedHealth() { return state?.useTrackedHealth ?: false }
 
@@ -365,11 +370,13 @@ def initialize() {
 
 def installed() {
 	Logger("Installed...", "trace")
+	runIn( 5, "initialize", [overwrite: true] )
 	update()
 }
 
 def updated() {
 	Logger("Updated...", "trace")
+	runIn( 5, "initialize", [overwrite: true] )
 	runIn(2, update)
 }
 
@@ -401,7 +408,6 @@ def update() {
 		state.transTime = 5000
 	}
 	runIn(2, refresh)
-	runIn( 5, "initialize")
 }
 
 void uninstalled() {
@@ -449,6 +455,7 @@ def setColor(Map color) {
 def poll() {
 	Logger("Polling parent...")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
+	refresh()
 }
 
 def refresh(){

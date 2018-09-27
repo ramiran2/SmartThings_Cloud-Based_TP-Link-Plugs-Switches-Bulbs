@@ -111,6 +111,11 @@ metadata {
 	}
 }
 
+def compileForC() {
+	// if using C mode, set this to true so that enums and colors are correct (due to ST issue of compile time evaluation)
+	return false
+}
+
 // ===== Logging =====
 void Logger(msg, logType = "debug") {
 	def smsg = state?.showLogNamePrefix ? "${device.displayName} (v${devVer()}) | ${msg}" : "${msg}"
@@ -329,11 +334,13 @@ def initialize() {
 
 def installed() {
 	Logger("Installed...", "trace")
+	runIn( 5, "initialize", [overwrite: true] )
 	update()
 }
 
 def updated() {
 	Logger("Updated...", "trace")
+	runIn( 5, "initialize", [overwrite: true] )
 	runIn(2, update)
 }
 
@@ -364,7 +371,6 @@ def update() {
 			log.info "Refresh Scheduled for every 30 minutes"
 	}
 	runIn(5, refresh)
-	runIn( 5, "initialize")
 }
 
 void uninstalled() {
@@ -396,6 +402,7 @@ def setLevel(percentage) {
 def poll() {
 	Logger("Polling parent...")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
+	refresh()
 }
 
 def refresh(){
