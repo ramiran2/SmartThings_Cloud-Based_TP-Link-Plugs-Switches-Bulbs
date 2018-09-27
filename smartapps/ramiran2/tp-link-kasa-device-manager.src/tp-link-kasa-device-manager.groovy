@@ -140,7 +140,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true, 
 					multiple: false,
-					options: ["Communication Error", "Reset Current Error State"],
+					options: ["Communication Error", "Add Devices"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -160,11 +160,6 @@ def mainPage() {
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
 	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token") {
-		return mainPage()
-	}
-	if (userSelectedOption == "Reset Current Error State") {
-		state.currentError = null
-		errorMsg = ""
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
