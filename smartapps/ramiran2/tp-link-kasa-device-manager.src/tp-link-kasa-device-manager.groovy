@@ -209,7 +209,7 @@ def selectDevices() {
 					if (userSelectedOption == "Update Token") {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
-					if (userSelectedOption != "Update Token" && errorMsg != ""){
+					if (userSelectedOption != "Update Token" && errorMsg == ""){
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
 			}
