@@ -159,11 +159,11 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && state.currentError != null) {
+	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token") {
 		return mainPage()
 	}
-	if (userSelectedOption == "Reset Current Error State" && state.currentError != null) {
-		state.currentError == null
+	if (userSelectedOption == "Reset Current Error State") {
+		state.currentError = null
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
