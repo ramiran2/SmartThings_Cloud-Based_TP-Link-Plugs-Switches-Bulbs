@@ -34,8 +34,8 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 		b.	User file-internal selection of Energy Monitor
 			function enabling.
 	===== Plug/Switch Type.  DO NOT EDIT ====================*/
-//	def deviceType = "Plug and Switch"		//	Plug/Switch
-	def deviceType = "Dimming Switch"		//	HS220 Only
+	def deviceType = "Switch"				//	Switch
+//	def deviceType = "Dimming Switch"		//	HS220 Only
 //	===== Hub or Cloud Installation =========================*/
 	def installType = "Kasa Account"
 	//def installType = "Node.js Applet"
@@ -51,7 +51,7 @@ metadata {
 				energyMonitorMode: "Standard",
 				ocfDeviceType: "oic.d.switch",
 				mnmn: "SmartThings",
-				vid: "generic-dimmer-power",
+				vid: "generic-switch-power",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

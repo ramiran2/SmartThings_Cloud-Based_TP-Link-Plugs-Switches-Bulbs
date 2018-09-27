@@ -27,6 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
 2018-08-28 Improved UI Elements with other small changes
 2018-08-27 Improved UI Elements with other large changes
 2018-08-22 Improved UI Elements and updated the app logo plus other small changes
@@ -125,6 +126,8 @@ def mainPage() {
 				displayDuringSetup: true,
 				image: getAppImg("email.png")
 			)
+		}
+		section("") {
 			input(
 				"userPassword", "password",
 				title: "TP-Link Kasa Account Password",
@@ -263,11 +266,11 @@ def getDevices() {
 def addDevices() {
 	def tpLinkModel = [:]
 	//	Plug-Switch Devices (no energy monitor capability)
-	tpLinkModel << ["HS100" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS100
-	tpLinkModel << ["HS105" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS105
-	tpLinkModel << ["HS200" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS200
-	tpLinkModel << ["HS210" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	HS210
-	tpLinkModel << ["KP100" : "TP-Link Smart Plug and Switch - Kasa Account"]				//	KP100
+	tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
+	tpLinkModel << ["HS105" : "TP-Link Smart Plug - Kasa Account"]						//	HS105
+	tpLinkModel << ["HS200" : "TP-Link Smart Switch - Kasa Account"]					//	HS200
+	tpLinkModel << ["HS210" : "TP-Link Smart Switch - Kasa Account"]					//	HS210
+	tpLinkModel << ["KP100" : "TP-Link Smart Plug - Kasa Account"]						//	KP100
 	//	Dimming Plug Devices
 	tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Kasa Account"]			//	HS220
 	//	Energy Monitor Plugs

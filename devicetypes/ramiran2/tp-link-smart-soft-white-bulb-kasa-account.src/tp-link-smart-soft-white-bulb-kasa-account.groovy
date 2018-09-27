@@ -21,6 +21,8 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
 2018-09-27	Update to Version 2.3.0
+		a.	Added Device Health Check
+		b.	Tweek from Dave Gutheinz
 2018-08-11	Update to Version 2.1.1
 		a.	Added Support for update from a repo on smartthings website
 		b.	Improved driver names
@@ -59,7 +61,6 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "onlineStatus", "string"
 		if (deviceType == "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"
 			command "setModeNormal"
@@ -152,9 +153,7 @@ simulator {
 //	===== Device Health Check / Driver Version =====
 def initialize() {
 	log.trace "Initialized..."
-	//sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
-	sendEvent(name: "onlineStatus", value: onlineStat, descriptionText: "Online Status is: ${onlineStat}", displayed: true, isStateChange: true, state: onlineStat)
 	state.swVersion = devVer()
 
 }
@@ -305,7 +304,6 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(0,5) == "ERROR"){
-		def onlineStat = "offline"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
@@ -313,7 +311,6 @@ private sendCmdtoCloud(command, hubCommand, action){
 		sendEvent(name: "deviceError", value: errMsg)
 		action = ""
 	} else {
-		def onlineStat = "online"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		sendEvent(name: "deviceError", value: "OK")
 	}
@@ -338,13 +335,11 @@ def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse == "TcpTimeout") {
-		def onlineStat = "offline"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR - OffLine in hubResponseParse")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
 	} else {
-		def onlineStat = "online"
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		actionDirector(action, cmdResponse)
 		sendEvent(name: "deviceError", value: "OK")
