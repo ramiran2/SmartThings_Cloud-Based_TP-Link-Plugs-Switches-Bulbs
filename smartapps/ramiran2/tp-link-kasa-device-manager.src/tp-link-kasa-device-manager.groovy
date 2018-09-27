@@ -37,7 +37,7 @@ primarily various users on GitHub.com.
 definition(
 	name: "TP-Link Kasa Device Manager",
 	namespace: "ramiran2",
-	author: "Dave Gutheinz",
+	author: "Dave Gutheinz (Modified by xKillerMaverick)",
 	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers (Cloud)",
 	category: "SmartThings Labs",
 	iconUrl: "${getAppImg("kasa_logo.png")}",
@@ -298,7 +298,7 @@ def addDevices() {
 			def device = state.devices.find { it.value.deviceMac == dni }
 			def deviceModel = device.value.deviceModel.substring(0,5)
 			addChildDevice(
-				"davegut",
+				"ramiran2",
 				tpLinkModel["${deviceModel}"], 
 				device.value.deviceMac,
 				hubId, [

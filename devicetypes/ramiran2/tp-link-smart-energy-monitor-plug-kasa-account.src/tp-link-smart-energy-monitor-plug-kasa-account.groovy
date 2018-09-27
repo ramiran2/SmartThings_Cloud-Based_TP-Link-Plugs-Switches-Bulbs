@@ -52,7 +52,7 @@ def devVer() { return "2.3.0" }
 metadata {
 	definition (name: "TP-Link Smart Energy Monitor Plug - ${installType}",
 				namespace: "ramiran2",
-				author: "xKiller Maverick",
+				author: "Dave Gutheinz (Modified by xKillerMaverick)",
 				deviceType: "energyMonitorMode Plug",
 				energyMonitorMode: "Energy Monitor",
 				ocfDeviceType: "oic.d.smartplug",
