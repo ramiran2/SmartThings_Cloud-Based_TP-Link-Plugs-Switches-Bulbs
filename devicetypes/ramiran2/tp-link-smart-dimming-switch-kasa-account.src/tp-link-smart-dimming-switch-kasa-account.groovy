@@ -51,7 +51,6 @@ metadata {
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
 				ocfDeviceType: "oic.d.switch",
-				vid: "generic-dimmer-power",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
