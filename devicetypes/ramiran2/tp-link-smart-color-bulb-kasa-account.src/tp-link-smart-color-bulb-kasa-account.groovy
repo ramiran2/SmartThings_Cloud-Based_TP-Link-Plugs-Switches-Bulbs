@@ -51,7 +51,6 @@ metadata {
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
 				ocfDeviceType: "oic.d.light",
-				mnmn: "SmartThings",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"
