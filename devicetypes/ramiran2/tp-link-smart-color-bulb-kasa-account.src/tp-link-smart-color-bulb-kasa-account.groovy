@@ -20,9 +20,11 @@ All  development is based upon open-source data on the
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
-2018-09-21	Update to Version 2.3.0
+2018-09-27	Update to Version 2.3.0
+		a.	Added Device Health Check
+		b.	Tweek from Dave Gutheinz
 2018-08-11	Update to Version 2.1.1
-		a.	Support for update from a repo on smartthings website
+		a.	Added Support for update from a repo on smartthings website
 		b.	Improved driver names
 		c.	Added driver version
 2018-01-31	Update to Version 2
@@ -145,86 +147,36 @@ metadata {
 	}
 }
 
-def compileForC() {
-	// if using C mode, set this to true so that enums and colors are correct (due to ST issue of compile time evaluation)
-	return false
-}
-
 simulator {
 		// TODO: define status and reply messages here
 }
 
-// ===== Logging =====
-void Logger(msg, logType = "debug") {
-	def smsg = state?.showLogNamePrefix ? "${device.displayName} (v${devVer()}) | ${msg}" : "${msg}"
-	def theId = lastN(device.deviceNetworkId().toString(),5)
-	if(state?.enRemDiagLogging) {
-		parent.saveLogtoRemDiagStore(smsg, logType, "${deviceType}-${theId}")
-	} else {
-		switch (logType) {
-			case "trace":
-				log.trace "|| ${smsg}"
-				break
-			case "debug":
-				log.debug "${smsg}"
-				break
-			case "info":
-				log.info "||| ${smsg}"
-				break
-			case "warn":
-				log.warn "|| ${smsg}"
-				break
-			case "error":
-				log.error "| ${smsg}"
-				break
-			default:
-				log.debug "${smsg}"
-				break
-		}
-	}
-}
-
-// Local Application Logging
-void LogAction(msg, logType = "debug") {
-	if(state?.debug) {
-		Logger(msg, logType)
-	}
-}
-
-// This will Print logs from the parent app when added to parent method that the child calls
-def log(message, level = "trace") {
-	def smsg = "PARENT_Log>> " + message
-	LogAction(smsg, level)
-	return null // always child interface call with a return value
-}
-
-//	===== Device Health / API Check =====
+//	===== Device Health Check / Driver Version =====
 def initialize() {
-	Logger("Initialized...")
-	def onlineStat = "online"
-	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
+	log.trace "Initialized..."
+	//sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	sendEvent(name: "onlineStatus", value: onlineStat, descriptionText: "Online Status is: ${onlineStat}", displayed: true, isStateChange: true, state: onlineStat)
 	state.swVersion = devVer()
 }
 
 def ping() {
-	Logger("Ping...")
+	log.trace "Ping..."
 }
 
 //	===== Update when installed or setting changed =====
 def installed() {
-	Logger("Installed...", "trace")
+	log.trace "Installed..."
 	update()
 }
 
 def updated() {
-	Logger("Updated...", "trace")
+	log.trace "Updated..."
 	runIn(2, update)
 }
 
 def update() {
-	Logger("Update...", "trace")
+	log.trace "Update..."
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
 	unschedule()
@@ -255,7 +207,7 @@ def update() {
 }
 
 void uninstalled() {
-	Logger("Uninstalled...", "trace")
+	log.trace "Uninstalled..."
 	if (state.installType == "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
@@ -297,7 +249,7 @@ def setColor(Map color) {
 }
 
 def poll() {
-	Logger("Polling parent...")
+	log.trace "Polling parent..."
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 }
 

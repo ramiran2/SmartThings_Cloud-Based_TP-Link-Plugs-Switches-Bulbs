@@ -30,7 +30,7 @@ primarily various users on GitHub.com.
 2018-08-28 Improved UI Elements with other small changes
 2018-08-27 Improved UI Elements with other large changes
 2018-08-22 Improved UI Elements and updated the app logo plus other small changes
-2018-08-11 Updated for support for update from a repo on smartthings website + Improved app name + Added app version
+2018-08-11 Updated for Added Support for update from a repo on smartthings website + Improved app name + Added app version
 2018-01-31 Updated for new release of Device Handlers
 */
 
