@@ -44,9 +44,6 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 	//def installType = "Node.js Applet"
 //	===========================================================
 
-import java.text.SimpleDateFormat
-import groovy.time.*
-
 def devVer() { return "2.3.0" }
 
 metadata {
