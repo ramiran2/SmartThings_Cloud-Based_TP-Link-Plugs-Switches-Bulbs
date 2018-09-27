@@ -50,7 +50,6 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
-				ocfDeviceType: "oic.d.switch",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

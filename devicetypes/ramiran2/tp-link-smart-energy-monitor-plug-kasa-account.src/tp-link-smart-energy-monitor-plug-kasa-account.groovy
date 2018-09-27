@@ -55,7 +55,6 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "energyMonitorMode Plug",
 				energyMonitorMode: "Energy Monitor",
-				ocfDeviceType: "oic.d.smartplug",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
