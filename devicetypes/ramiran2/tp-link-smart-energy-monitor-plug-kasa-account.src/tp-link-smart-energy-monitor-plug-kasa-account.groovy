@@ -55,6 +55,8 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "energyMonitorMode Plug",
 				energyMonitorMode: "Energy Monitor",
+				mnmn: "SmartThings",
+				vid: "generic-switch-power-energy",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

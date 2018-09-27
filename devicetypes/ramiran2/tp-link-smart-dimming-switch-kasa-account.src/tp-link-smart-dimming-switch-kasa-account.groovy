@@ -50,6 +50,8 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
+				mnmn: "SmartThings",
+				vid: "generic-dimmer-power",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

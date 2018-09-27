@@ -50,6 +50,8 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
+				mnmn: "SmartThings",
+				vid: "generic-switch-power",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

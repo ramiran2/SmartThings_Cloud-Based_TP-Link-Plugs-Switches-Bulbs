@@ -50,6 +50,8 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
+				mnmn: "SmartThings",
+				vid: "generic-rgbw-color-bulb",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"
