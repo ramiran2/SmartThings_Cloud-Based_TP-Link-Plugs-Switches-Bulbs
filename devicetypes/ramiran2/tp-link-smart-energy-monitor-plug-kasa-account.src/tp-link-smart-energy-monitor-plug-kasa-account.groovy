@@ -70,6 +70,8 @@ metadata {
 		command "getEnergyStats"
 		capability "Health Check"
 		attribute "devVer", "string"
+		attribute "apiStatus", "string"
+		attribute "onlineStatus", "string"
 		attribute "monthTotalE", "string"
 		attribute "monthAvgE", "string"
 		attribute "weekTotalE", "string"
@@ -198,21 +200,29 @@ def log(message, level = "trace") {
 	return null // always child interface call with a return value
 }
 
-//	===== Device Health Check =====
+//	===== Device Health / API Check =====
 def initialize() {
 	Logger("Initialized...")
+	state?.onlineStatus = onlineStat
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
-	sendEvent(name: "healthStatus", value: "online")
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
-	if(state?.swVersion != devVer()) {
-		state.swVersion = devVer()
-	}
+	sendEvent(name: "onlineStatus", value: onlineStat, descriptionText: "Online Status is: ${onlineStat}", displayed: true, isStateChange: true, state: onlineStat)
+	state.swVersion = devVer()
 }
 
 def ping() {
 	Logger("Ping...")
 }
 
+def apiStatusEvent(issue) {
+	def curStat = device.currentState("apiStatus")?.value
+	def newStat = issue ? "Has Issue" : "Good"
+	state?.apiStatus = newStat
+	if(isStateChange(device, "apiStatus", newStat.toString())) {
+		Logger("UPDATED | API Status is: (${newStat.toString().capitalize()}) | Original State: (${curStat.toString().capitalize()})")
+		sendEvent(name: "apiStatus", value: newStat, descriptionText: "API Status is: ${newStat}", displayed: true, isStateChange: true, state: newStat)
+	} else { LogAction("API Status is: (${newStat}) | Original State: (${curStat})") }
+}
 
 //	===== Update when installed or setting changed =====
 def installed() {
