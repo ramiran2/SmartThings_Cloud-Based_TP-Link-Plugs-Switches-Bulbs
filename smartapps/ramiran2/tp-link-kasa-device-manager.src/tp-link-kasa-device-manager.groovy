@@ -164,6 +164,7 @@ def selectDevices() {
 	}
 	if (userSelectedOption == "Reset Current Error State") {
 		state.currentError = null
+		errorMsg = ""
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
@@ -207,17 +208,15 @@ def selectDevices() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg != "") {
-					if (userSelectedOption != "Update Token") {
+					if (userSelectedOption != "Update Token" && errorMsg != "") {
 						paragraph title: "Device Error:", errorMsg
 					}
 					if (userSelectedOption == "Update Token") {
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
-				}
-				if (errorMsg == "" && userSelectedOption != "Update Token"){
-					paragraph title: "Information:", TPLinkDevicesMsg
-				}
+					if (userSelectedOption != "Update Token" && errorMsg != ""){
+						paragraph title: "Information:", TPLinkDevicesMsg
+					}
 			}
 		if (userSelectedOption == "Update Token") {
 			section("Account Configuration Page:") {
