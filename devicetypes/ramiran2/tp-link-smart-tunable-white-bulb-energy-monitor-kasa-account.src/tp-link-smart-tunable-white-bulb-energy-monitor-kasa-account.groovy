@@ -58,9 +58,9 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Energy Monitor",
+				ocfDeviceType: "oic.d.light",
 				mnmn: "SmartThings",
 				vid: "generic-rgbw-color-bulb",
-				ocfDeviceType: "oic.d.light",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"

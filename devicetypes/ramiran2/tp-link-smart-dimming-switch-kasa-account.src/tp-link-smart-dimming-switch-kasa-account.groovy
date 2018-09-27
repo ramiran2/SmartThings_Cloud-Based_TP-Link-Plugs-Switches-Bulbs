@@ -50,9 +50,9 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
+				ocfDeviceType: "oic.d.switch",
 				mnmn: "SmartThings",
 				vid: "generic-dimmer-power",
-				ocfDeviceType: "oic.d.light",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

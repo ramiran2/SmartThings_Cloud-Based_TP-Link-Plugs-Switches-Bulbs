@@ -50,9 +50,9 @@ metadata {
 				author: "xKiller Maverick",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
+				ocfDeviceType: "oic.d.switch",
 				mnmn: "SmartThings",
 				vid: "generic-switch-power",
-				ocfDeviceType: "oic.d.switch",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
