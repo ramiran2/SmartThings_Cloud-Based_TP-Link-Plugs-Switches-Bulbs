@@ -246,7 +246,6 @@ def setLevel(percentage) {
 def poll() {
 	Logger("Polling parent...")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
-	refresh()
 }
 
 def refresh(){

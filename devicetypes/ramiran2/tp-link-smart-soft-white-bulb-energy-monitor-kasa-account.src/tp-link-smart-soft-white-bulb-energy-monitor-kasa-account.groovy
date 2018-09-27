@@ -60,7 +60,6 @@ metadata {
 				energyMonitorMode: "Energy Monitor",
 				ocfDeviceType: "oic.d.light",
 				mnmn: "SmartThings",
-				vid: "generic-rgbw-color-bulb",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"
@@ -368,7 +367,6 @@ def setColor(Map color) {
 def poll() {
 	Logger("Polling parent...")
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
-	refresh()
 }
 
 def refresh(){
