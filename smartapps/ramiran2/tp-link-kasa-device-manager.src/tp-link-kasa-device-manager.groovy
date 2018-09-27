@@ -118,17 +118,17 @@ def mainPage() {
 			}
 		}
 		section("Login Page:") {
-			input( 
-				"userName", "string", 
-				title:"TP-Link Kasa Email Address", 
-				required:true, 
+			input(
+				"userName", "string",
+				title: "TP-Link Kasa Email Address",
+				required: true,
 				displayDuringSetup: true,
 				image: getAppImg("email.png")
 			)
 			input(
-				"userPassword", "password", 
-				title:"TP-Link Kasa Account Password", 
-				required: true, 
+				"userPassword", "password",
+				title: "TP-Link Kasa Account Password",
+				required: true,
 				displayDuringSetup: true,
 				image: getAppImg("password.png")
 			)
@@ -138,17 +138,17 @@ def mainPage() {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
-					required: true, 
+					required: true,
 					multiple: false,
-					options: ["Communication Error", "Add Devices"],
+					options: ["Communication Error", "Add Devices", "Update Token"],
 					image: getAppImg("error.png")
 				)
 			} else {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
-					required: true, 
-					multiple: false,	
+					required: true,
+					multiple: false,
 					options: ["Initial Install", "Add Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
@@ -218,8 +218,8 @@ def selectDevices() {
 				input(
 					"userSelected", "enum",
 					title: "What do you want to do?",
-					required: true, 
-					multiple: false,	
+					required: true,
+					multiple: false,
 					options: ["Update Token"],
 					image: getAppImg("token.png")
 					)
@@ -229,8 +229,8 @@ def selectDevices() {
 			section("Device Configuration Page:") {
 				input(
 					"selectedDevices", "enum",
-					required:true, 
-					multiple:true, 
+					required: true,
+					multiple: true,
 					title: "Select Devices (${newDevices.size() ?: 0} found)",
 					options: newDevices,
 					image: getAppImg("devices.png")
