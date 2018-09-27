@@ -204,6 +204,7 @@ def log(message, level = "trace") {
 def initialize() {
 	Logger("Initialized...")
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
+	sendEvent(name: "healthStatus", value: "online")
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	if(state?.swVersion != devVer()) {
 		state.swVersion = devVer()
