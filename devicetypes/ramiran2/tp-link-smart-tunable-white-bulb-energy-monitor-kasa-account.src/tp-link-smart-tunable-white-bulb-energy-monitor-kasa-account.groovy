@@ -60,7 +60,7 @@ metadata {
 				energyMonitorMode: "Energy Monitor",
 				mnmn: "SmartThings",
 				vid: "generic-rgbw-color-bulb",
-				ocfDeviceType: “oic.d.light”,
+				ocfDeviceType: "oic.d.light",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "Switch Level"

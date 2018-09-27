@@ -52,7 +52,7 @@ metadata {
 				energyMonitorMode: "Standard",
 				mnmn: "SmartThings",
 				vid: "generic-switch-power",
-				ocfDeviceType: “oic.d.switch”,
+				ocfDeviceType: "oic.d.switch",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

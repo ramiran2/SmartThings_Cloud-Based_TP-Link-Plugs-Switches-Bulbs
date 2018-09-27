@@ -52,7 +52,7 @@ metadata {
 				energyMonitorMode: "Standard",
 				mnmn: "SmartThings",
 				vid: "generic-dimmer-power",
-				ocfDeviceType: “oic.d.light”,
+				ocfDeviceType: "oic.d.light",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"
