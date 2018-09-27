@@ -140,7 +140,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true, 
 					multiple: false,
-					options: ["Communication Error"],
+					options: ["Communication Error", "Reset Current Error State"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -160,6 +160,10 @@ def mainPage() {
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
 	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && state.currentError != null) {
+		return mainPage()
+	}
+	if (userSelectedOption == "Reset Current Error State" && state.currentError != null) {
+		state.currentError == null
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
@@ -495,16 +499,16 @@ def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
-	str += "\n" + "• Version: ${appVersion()}"
-	str += "\n" + "• Updated: ${appVerDate()}"
-	str += "\n" + "• Author: ${appAuthor()}"
-	str += "\n" + "• Modifier: ${appModifier()}"
+	str += "\n" + "• Version: ${appVersion()}	"
+	str += "\n" + "• Updated: ${appVerDate()}	"
+	str += "\n" + "• Author: ${appAuthor()}		"
+	str += "\n" + "• Modifier: ${appModifier()}	"
 	return str
 }
 def appSmallInfoDesc()	{
 	def strTwo = ""
 	strTwo += "TP-Link Kasa Device Manager"
-	strTwo += "\n" + "• Version: ${appVersion()}"
-	strTwo += "\n" + "• Updated: ${appVerDate()}"
+	strTwo += "\n" + "• Version: ${appVersion()}	"
+	strTwo += "\n" + "• Updated: ${appVerDate()}	"
 	return strTwo
 }
