@@ -157,7 +157,7 @@ simulator {
 // ===== Logging =====
 void Logger(msg, logType = "debug") {
 	def smsg = state?.showLogNamePrefix ? "${device.displayName} (v${devVer()}) | ${msg}" : "${msg}"
-	def theId = lastN(device.deviceNetworkId.toString(),5)
+	def theId = lastN(device.deviceNetworkId().toString(),5)
 	if(state?.enRemDiagLogging) {
 		parent.saveLogtoRemDiagStore(smsg, logType, "${deviceType}-${theId}")
 	} else {
