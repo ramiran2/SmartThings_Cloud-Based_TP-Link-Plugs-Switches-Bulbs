@@ -144,11 +144,6 @@ def mainPage() {
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
-	getDevices()
-	def devices = state.devices
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-	}
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
