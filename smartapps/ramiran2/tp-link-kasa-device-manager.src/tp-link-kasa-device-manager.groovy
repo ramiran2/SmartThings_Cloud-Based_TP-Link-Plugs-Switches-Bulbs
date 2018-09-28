@@ -89,9 +89,6 @@ def startPage() {
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	if (${userName} != "" || ${userPassword} != "" ){
-		mainPage()
-	}
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
@@ -129,6 +126,9 @@ def authPage() {
 				displayDuringSetup: true,
 				image: getAppImg("password.png")
 			)
+		}
+		if (${userName} != "" || ${userPassword} != "" ){
+			mainPage()
 		}
 		section("Configuration Page:") {
 			input(
