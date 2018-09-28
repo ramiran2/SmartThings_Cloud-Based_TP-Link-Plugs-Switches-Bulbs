@@ -84,11 +84,14 @@ def setInitialStates() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	mainPage()
+	authPage()
 }
 
 //	----- LOGIN PAGE -----
 def authPage() {
+	if (${userName} != "" || ${userPassword} != "" ){
+		mainPage()
+	}
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
@@ -211,10 +214,10 @@ def mainPage() {
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
 	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
-		return authPage()
+		authPage()
 	}
 	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
-		return mainPage()
+		mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
 		getToken()
