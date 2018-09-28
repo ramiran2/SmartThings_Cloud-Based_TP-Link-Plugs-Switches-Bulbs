@@ -101,7 +101,7 @@ def authPage() {
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
-		def hideInfoDiagDescStat = (state.TpLinkToken == null)
+		def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
 		name: "authPage",
 		title: "TP-Link Kasa - Login Page",
@@ -175,21 +175,21 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
         section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError != null){
+			if (state.currentError != null || state.currentError == "none"){
 				paragraph title: "Communication Error:", errorMsg
 			}
 			if (userSelectedOption == "Communication Error"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
-			if (state.currentError == null){
+			if (state.currentError == null || state.currentError == "none"){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null){
+			if (state.currentError != null || state.currentError == "none"){
 				paragraph title: "Driver Version:", driverVerionText
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && isChild != null) {
+			if (state.currentError != null && isChild != null || state.currentError == "none" && isChild) {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
