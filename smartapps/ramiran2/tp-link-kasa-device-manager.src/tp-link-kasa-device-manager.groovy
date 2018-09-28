@@ -142,6 +142,9 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
+	if (atomicState?.isInstalled == true){
+		authPage()
+	}
 	setInitialStates()
 	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
@@ -212,10 +215,10 @@ def mainPage() {
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
 	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
-		return authPage()
+		authPage()
 	}
 	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
-		return mainPage()
+		mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
 		getToken()
