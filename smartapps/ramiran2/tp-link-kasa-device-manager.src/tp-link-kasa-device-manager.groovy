@@ -84,7 +84,7 @@ def setInitialStates() {
 //This Page is used to load either parent or child app interface code
 def startPage() {
 	atomicState?.isParent = true
-	mainPage()
+	authPage()
 }
 
 //	----- LOGIN PAGE -----
