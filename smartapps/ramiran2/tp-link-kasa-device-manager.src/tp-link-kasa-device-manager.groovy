@@ -54,15 +54,16 @@ definition(
 	def appModifier() { "xKillerMaverick" }
 	def driverVersionsMin() {
 		return [
-			"colorbulbenergymonitor":["val":211, "desc":"2.1.1"],
-			"colorbulb":["val":211, "desc":"2.1.1"],
-			"dimmingswitch":["val":211, "desc":"2.1.1"],
-			"energymonitorplug":["val":211, "desc":"2.1.1"],
-			"plugswitch":["val":211, "desc":"2.1.1"],
-			"softwhitebulbenergymonitor":["val":211, "desc":"2.1.1"],
-			"softwhitebulb":["val":211, "desc":"2.1.1"],
-			"tunablewhitebulbenergymonitor":["val":211, "desc":"2.1.1"],
-			"tunablewhitebulb":["val":211, "desc":"2.1.1"]
+			"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
+			"colorbulb":["val":230, "desc":"2.3.0"],
+			"dimmingswitch":["val":230, "desc":"2.3.0"],
+			"energymonitorplug":["val":230, "desc":"2.3.0"],
+			"plug":["val":230, "desc":"2.3.0"],
+			"switch":["val":230, "desc":"2.3.0"],
+			"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+			"softwhitebulb":["val":230, "desc":"2.3.0"],
+			"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+			"tunablewhitebulb":["val":230, "desc":"2.3.0"]
 		]
 	}
 
@@ -175,7 +176,7 @@ def mainPage() {
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null) {
+			if (state.currentError != null && isChild != null) {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
