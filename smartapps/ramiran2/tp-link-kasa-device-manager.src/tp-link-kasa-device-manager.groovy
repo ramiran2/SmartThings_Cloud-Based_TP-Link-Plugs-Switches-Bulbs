@@ -51,7 +51,6 @@ definition(
 	def appVersion() { "2.4.0" }
 	def appVerDate() { "09-28-2018" }
 	def appAuthor() { "Dave Gutheinz (Modified by xKillerMaverick)" }
-	def appModifier() { "xKillerMaverick" }
 	def driverVersionsMin() {
 		return [
 			"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
@@ -105,6 +104,9 @@ def authPage() {
 		nextPage: "selectDevices",
 		install: (atomicState?.isInstalled == true ? true : false),
 		uninstall: false) {
+		section("") {
+			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+		}
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Options Information:", userOptionsText
@@ -546,7 +548,6 @@ def appInfoDesc()	{
 	str += "\n" + "• Version: ${appVersion()}"
 	str += "\n" + "• Updated: ${appVerDate()}"
 	str += "\n" + "• Author: ${appAuthor()}"
-	str += "\n" + "• Modified by ${appModifier()}"
 	return str
 }
 def appSmallInfoDesc()	{
