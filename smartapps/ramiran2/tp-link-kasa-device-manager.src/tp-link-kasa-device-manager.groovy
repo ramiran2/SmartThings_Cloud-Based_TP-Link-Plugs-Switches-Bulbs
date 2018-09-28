@@ -98,7 +98,6 @@ def authPage() {
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
-		def hideInfoDiagDescStat = (state.TpLinkToken = null)
 	return dynamicPage(
 		name: "authPage", 
 		title: "TP-Link Kasa - Login Page", 
@@ -111,6 +110,32 @@ def authPage() {
 				paragraph title: "Current Username:", userName
 				paragraph title: "Current Password:", userPassword
 			}
+		}
+		section("Login Page:") {
+			input(
+				"userName", "email",
+				title: "TP-Link Kasa Email Address",
+				required: true,
+				displayDuringSetup: true,
+				image: getAppImg("email.png")
+			)
+			input(
+				"userPassword", "password",
+				title: "TP-Link Kasa Account Password",
+				required: true,
+				displayDuringSetup: true,
+				image: getAppImg("password.png")
+			)
+		}
+		section("Configuration Page:") {
+			input(
+				"userSelectedOption", "enum",
+				title: "What do you want to do?",
+				required: true,
+				multiple: false,
+				options: ["Activate Account", "Update Account"],
+				image: getAppImg("settings.png")
+			)
 		}
 	}
 }
