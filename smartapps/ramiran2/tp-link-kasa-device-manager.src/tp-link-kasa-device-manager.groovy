@@ -142,7 +142,7 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
-	if (atomicState?.isInstalled == true){
+	if (atomicState?.isInstalled == false){
 		authPage()
 	}
 	setInitialStates()
