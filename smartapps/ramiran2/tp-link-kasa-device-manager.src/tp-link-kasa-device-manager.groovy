@@ -83,12 +83,12 @@ def setInitialStates() {
 //This Page is used to load either parent or child app interface code
 def startPage() {
 	atomicState?.isParent = true
+	setInitialStates()
 	mainPage()
 }
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	setInitialStates()
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
@@ -142,10 +142,6 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
-	if (${userName} = "" || ${userPassword} = "" ){
-		return authPage()
-	}
-	setInitialStates()
 	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
