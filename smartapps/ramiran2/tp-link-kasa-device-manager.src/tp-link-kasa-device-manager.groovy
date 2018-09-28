@@ -27,6 +27,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-09-28 Improved UI Elements with other small changes + Added a login page + Updated Driver Version Variables + Added a New Device Handler
 2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
 2018-08-28 Improved UI Elements with other small changes
 2018-08-27 Improved UI Elements with other large changes
@@ -39,7 +40,7 @@ definition(
 	name: "TP-Link Kasa Device Manager",
 	namespace: "ramiran2",
 	author: "Dave Gutheinz (Modified by xKillerMaverick)",
-	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers (Cloud)",
+	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers",
 	category: "SmartThings Labs",
 	iconUrl: "${getAppImg("kasa_logo.png")}",
 	iconX2Url: "${getAppImg("kasa_logo.png")}",
@@ -47,9 +48,9 @@ definition(
 	singleInstance: true
 	)
 	
-	def appVersion() { "2.2.9" }
-	def appVerDate() { "08-28-2018" }
-	def appAuthor() { "Dave Gutheinz" }
+	def appVersion() { "2.4.0" }
+	def appVerDate() { "09-28-2018" }
+	def appAuthor() { "Dave Gutheinz (Modified by xKillerMaverick)" }
 	def appModifier() { "xKillerMaverick" }
 	def driverVersionsMin() {
 		return [
@@ -66,8 +67,9 @@ definition(
 	}
 
 preferences {
-	page(name: "mainPage", title: "TP-Link Kasa - Settings Page", nextPage:"", content:"mainPage", uninstall: true)
-	page(name: "selectDevices", title: "TP-Link Kasa - Device Settings Page", nextPage:"", content:"selectDevices", uninstall: true, install: true)
+	page(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage:"selectDevices", content:"authPage", uninstall: false)
+	page(name: "mainPage", title: "TP-Link Kasa - Settings Page", nextPage:"selectDevices", content:"mainPage", uninstall: true)
+	page(name: "selectDevices", title: "TP-Link Kasa - Device Setup Page", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
 def setInitialStates() {
@@ -78,20 +80,74 @@ def setInitialStates() {
 }
 
 //	----- LOGIN PAGE -----
-def mainPage() {
+def authPage() {
 	setInitialStates()
+	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
+		"\n\rAvailable actions:\n\r" +
+		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"	Update Account: Updates the token."
 	def mainPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. Your current token:\n\r" + "${state.TpLinkToken}" +
+		"action you want to complete."
+		def hideInfoDiagDescCont = (true)
+		def hideInfoDiagDescStat = (state.TpLinkToken = null)
+	return dynamicPage(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage: "selectDevices", uninstall: false){
+		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			paragraph title: "Information:", mainPageText
+			paragraph title: "Information:", userOptionsText
+			if (state.TpLinkToken = null){
+				paragraph title: "Current Username:", userName
+				paragraph title: "Current Password:", userPassword
+			}
+		}
+		section("Login Page:") {
+			input(
+				"userName", "email",
+				title: "TP-Link Kasa Email Address",
+				required: true,
+				displayDuringSetup: true,
+				image: getAppImg("email.png")
+			)
+			input(
+				"userPassword", "password",
+				title: "TP-Link Kasa Account Password",
+				required: true,
+				displayDuringSetup: true,
+				image: getAppImg("password.png")
+			)
+		}
+		section("Configuration Page:") {
+			input(
+				"userSelectedOption", "enum",
+				title: "What do you want to do?",
+				required: true,
+				multiple: false,
+				options: ["Activate Account", "Update Account"],
+				image: getAppImg("settings.png")
+			)
+		}
+	}
+}
+
+//	----- SETTINGS PAGE -----
+def mainPage() {
+	setInitialStates()
+	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
-		"	Initial Install: Obtains token and adds devices.\n\r" +
+		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"	Add Devices: Only add devices.\n\r" +
-		"	Update Token: Updates the token."
+		"	Update Token: Updates the token." +
+		"	Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
+	getDevices()
+	def devices = state.devices
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+	}
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
@@ -118,22 +174,6 @@ def mainPage() {
 				paragraph title: "Driver Version:", driverVerionText
 			}
 		}
-		section("Login Page:") {
-			input(
-				"userName", "email",
-				title: "TP-Link Kasa Email Address",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("email.png")
-			)
-			input(
-				"userPassword", "password",
-				title: "TP-Link Kasa Account Password",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("password.png")
-			)
-		}
 		section("Configuration Page:") {
 			if (state.currentError != null) {
 				input(
@@ -141,7 +181,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
-					options: ["Communication Error", "Add Devices", "Update Token"],
+					options: ["Communication Error"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -160,10 +200,13 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Initial Install" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token") {
+	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+		return authPage()
+	}
+	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
 		return mainPage()
 	}
-	if (userSelectedOption == "Update Token" || userSelectedOption == "Initial Install") {
+	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
 		getToken()
 	}
 	getDevices()
@@ -197,24 +240,21 @@ def selectDevices() {
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices", 
-		title: "TP-Link Kasa - Device Settings Page", 
+		title: "TP-Link Kasa - Device Setup Page", 
 		install: true,
 		uninstall: true) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-					if (userSelectedOption != "Update Token" && errorMsg != "") {
+					if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
 						paragraph title: "Device Error:", errorMsg
 					}
-					if (userSelectedOption == "Update Token") {
-						paragraph title: "Information:", TPLinkDevicesMsg
-					}
-					if (userSelectedOption != "Update Token" && errorMsg == ""){
+					if (errorMsg == ""){
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
 			}
-		if (userSelectedOption == "Update Token") {
+		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
 			section("Account Configuration Page:") {
 				input(
 					"userSelected", "enum",
@@ -226,7 +266,7 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOption == "Add Devices" || userSelectedOption == "Initial Install") {
+		if (userSelectedOption == "Add Devices" || userSelectedOption == "Activate Account") {
 			section("Device Configuration Page:") {
 				input(
 					"selectedDevices", "enum",
@@ -493,17 +533,17 @@ def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
 def appInfoDesc()	{
 	def str = ""
-	str += "TP-Link Kasa Device Manager   "
-	str += "\n" + "• Version: ${appVersion()}   "
-	str += "\n" + "• Updated: ${appVerDate()}  "
+	str += "TP-Link Kasa Device Manager"
+	str += "\n" + "• Version: ${appVersion()}"
+	str += "\n" + "• Updated: ${appVerDate()}"
 	str += "\n" + "• Author: ${appAuthor()}"
-	str += "\n" + "• Modifier: ${appModifier()}"
+	str += "\n" + "• Modified by ${appModifier()}"
 	return str
 }
 def appSmallInfoDesc()	{
 	def strTwo = ""
-	strTwo += "TP-Link Kasa Device Manager    "
-	strTwo += "\n" + "• Version: ${appVersion()}  "
-	strTwo += "\n" + "• Updated: ${appVerDate()}  "
+	strTwo += "TP-Link Kasa Device Manager"
+	strTwo += "\n" + "• Version: ${appVersion()}"
+	strTwo += "\n" + "• Updated: ${appVerDate()}"
 	return strTwo
 }

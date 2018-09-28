@@ -20,9 +20,10 @@ All development is based upon open-source data on the
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== History =============================================
-2018-09-27	Update to Version 2.3.0
+2018-09-28	Update to Version 2.3.0
 		a.	Added Device Health Check
-		b.	Tweek from Dave Gutheinz
+		b.	Tweek from Dave Gutheinz for support for new tp-link devices
+		c.	Added support for the new Smart Things app
 2018-08-11	Update to Version 2.1.1
 		a.	Added Support for update from a repo on smartthings website
 		b.	Improved driver names
