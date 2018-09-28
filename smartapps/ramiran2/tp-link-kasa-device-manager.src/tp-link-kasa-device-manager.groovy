@@ -71,6 +71,7 @@ preferences {
 	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
+	page(name: "devMode")
 }
 
 def setInitialStates() {
@@ -97,8 +98,8 @@ def authPage() {
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
-		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"	Update Account: Updates the token."
+		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"Update Account: Updates the token."
 		def hideInfoDiagDescCont = (true)
 		def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
@@ -138,6 +139,11 @@ def authPage() {
 				options: ["Activate Account", "Update Account"],
 				image: getAppImg("settings.png")
 			)
+			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				image: getAppImg("developer.png")
+			)
 		}
 	}
 }
@@ -146,10 +152,10 @@ def authPage() {
 def mainPage() {
 	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
-		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"	Add Devices: Only add devices.\n\r" +
-		"	Update Token: Updates the token." +
-		"	Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
+		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"Add Devices: Only add devices.\n\r" +
+		"Update Token: Updates the token." +
+		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
@@ -168,7 +174,7 @@ def mainPage() {
 		name: "mainPage", 
 		title: "TP-Link Kasa - Settings Page", 
 		nextPage: "selectDevices", 
-		uninstall: true) {
+		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
@@ -193,7 +199,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
-					options: ["Communication Error"],
+					options: ["Communication Error", "Developer Page"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -206,12 +212,7 @@ def mainPage() {
 					image: getAppImg("settings.png")
 				)
 			}
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				required: true,
-				image: getAppImg("developer.png")
-			)
+			href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 		}
 	}
 }
@@ -295,6 +296,18 @@ def selectDevices() {
 					image: getAppImg("devices.png")
 				)
 			}
+		}
+	}
+}
+
+//	----- DEVELOPER MODE PAGE -----
+def devMode() {
+	return dynamicPage(
+		name: "devMode", 
+		title: "TP-Link Kasa - Developer Page", 
+		uninstall: false) {
+		section("") {
+			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 	}
 }
