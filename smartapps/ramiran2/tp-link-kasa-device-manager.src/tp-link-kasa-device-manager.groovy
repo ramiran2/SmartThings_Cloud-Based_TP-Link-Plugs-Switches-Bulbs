@@ -69,7 +69,6 @@ definition(
 
 preferences {
 	page(name: "startPage")
-	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
 }
@@ -87,58 +86,6 @@ def startPage() {
 	mainPage()
 }
 
-//	----- LOGIN PAGE -----
-def authPage() {
-	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
-		"\n\rAvailable actions:\n\r" +
-		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"	Update Account: Updates the token."
-	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
-		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete."
-		def hideInfoDiagDescCont = (true)
-		def hideInfoDiagDescStat = (state.TpLinkToken = null)
-	return dynamicPage(
-		name: "authPage", 
-		title: "TP-Link Kasa - Login Page", 
-		nextPage: "selectDevices", 
-		uninstall: false) {
-		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Information:", authPageText
-			paragraph title: "Information:", userOptionsText
-			if (state.TpLinkToken = null){
-				paragraph title: "Current Username:", userName
-				paragraph title: "Current Password:", userPassword
-			}
-		}
-		section("Login Page:") {
-			input(
-				"userName", "email",
-				title: "TP-Link Kasa Email Address",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("email.png")
-			)
-			input(
-				"userPassword", "password",
-				title: "TP-Link Kasa Account Password",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("password.png")
-			)
-		}
-		section("Configuration Page:") {
-			input(
-				"userSelectedOption", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				options: ["Activate Account", "Update Account"],
-				image: getAppImg("settings.png")
-			)
-		}
-	}
-}
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
