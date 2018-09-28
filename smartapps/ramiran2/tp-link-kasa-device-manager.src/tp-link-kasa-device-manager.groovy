@@ -82,13 +82,12 @@ def setInitialStates() {
 
 //This Page is used to load either parent or child app interface code
 def startPage() {
-	atomicState?.isParent = true
+	setInitialStates()
 	mainPage()
 }
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	setInitialStates()
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
@@ -102,7 +101,6 @@ def authPage() {
 		name: "authPage",
 		title: "TP-Link Kasa - Login Page",
 		nextPage: "selectDevices",
-		install: (atomicState?.isInstalled == true ? true : false),
 		uninstall: false) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
@@ -142,10 +140,9 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
-	if (atomicState?.isInstalled == false){
+	if (${userName} = "" || ${userPassword} = "" ){
 		return authPage()
 	}
-	setInitialStates()
 	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
