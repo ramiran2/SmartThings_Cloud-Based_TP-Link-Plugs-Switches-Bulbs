@@ -93,13 +93,12 @@ def startPage() {
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
+	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
+		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
+		"action you want to complete. " + "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"	Update Account: Updates the token."
-	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
-		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
 		def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
@@ -113,7 +112,6 @@ def authPage() {
 		}
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
-			paragraph title: "Options Information:", userOptionsText
 		}
 		section("Login Page:") {
 			input(
@@ -189,7 +187,7 @@ def mainPage() {
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && isChild != null || state.currentError == "none" && isChild) {
+			if (state.currentError != null && isChild != null || state.currentError == "none" && isChild != null) {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
@@ -208,6 +206,12 @@ def mainPage() {
 					image: getAppImg("settings.png")
 				)
 			}
+			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				required: true,
+				image: getAppImg("developer.png")
+			)
 		}
 	}
 }
