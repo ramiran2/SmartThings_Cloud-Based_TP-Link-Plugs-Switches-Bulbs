@@ -108,10 +108,6 @@ def authPage() {
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Options Information:", userOptionsText
-			if (state.TpLinkToken = null){
-				paragraph title: "Current Username:", userName
-				paragraph title: "Current Password:", userPassword
-			}
 		}
 		section("Login Page:") {
 			input(
@@ -138,6 +134,75 @@ def authPage() {
 				options: ["Activate Account", "Update Account"],
 				image: getAppImg("settings.png")
 			)
+		}
+	}
+}
+
+//	----- SETTINGS PAGE -----
+def mainPage() {
+	setInitialStates()
+	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
+		"\n\rAvailable actions:\n\r" +
+		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"	Add Devices: Only add devices.\n\r" +
+		"	Update Token: Updates the token." +
+		"	Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
+	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
+	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
+	def errorMsg = ""
+	getDevices()
+	def devices = state.devices
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+	}
+	if (state.currentError != null){
+		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
+			"\n\rPlease resolve the error and try again."
+		}
+	return dynamicPage(
+		name: "mainPage", 
+		title: "TP-Link Kasa - Settings Page", 
+		nextPage: "selectDevices", 
+		uninstall: true) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
+		}
+        section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			if (state.currentError != null){
+				paragraph title: "Communication Error:", errorMsg
+			}
+			if (userSelectedOption == "Communication Error"){
+				paragraph title: "Loading Error:", errorRetuInfo
+			}
+			if (state.currentError == null){
+				paragraph title: "Information:", mainPageText
+			}
+			if (state.currentError != null){
+				paragraph title: "Driver Version:", driverVerionText
+			}
+		}
+		section("Configuration Page:") {
+			if (state.currentError != null && isChild != null) {
+				input(
+					"userSelectedOption", "enum",
+					title: "What do you want to do?",
+					required: true,
+					multiple: false,
+					options: ["Communication Error"],
+					image: getAppImg("error.png")
+				)
+			} else {
+				input(
+					"userSelectedOption", "enum",
+					title: "What do you want to do?",
+					required: true,
+					multiple: false,
+					options: ["Initial Install", "Add Devices", "Update Token"],
+					image: getAppImg("settings.png")
+				)
+			}
 		}
 	}
 }
