@@ -83,6 +83,7 @@ def setInitialStates() {
 //This Page is used to load either parent or child app interface code
 def startPage() {
 	atomicState?.isParent = true
+	setInitialStates()
 	if ("${userPassword}" == "" || "${userPassword}" == "" ){
 		authPage()
 	} else {
@@ -92,16 +93,15 @@ def startPage() {
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	setInitialStates()
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
-		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"	Update Account: Updates the token."
+		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"Update Account: Updates the token."
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
-		def hideInfoDiagDescStat = (state.TpLinkToken = null)
+		def hideInfoDiagDescStat = ("${state.TpLinkToken}" = null)
 	return dynamicPage(
 		name: "authPage",
 		title: "TP-Link Kasa - Login Page",
@@ -146,24 +146,23 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
-	setInitialStates()
 	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
-		"	Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"	Add Devices: Only add devices.\n\r" +
-		"	Update Token: Updates the token." +
-		"	Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
+		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
+		"Add Devices: Only add devices.\n\r" +
+		"Update Token: Updates the token." +
+		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = ("${state.currentError}" == null)
 	def errorMsg = ""
 	getDevices()
 	def devices = state.devices
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 	}
-	if (state.currentError != null){
+	if ("${state.currentError}" != null){
 		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
 		}
@@ -176,16 +175,16 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
         section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError != null){
+			if ("${state.currentError}" != null){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (userSelectedOption == "Communication Error"){
+			if ("${userSelectedOption}" == "Communication Error"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 			if (state.currentError == null){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null){
+			if ("${state.currentError}" != null){
 				paragraph title: "Driver Version:", driverVerionText
 			}
 		}
@@ -215,13 +214,13 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if ("${userSelectedOption}" != "Activate Account" && "${userSelectedOption}" != "Add Devices" && "${userSelectedOption}" != "Update Token" && "${userSelectedOption}" != "Update Account" && "${userSelectedOption}" != "Communication Error") {
 		return authPage()
 	}
-	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
+	if ("${userSelectedOption}" != "Add Devices" && "${userSelectedOption}" != "Update Token" && "${userSelectedOption}" != "Update Account" && "${userSelectedOption}" != "Activate Account") {
 		return mainPage()
 	}
-	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
+	if ("${userSelectedOption}" == "Update Token" || "${userSelectedOption}" == "Activate Account" || "${userSelectedOption}" == "Update Account") {
 		getToken()
 	}
 	getDevices()
@@ -235,17 +234,17 @@ def selectDevices() {
 		}
 	}
 	settings.selectedDevices = null
-	if (devices == [:]) {
+	if ("${devices}" == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 		}
-	if (newDevices == [:]) {
+	if ("${newDevices}" == [:]) {
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 		}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "")
+	def hideInfoDiagDescStat = ("${errorMsg}" == "")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -262,14 +261,14 @@ def selectDevices() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-					if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
+					if ("${userSelectedOption}" != "Update Token" && "${userSelectedOption}" != "Update Account" && "${errorMsg}" != "") {
 						paragraph title: "Device Error:", errorMsg
 					}
-					if (errorMsg == ""){
+					if ("${errorMsg}" == ""){
 						paragraph title: "Information:", TPLinkDevicesMsg
 					}
 			}
-		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
+		if ("${userSelectedOption}" == "Update Token" || "${userSelectedOption}" == "Update Account") {
 			section("Account Configuration Page:") {
 				input(
 					"userSelected", "enum",
@@ -281,7 +280,7 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOption == "Add Devices" || userSelectedOption == "Activate Account") {
+		if ("${userSelectedOption}" == "Add Devices" || "${userSelectedOption}" == "Activate Account") {
 			section("Device Configuration Page:") {
 				input(
 					"selectedDevices", "enum",
@@ -393,7 +392,7 @@ def getToken() {
 			state.TpLinkToken = resp.data.result.token
 			log.info "TpLinkToken updated to ${state.TpLinkToken}"
 			sendEvent(name: "TokenUpdate", value: "tokenUpdate Successful.")
-			if (state.currentError != null) {
+			if ("${state.currentError}" != null) {
 				state.currentError = null
 			}
 		} else if (resp.status != 200) {
@@ -424,7 +423,7 @@ def getDeviceData() {
 	httpPostJson(getDevicesParams) {resp ->
 		if (resp.status == 200 && resp.data.error_code == 0) {
 			currentDevices = resp.data.result.deviceList
-			if (state.currentError != null) {
+			if ("${state.currentError}" != null) {
 				state.currentError = null
 			}
 			return currentDevices
@@ -464,7 +463,7 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 			if (state.errorCount != 0) {
 				state.errorCount = 0
 			}
-			if (state.currentError != null) {
+			if ("${state.currentError}" != null) {
 				state.currentError = null
 				sendEvent(name: "currentError", value: null)
 			log.debug "state.errorCount = ${state.errorCount} //	state.currentError = ${state.currentError}"
@@ -507,7 +506,7 @@ def initialize() {
 
 //	----- PERIODIC CLOUD MX TASKS -----
 def checkError() {
-	if (state.currentError == null || state.currentError == "none") {
+	if ("${state.currentError}" == null || "${state.currentError}" == "none") {
 		log.info "TP-Link Connect did not have any set errors."
 		return
 	}
@@ -517,13 +516,13 @@ def checkError() {
 	if (errMsg == "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
-		if (state.currentError == null) {
+		if ("${state.currentError}" == null) {
 			log.info "getDevices successful. apiServerUrl updated and token is good."
 			return
 		}
 		log.error "${errMsg} error while attempting getDevices. Will attempt getToken"
 		getToken()
-		if (state.currentError == null) {
+		if ("${state.currentError}" == null) {
 			log.info "getToken successful. Token has been updated."
 			getDevices()
 			return
