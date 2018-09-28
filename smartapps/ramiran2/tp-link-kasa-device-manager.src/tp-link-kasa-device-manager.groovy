@@ -102,11 +102,11 @@ def authPage() {
 	return dynamicPage(
 		name: "authPage", 
 		title: "TP-Link Kasa - Login Page", 
-		nextPage: "", 
+		nextPage: "selectDevices", 
 		uninstall: false) {
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
-			paragraph title: "Information:", userOptionsText
+			paragraph title: "Options Information:", userOptionsText
 			if (state.TpLinkToken = null){
 				paragraph title: "Current Username:", userName
 				paragraph title: "Current Password:", userPassword
