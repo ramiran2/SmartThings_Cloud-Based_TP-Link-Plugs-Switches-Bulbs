@@ -69,7 +69,7 @@ definition(
 
 preferences {
 	page(name: "mainPage", title: "TP-Link Kasa - Settings Page", nextPage:"selectDevices", content:"mainPage", uninstall: true)
-	page(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage:"selectDevices", content:"authPage", uninstall: false)
+	page(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage:"selectDevices", content:"authPage", uninstall: true)
 	page(name: "selectDevices", title: "TP-Link Kasa - Device Setup Page", nextPage:"", content:"selectDevices", uninstall: true, install: true)
 }
 
@@ -82,7 +82,6 @@ def setInitialStates() {
 
 //	----- LOGIN PAGE -----
 def authPage() {
-	setInitialStates()
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"	Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
@@ -92,7 +91,7 @@ def authPage() {
 		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
 		def hideInfoDiagDescStat = (state.TpLinkToken = null)
-	return dynamicPage(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage: "selectDevices", uninstall: false){
+	return dynamicPage(name: "authPage", title: "TP-Link Kasa - Login Page", nextPage: "selectDevices", uninstall: true) {
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", mainPageText
 			paragraph title: "Information:", userOptionsText
