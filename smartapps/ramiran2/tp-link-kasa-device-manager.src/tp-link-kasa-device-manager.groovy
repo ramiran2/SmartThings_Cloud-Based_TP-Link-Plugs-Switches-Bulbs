@@ -112,32 +112,6 @@ def authPage() {
 				paragraph title: "Current Password:", userPassword
 			}
 		}
-		section("Login Page:") {
-			input(
-				"userName", "email",
-				title: "TP-Link Kasa Email Address",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("email.png")
-			)
-			input(
-				"userPassword", "password",
-				title: "TP-Link Kasa Account Password",
-				required: true,
-				displayDuringSetup: true,
-				image: getAppImg("password.png")
-			)
-		}
-		section("Configuration Page:") {
-			input(
-				"userSelectedOption", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				options: ["Activate Account", "Update Account"],
-				image: getAppImg("settings.png")
-			)
-		}
 	}
 }
 
