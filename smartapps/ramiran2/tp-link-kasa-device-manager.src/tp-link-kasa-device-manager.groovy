@@ -100,9 +100,10 @@ def authPage() {
 		def hideInfoDiagDescCont = (true)
 		def hideInfoDiagDescStat = (state.TpLinkToken = null)
 	return dynamicPage(
-		name: "authPage", 
-		title: "TP-Link Kasa - Login Page", 
-		nextPage: "selectDevices", 
+		name: "authPage",
+		title: "TP-Link Kasa - Login Page",
+		nextPage: "selectDevices",
+		install: (atomicState?.isInstalled == true ? true : false),
 		uninstall: false) {
 		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
