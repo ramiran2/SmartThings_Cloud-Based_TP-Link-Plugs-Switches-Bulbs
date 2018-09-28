@@ -68,8 +68,10 @@ definition(
 	}
 
 preferences {
-	page(name: "mainPage", title: "TP-Link Kasa - Settings Page", nextPage:"selectDevices", content:"mainPage", uninstall: true)
-	page(name: "selectDevices", title: "TP-Link Kasa - Device Setup Page", nextPage:"", content:"selectDevices", uninstall: true, install: true)
+	page(name: "startPage")
+	page(name: "authPage")
+	page(name: "mainPage")
+	page(name: "selectDevices")
 }
 
 def setInitialStates() {
@@ -77,6 +79,12 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
+}
+
+//This Page is used to load either parent or child app interface code
+def startPage() {
+	atomicState?.isParent = true
+	mainPage()
 }
 
 //	----- LOGIN PAGE -----
