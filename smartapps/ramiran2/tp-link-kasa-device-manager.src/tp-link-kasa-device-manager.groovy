@@ -82,6 +82,7 @@ def setInitialStates() {
 
 //This Page is used to load either parent or child app interface code
 def startPage() {
+	atomicState?.isParent = true
 	setInitialStates()
 	mainPage()
 }
@@ -101,6 +102,7 @@ def authPage() {
 		name: "authPage",
 		title: "TP-Link Kasa - Login Page",
 		nextPage: "selectDevices",
+		install: (atomicState?.isInstalled == true ? true : false),
 		uninstall: false) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
