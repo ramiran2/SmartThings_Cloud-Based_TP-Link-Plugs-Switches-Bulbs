@@ -69,7 +69,7 @@ definition(
 
 preferences {
 	page(name: "startPage")
-	page(name: "authPage")
+	page(name: "loginPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
 }
@@ -88,7 +88,7 @@ def startPage() {
 }
 
 //	----- LOGIN PAGE -----
-def authPage() {
+def loginPage() {
 	setInitialStates()
 	def userOptionsText = "Your current token:\n\r" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
@@ -98,6 +98,7 @@ def authPage() {
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
 		def hideInfoDiagDescCont = (true)
+		def hideInfoDiagDescStat = (state.TpLinkToken = null)
 	return dynamicPage(
 		name: "authPage", 
 		title: "TP-Link Kasa - Login Page", 
