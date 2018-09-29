@@ -228,9 +228,6 @@ def mainPage() {
 				title: "Do you want to enable developer mode?",
 				image: getAppImg("developer.png")
 			)
-			if (userSelectedDevMode == true){
-				paragraph title: "Information:", mainPageText
-			}
 		}
 	}
 }
@@ -334,7 +331,8 @@ def devMode() {
 			paragraph title: "Driver Version:", driverVerionText
 		}
 		section("Help and Feedback:") {
-			paragraph title: "Information:", mainPageText
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 	}
 }
