@@ -57,7 +57,7 @@ definition(
 	namespace: "ramiran2",
 	author: "Dave Gutheinz (Modified by xKillerMaverick)",
 	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers",
-	category: "SmartThings Labs",
+	category: "Convenience",
 	iconUrl: "${getAppImg("kasa_logo.png")}",
 	iconX2Url: "${getAppImg("kasa_logo.png")}",
 	iconX3Url: "${getAppImg("kasa_logo.png")}",
@@ -283,14 +283,14 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-			section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-					if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
-						paragraph title: "Device Error:", errorMsg
-					}
-					if (errorMsg == ""){
-						paragraph title: "Information:", TPLinkDevicesMsg
-					}
-			}
+		section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+				if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
+					paragraph title: "Device Error:", errorMsg
+				}
+				if (errorMsg == ""){
+					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+		}
 		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
 			section("Account Configuration Page:") {
 				input(
@@ -320,9 +320,9 @@ def selectDevices() {
 
 //	----- DEVELOPER MODE PAGE -----
 def devMode() {
-	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	def driverVersionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = (true)
 	return dynamicPage(
 		name: "devMode", 
 		title: "TP-Link Kasa - Developer Page", 
@@ -331,7 +331,7 @@ def devMode() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Driver Version:", driverVerionText
+			paragraph title: "Driver Version:", driverVersionText
 		}
 		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
