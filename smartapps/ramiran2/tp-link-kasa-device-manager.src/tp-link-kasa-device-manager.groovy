@@ -326,7 +326,6 @@ def devMode() {
 	return dynamicPage(
 		name: "devMode", 
 		title: "TP-Link Kasa - Developer Page", 
-		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
