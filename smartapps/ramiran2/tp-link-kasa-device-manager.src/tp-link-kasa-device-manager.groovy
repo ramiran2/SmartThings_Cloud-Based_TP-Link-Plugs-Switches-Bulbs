@@ -87,7 +87,6 @@ preferences {
 	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
-	page(name: "devMode")
 }
 
 def setInitialStates() {
@@ -229,9 +228,6 @@ def mainPage() {
 				title: "Do you want to enable developer mode?",
 				image: getAppImg("developer.png")
 			)
-			if (userSelectedDevMode == true){
-				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
-			}
 	}
 }
 
@@ -318,27 +314,6 @@ def selectDevices() {
 	}
 }
 
-//	----- DEVELOPER MODE PAGE -----
-def devMode() {
-	def driverVersionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (true)
-	return dynamicPage(
-		name: "devMode", 
-		title: "TP-Link Kasa - Developer Page", 
-		uninstall: false) {
-		section("") {
-			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
-		}
-		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Driver Version:", driverVersionText
-		}
-		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
-		}
-	}
-}
 
 def getDevices() {
 	def currentDevices = getDeviceData()
