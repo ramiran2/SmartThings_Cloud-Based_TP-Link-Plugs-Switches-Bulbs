@@ -223,12 +223,15 @@ def mainPage() {
 					options: ["Initial Install", "Add Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
+			}
 			input(
 				"userSelectedDevMode", "bool",
 				title: "Do you want to enable developer mode?",
 				image: getAppImg("developer.png")
 			)
-		}
+			if (userSelectedDevMode == true){
+				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+			}
 	}
 }
 
@@ -258,11 +261,11 @@ def selectDevices() {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
-		}
+	}
 	if (newDevices == [:]) {
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
-		}
+	}
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (errorMsg == "")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
@@ -331,7 +334,8 @@ def devMode() {
 			paragraph title: "Driver Version:", driverVerionText
 		}
 		section("Help and Feedback:") {
-			
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 	}
 }
