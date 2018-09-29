@@ -87,7 +87,6 @@ preferences {
 	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
-	page(name: "devMode")
 }
 
 def setInitialStates() {
@@ -318,18 +317,7 @@ def selectDevices() {
 	}
 }
 
-//	----- DEVELOPER MODE PAGE -----
-def devMode() {
-	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
-	return dynamicPage(
-		name: "devMode", 
-		title: "TP-Link Kasa - Developer Page", 
-		uninstall: false) {
-		
-	}
-}
+
 
 def getDevices() {
 	def currentDevices = getDeviceData()
