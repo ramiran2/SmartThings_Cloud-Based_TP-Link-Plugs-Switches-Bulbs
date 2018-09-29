@@ -87,6 +87,7 @@ preferences {
 	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
+	page(name: "devMode")
 }
 
 def setInitialStates() {
@@ -227,7 +228,7 @@ def mainPage() {
 				title: "Do you want to enable developer mode?",
 				image: getAppImg("developer.png")
 			)
-			if (userSelectedDevMode == true){
+			if ("${userSelectedDevMode}" == true){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
 		}
@@ -317,7 +318,28 @@ def selectDevices() {
 	}
 }
 
-
+//	----- DEVELOPER MODE PAGE -----
+def devMode() {
+	def driverVerionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
+	return dynamicPage(
+		name: "devMode", 
+		title: "TP-Link Kasa - Developer Page", 
+		install: false,
+		uninstall: false) {
+		section("") {
+			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+		}
+		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			paragraph title: "Driver Version:", driverVerionText
+		}
+		section("Help and Feedback:") {
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+		}
+	}
+}
 
 def getDevices() {
 	def currentDevices = getDeviceData()
@@ -568,9 +590,9 @@ def removeChildDevice(alias, deviceNetworkId) {
 }
 
 def gitBranch() { return "master" }
-def getWikiPageUrl()		{ return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
-def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
+def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
+def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
