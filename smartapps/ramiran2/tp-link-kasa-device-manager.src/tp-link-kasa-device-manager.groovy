@@ -327,16 +327,7 @@ def devMode() {
 		name: "devMode", 
 		title: "TP-Link Kasa - Developer Page", 
 		uninstall: false) {
-		section("") {
-			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
-		}
-		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Driver Version:", driverVerionText
-		}
-		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
-		}
+		
 	}
 }
 
