@@ -116,6 +116,7 @@ def authPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Update Account: Updates the token."
+	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "2.3.0" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 		def hideInfoDiagDescCont = (true)
 		def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
@@ -127,8 +128,9 @@ def authPage() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		section("Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Information/Driver Version Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
+			paragraph title: "Driver Version:", driverVersionText
 		}
 		section("Login Page:") {
 			input(
@@ -321,8 +323,8 @@ def selectDevices() {
 
 //	----- DEVELOPER MODE PAGE -----
 def devMode() {
+	def errorMsg = ""
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
-	def driverVersionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	getDevices()
 	def devices = state.devices
 	def newDevices = [:]
@@ -352,15 +354,15 @@ def devMode() {
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Current Error:", "${state.currentError}"
-			paragraph title: "Managed Devices:", "${isChild}",
-			paragraph title: "Command Response:", "${cmdResponse}",
-			paragraph title: "Sent Data:", "${sendDeviceCmd}",
-			paragraph title: "Manager Devices:", "${state.TpLinkToken}",
-			paragraph title: "Error Messages:", "${errMsg}",
-			paragraph title: "Username:", "${userName}",
-			paragraph title: "Password:", "${userPassword}",
-			paragraph title: "Driver Version:", driverVersionText,
-			paragraph title: "Communication/Device Error:", errorMsg,
+			paragraph title: "Managed Devices:", "${isChild}"
+			paragraph title: "New Devices:", "${newDevices}"
+			paragraph title: "Command Response:", "${cmdResponse}"
+			paragraph title: "Sent Data:", "${sendDeviceCmd}"
+			paragraph title: "Manager Devices:", "${state.TpLinkToken}"
+			paragraph title: "Error Messages:", "${errMsg}"
+			paragraph title: "Username:", "${userName}"
+			paragraph title: "Password:", "${userPassword}"
+			paragraph title: "Communication/Device Error:", errorMsg
 			paragraph title: "Loading Error:", errorRetuInfo
 		}
 		section("Help and Feedback:") {
