@@ -323,8 +323,6 @@ def selectDevices() {
 
 //	----- DEVELOPER MODE PAGE -----
 def devMode() {
-	def errorMsg = ""
-	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	getDevices()
 	def devices = state.devices
 	def newDevices = [:]
@@ -333,15 +331,6 @@ def devMode() {
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
-	}
-	if (devices == [:]) {
-		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
-		"that all devices are in 'Local Control Only'. Correct them then " +
-		"rerun the application."
-	}
-	if (newDevices == [:]) {
-		errorMsg = "No new devices to add. Are you sure they are in Remote " +
-		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = ("${state.currentError}")
@@ -353,17 +342,18 @@ def devMode() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			paragraph title: "Error Count:", "${state.currentError}"
 			paragraph title: "Current Error:", "${state.currentError}"
 			paragraph title: "Managed Devices:", "${isChild}"
 			paragraph title: "New Devices:", "${newDevices}"
 			paragraph title: "Command Response:", "${cmdResponse}"
-			paragraph title: "Sent Data:", "${sendDeviceCmd}"
-			paragraph title: "Manager Devices:", "${state.TpLinkToken}"
+			paragraph title: "Request Data:", "${command}"
+			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
+			paragraph title: "Hub:", "${hub}"
+			paragraph title: "Hub ID:", "${hub.id}"
 			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
-			paragraph title: "Communication/Device Error:", errorMsg
-			paragraph title: "Loading Error:", errorRetuInfo
 		}
 		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
