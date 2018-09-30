@@ -342,9 +342,7 @@ def devMode() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "")
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = ("${state.currentError}")
 	return dynamicPage(
 		name: "devMode",
 		title: "TP-Link Kasa - Developer Page",
@@ -353,7 +351,18 @@ def devMode() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-
+			paragraph title: "Current Error:", "${state.currentError}"
+			paragraph title: "Managed Devices:", "${isChild}",
+			paragraph title: "New Devices:", "${newDevices}",
+			paragraph title: "Command Response:", "${cmdResponse}",
+			paragraph title: "Sent Data:", "${sendDeviceCmd}",
+			paragraph title: "Manager Devices:", "${state.TpLinkToken}",
+			paragraph title: "Error Messages:", "${errMsg}",
+			paragraph title: "Username:", "${userName}"
+			paragraph title: "Password:", "${userPassword}",
+			paragraph title: "Driver Version:", driverVersionText
+			paragraph title: "Communication/Device Error:", errorMsg
+			paragraph title: "Loading Error:", errorRetuInfo
 		}
 		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
