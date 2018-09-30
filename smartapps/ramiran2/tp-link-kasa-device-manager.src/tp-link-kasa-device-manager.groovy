@@ -3,16 +3,16 @@ TP-Link Connect Service Manager, 2018 Version 2
 
 Copyright 2018 Dave Gutheinz
 
-Licensed under the Apache License, Version 2.0 (the "License"); you 
-may not use this file except in compliance with the License. You may 
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You may
 obtain a copy of the License at:
 
 	http://www.apache.org/licenses/LICENSE-2.0
-		
-Unless required by applicable law or agreed to in writing, software 
-distributed under the License is distributed on an "AS IS" BASIS, 
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-implied. See the License for the specific language governing 
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing
 permissions and limitations under the License.
 
 TP-Link Kasa Device Manager, 2018 Version 2
@@ -20,26 +20,26 @@ TP-Link Kasa Device Manager, 2018 Version 2
 Copyright 2018 Anthony Ramirez
 
 Licensed under the Apache License, Version 2.0 (the "License"); you 
-may not use this file except in compliance with the License. You may 
+may not use this file except in compliance with the License. You may
 obtain a copy of the License at:
 
 	http://www.apache.org/licenses/LICENSE-2.0
-		
-Unless required by applicable law or agreed to in writing, software 
-distributed under the License is distributed on an "AS IS" BASIS, 
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-implied. See the License for the specific language governing 
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing
 permissions and limitations under the License.
 
-##### Discalimer: This Service Manager and the associated Device 
+##### Discalimer: This Service Manager and the associated Device
 Handlers are in no way sanctioned or supported by TP-Link. All
-development is based upon open-source data on the TP-Link Kasa Devices; 
+development is based upon open-source data on the TP-Link Kasa Devices;
 primarily various users on GitHub.com.
 
 ##### Notes #####
-1.	This Service Manager is designed to install and manage TP-Link 
+1.	This Service Manager is designed to install and manage TP-Link
 	bulbs, plugs, and switches using their respective device handlers.
-2.	Please direct comments to the SmartThings community thread 
+2.	Please direct comments to the SmartThings community thread
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
@@ -63,7 +63,7 @@ definition(
 	iconX3Url: "${getAppImg("kasa_logo.png")}",
 	singleInstance: true
 	)
-	
+
 	def appVersion() { "2.4.0" }
 	def appVerDate() { "09-28-2018" }
 	def appAuthor() { "Dave Gutheinz (Modified by xKillerMaverick)" }
@@ -186,9 +186,9 @@ def mainPage() {
 			"\n\rPlease resolve the error and try again."
 		}
 	return dynamicPage(
-		name: "mainPage", 
-		title: "TP-Link Kasa - Settings Page", 
-		nextPage: "selectDevices", 
+		name: "mainPage",
+		title: "TP-Link Kasa - Settings Page",
+		nextPage: "selectDevices",
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
@@ -233,6 +233,7 @@ def mainPage() {
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
 		}
+	}
 }
 
 //	----- SELECT DEVICES PAGE -----
@@ -276,8 +277,8 @@ def selectDevices() {
 		"wish to add, thenpress Done again to install the devices. Press	<	" +
 		"to return to the previous page."
 	return dynamicPage(
-		name: "selectDevices", 
-		title: "TP-Link Kasa - Device Setup Page", 
+		name: "selectDevices",
+		title: "TP-Link Kasa - Device Setup Page",
 		install: true,
 		uninstall: true) {
 		section("") {
@@ -320,18 +321,50 @@ def selectDevices() {
 
 //	----- DEVELOPER MODE PAGE -----
 def devMode() {
+	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings: ${driverVersionsMin()}\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	getDevices()
+	def devices = state.devices
+	def newDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	if (devices == [:]) {
+		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+		"that all devices are in 'Local Control Only'. Correct them then " +
+		"rerun the application."
+	}
+	if (newDevices == [:]) {
+		errorMsg = "No new devices to add. Are you sure they are in Remote " +
+		"Control Mode?"
+	}
+	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (errorMsg == "")
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
-		name: "devMode", 
-		title: "TP-Link Kasa - Developer Page", 
+		name: "devMode",
+		title: "TP-Link Kasa - Developer Page",
 		uninstall: false) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			paragraph title: "Current Error:", "${state.currentError}"
+			paragraph title: "Managed Devices:", "${isChild}",
+			paragraph title: "New Devices:", "${newDevices}",
+			paragraph title: "Command Response:", "${cmdResponse}",
+			paragraph title: "Sent Data:", "${sendDeviceCmd}",
+			paragraph title: "Manager Devices:", "${state.TpLinkToken}",
+			paragraph title: "Error Messages:", "${errMsg}",
+			paragraph title: "Username:", "${userName}"
+			paragraph title: "Password:", "${userPassword}",
 			paragraph title: "Driver Version:", driverVersionText
+			paragraph title: "Communication/Device Error:", errorMsg
+			paragraph title: "Loading Error:", errorRetuInfo
 		}
 		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
@@ -397,11 +430,11 @@ def addDevices() {
 			def deviceModel = device.value.deviceModel.substring(0,5)
 			addChildDevice(
 				"ramiran2",
-				tpLinkModel["${deviceModel}"], 
+				tpLinkModel["${deviceModel}"],
 				device.value.deviceMac,
 				hubId, [
 					"label": device.value.alias,
-						"name": device.value.deviceModel, 
+						"name": device.value.deviceModel,
 					"data": [
 						"deviceId" : device.value.deviceId,
 						"appServerUrl": device.value.appServerUrl,
@@ -490,7 +523,7 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 	def cmdBody = [
 		method: "passthrough",
 		params: [
-			deviceId: deviceId, 
+			deviceId: deviceId,
 			requestData: "${command}"
 		]
 	]
