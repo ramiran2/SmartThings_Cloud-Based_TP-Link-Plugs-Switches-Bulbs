@@ -350,7 +350,7 @@ def devMode() {
 			paragraph title: "Request Data:", "${command}"
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
 			paragraph title: "Hub:", "${hub}"
-			paragraph title: "Hub ID:", "${hub.id}"
+			paragraph title: "Hub ID:", "${hubId}"
 			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
