@@ -498,7 +498,6 @@ def addDevices() {
 			log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
 		} else {
 			def oldDevice = state.devices.find { it.value.deviceMac == dni }
-			def oldDeviceModel = oldDevice.value.deviceModel.substring(0,5)
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
 			try {
