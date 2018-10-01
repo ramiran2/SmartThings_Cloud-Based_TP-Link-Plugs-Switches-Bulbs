@@ -404,7 +404,7 @@ def getAccessToken() {
 		else { return true }
 	}
 	catch (ex) {
-		def msg = "Error: OAuth is not Enabled for ${appName()}!. Please click remove and Enable Oauth under the SmartApp App Settings in the IDE"
+		def msg = "Error: OAuth is not Enabled for TP-Link Kasa Device Manager!. Please click remove and Enable Oauth under the SmartApp App Settings in the IDE"
 		sendPush(msg)
 		log.error "getAccessToken Exception", ex
 		LogAction("getAccessToken Exception | $msg", "warn", true)
