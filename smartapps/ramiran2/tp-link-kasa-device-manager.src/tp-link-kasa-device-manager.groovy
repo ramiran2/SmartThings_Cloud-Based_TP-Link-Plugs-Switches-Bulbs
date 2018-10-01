@@ -480,11 +480,12 @@ def addDevices() {
 	selectedDevices.each { dni ->
 		def isChild = getChildDevice(dni)
 		if (isChild) {
-			def oldDevice = state.devices.find { it.value.deviceMac == isChild }
+			def isChildMac = getChildDevice(it.value.deviceMac)
+			def oldDevice = state.devices.find { it.value.deviceMac == isChildMac }
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
 			try {
-				deleteChildDevice(it.deviceNetworkId)
+				deleteChildDevice(deviceNetworkId)
 				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
 			} catch (Exception e) {
 				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
