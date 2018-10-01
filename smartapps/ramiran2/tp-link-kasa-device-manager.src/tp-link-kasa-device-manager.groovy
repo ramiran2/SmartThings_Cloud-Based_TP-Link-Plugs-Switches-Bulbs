@@ -83,6 +83,7 @@ definition(
 	}
 
 preferences {
+	page(name: "oauthVerification")
 	page(name: "startPage")
 	page(name: "authPage")
 	page(name: "mainPage")
@@ -95,6 +96,23 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
+}
+
+def oauthVerification() {
+    if(!atomicState?.accessToken) { getAccessToken() }
+	if(!atomicState?.accessToken) {
+		return dynamicPage(name: "startPage", title: "Status Page", nextPage: "", install: false, uninstall: true) {
+			section ("Status Page:") {
+				def title = ""
+                def desc = ""
+				if(!atomicState?.accessToken) { title="OAUTH Error"; desc = "OAuth is not Enabled for ${app?.label} application.  Please click remove and review the installation directions again"; }
+				else { title="Unknown Error"; desc = "Application Status has not received any messages to display";	}
+				log.warn "Status Message: $desc"
+				paragraph title: "$title", "$desc", required: true, state: null
+			}
+		}
+	}
+    else { return startPage() }
 }
 
 //This Page is used to load either parent or child app interface code
@@ -112,7 +130,7 @@ def startPage() {
 def authPage() {
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. " + "Your current token:\n\r" + "${state.TpLinkToken}" +
+		"action you want to complete. " + "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Update Account: Updates the token."
@@ -128,7 +146,7 @@ def authPage() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		section("Information/Driver Version Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Information and Driver Version:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Driver Version:", driverVersionText
 		}
@@ -168,7 +186,7 @@ def authPage() {
 
 //	----- SETTINGS PAGE -----
 def mainPage() {
-	def mainPageText = "Your current token:\n\r" + "${state.TpLinkToken}" +
+	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add Devices: Only add devices.\n\r" +
@@ -195,15 +213,15 @@ def mainPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-        section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+        section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			if (state.currentError == null || state.currentError == "none"){
+				paragraph title: "Information:", mainPageText
+			}
 			if (state.currentError != null || state.currentError == "none"){
 				paragraph title: "Communication Error:", errorMsg
 			}
 			if (userSelectedOption == "Communication Error"){
 				paragraph title: "Loading Error:", errorRetuInfo
-			}
-			if (state.currentError == null || state.currentError == "none"){
-				paragraph title: "Information:", mainPageText
 			}
 		}
 		section("Configuration Page:") {
@@ -286,12 +304,12 @@ def selectDevices() {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
-		section("Diagnostics/Information Description:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
-					paragraph title: "Device Error:", errorMsg
-				}
+		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 				if (errorMsg == ""){
 					paragraph title: "Information:", TPLinkDevicesMsg
+				}
+				if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
+					paragraph title: "Device Error:", errorMsg
 				}
 		}
 		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
@@ -344,8 +362,6 @@ def devMode() {
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Error Count:", "${state.currentError}"
 			paragraph title: "Current Error:", "${state.currentError}"
-			paragraph title: "Managed Devices:", "${isChild}"
-			paragraph title: "New Devices:", "${newDevices}"
 			paragraph title: "Command Response:", "${cmdResponse}"
 			paragraph title: "Request Data:", "${command}"
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
@@ -354,12 +370,65 @@ def devMode() {
 			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
+			paragraph title: "Managed Devices:", "${isChild}"
+			paragraph title: "New Devices:", "${newDevices}"
 		}
 		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("web.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 	}
+}
+
+//This code really does nothing at the moment but return the dynamic url of the app's endpoints
+def getEndpointUrl() {
+	def params = [
+		uri: "https://graph.api.smartthings.com/api/smartapps/endpoints",
+		query: ["access_token": atomicState?.accessToken],
+		contentType: 'application/json'
+	]
+	try {
+		httpGet(params) { resp ->
+			LogAction("EndPoint URL: ${resp?.data?.uri}", "trace", false)
+			return resp?.data?.uri
+		}
+	} catch (ex) {
+		log.error "getEndpointUrl Exception:", ex
+		sendExceptionData(ex, "getEndpointUrl")
+	}
+}
+
+def getAccessToken() {
+	try {
+		if(!atomicState?.accessToken) { atomicState?.accessToken = createAccessToken() }
+		else { return true }
+	}
+	catch (ex) {
+		def msg = "Error: OAuth is not Enabled for ${appName()}!. Please click remove and Enable Oauth under the SmartApp App Settings in the IDE"
+		sendPush(msg)
+		log.error "getAccessToken Exception", ex
+		LogAction("getAccessToken Exception | $msg", "warn", true)
+		//sendExceptionData(ex, "getAccessToken")
+		return false
+	}
+}
+
+void resetSTAccessToken(reset) {
+	if(reset != true) { return }
+	LogAction("Resetting SmartApp Access Token....", "info", true)
+	restStreamHandler(true)
+	atomicState?.restStreamingOn = false
+	revokeAccessToken()
+	atomicState?.accessToken = null
+	if(getAccessToken()) {
+		LogAction("Reset SmartApp Access Token... Successful", "info", true)
+		settingUpdate("resetSTAccessToken", "false", "bool")
+	}
+	startStopStream()
+}
+
+def generateInstallId() {
+	if(!atomicState?.installationId) { atomicState?.installationId = UUID?.randomUUID().toString() }
 }
 
 def getDevices() {
@@ -390,7 +459,7 @@ def addDevices() {
 	tpLinkModel << ["HS200" : "TP-Link Smart Switch - Kasa Account"]					//	HS200
 	tpLinkModel << ["HS210" : "TP-Link Smart Switch - Kasa Account"]					//	HS210
 	tpLinkModel << ["KP100" : "TP-Link Smart Plug - Kasa Account"]						//	KP100
-	//	Dimming Plug Devices
+	//	Dimming Switch Devices
 	tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Kasa Account"]			//	HS220
 	//	Energy Monitor Plugs
 	tpLinkModel << ["HS110" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
@@ -614,6 +683,7 @@ def gitBranch() { return "master" }
 def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
 def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
 def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
+def getAppEndpointUrl(subPath) { return "${apiServerUrl("/api/smartapps/installations/${app.id}${subPath ? "/${subPath}" : ""}?access_token=${atomicState.accessToken}")}" }
 def appInfoDesc()	{
 	def str = ""
 	str += "TP-Link Kasa Device Manager"
