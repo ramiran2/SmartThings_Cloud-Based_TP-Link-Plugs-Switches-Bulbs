@@ -43,6 +43,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-10-01 Improved UI Elements with other small changes + Added a developer page
 2018-09-28 Improved UI Elements with other small changes + Added a login page + Updated Driver Version Variables + Added a New Device Handler
 2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
 2018-08-28 Improved UI Elements with other small changes
@@ -64,8 +65,8 @@ definition(
 	singleInstance: true
 	)
 
-	def appVersion() { "2.4.0" }
-	def appVerDate() { "09-28-2018" }
+	def appVersion() { "2.5.0" }
+	def appVerDate() { "10-01-2018" }
 	def appAuthor() { "Dave Gutheinz (Modified by xKillerMaverick)" }
 	def driverVersionsMin() {
 		return [
@@ -240,7 +241,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
-					options: ["Initial Install", "Add Devices", "Update Token"],
+					options: ["Initial Install", "Add Devices", "Remove Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
 			}
@@ -253,10 +254,10 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Remove Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
 		return authPage()
 	}
-	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
+	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Remove Devices" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
@@ -331,6 +332,18 @@ def selectDevices() {
 				)
 			}
 		}
+		if (userSelectedOption == "Remove Devices") {
+			section("Device Configuration Page:") {
+				input(
+					"selectedDevices", "enum",
+					required: true,
+					multiple: true,
+					title: "Select Devices (${isChild.size() ?: 0} found)",
+					options: isChild,
+					image: getAppImg("devices.png")
+				)
+			}
+		}
 	}
 }
 
@@ -345,6 +358,8 @@ def devMode() {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
+	def hub = location.hubs[0]
+	def hubId = hub.id
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = ("${state.currentError}")
 	return dynamicPage(
@@ -365,7 +380,7 @@ def devMode() {
 			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
-			paragraph title: "Managed Devices:", "${isChild}"
+			paragraph title: "Managed Devices:", "${devices}"
 			paragraph title: "New Devices:", "${newDevices}"
 		}
 		section("Help and Feedback:") {
@@ -406,24 +421,6 @@ def getAccessToken() {
 		//sendExceptionData(ex, "getAccessToken")
 		return false
 	}
-}
-
-void resetSTAccessToken(reset) {
-	if(reset != true) { return }
-	LogAction("Resetting SmartApp Access Token....", "info", true)
-	restStreamHandler(true)
-	atomicState?.restStreamingOn = false
-	revokeAccessToken()
-	atomicState?.accessToken = null
-	if(getAccessToken()) {
-		LogAction("Reset SmartApp Access Token... Successful", "info", true)
-		settingUpdate("resetSTAccessToken", "false", "bool")
-	}
-	startStopStream()
-}
-
-def generateInstallId() {
-	if(!atomicState?.installationId) { atomicState?.installationId = UUID?.randomUUID().toString() }
 }
 
 def getDevices() {
