@@ -480,31 +480,31 @@ def addDevices() {
 	selectedDevices.each { dni ->
 		def isChild = getChildDevice(dni)
 		if (isChild) {
-			def device = state.devices.find { it.value.deviceMac == dni }
-			def deviceModel = device.value.deviceModel.substring(0,5)
-			def alias = device.value.alias
-			def deviceNetworkId = device.value.deviceId
-			def deviceModel = device.value.deviceModel.substring(0,5)
+			def oldDevice = state.devices.find { it.value.deviceMac == dni }
+			def oldDeviceModel = device.value.deviceModel.substring(0,5)
+			def alias = oldDevice.value.alias
+			def deviceNetworkId = oldDevice.value.deviceId
+			def deviceModel = oldDevice.value.deviceModel.substring(0,5)
 			removeChildDevice(alias, deviceNetworkId)
-			log.info "Removed TP-Link $deviceModel with alias ${device.value.alias}"
+			log.info "Removed TP-Link $oldDeviceModel with alias ${oldDevice.value.alias}"
 		}
 		if (!isChild) {
-			def device = state.devices.find { it.value.deviceMac == dni }
-			def deviceModel = device.value.deviceModel.substring(0,5)
+			def newDevice = state.devices.find { it.value.deviceMac == dni }
+			def newDeviceModel = device.value.deviceModel.substring(0,5)
 			addChildDevice(
 				"ramiran2",
-				tpLinkModel["${deviceModel}"],
-				device.value.deviceMac,
+				tpLinkModel["${newDeviceModel}"],
+				newDevice.value.deviceMac,
 				hubId, [
-					"label": device.value.alias,
-						"name": device.value.deviceModel,
+					"label": newDevice.value.alias,
+						"name": newDevice.value.newDeviceModel,
 					"data": [
-						"deviceId" : device.value.deviceId,
-						"appServerUrl": device.value.appServerUrl,
+						"deviceId" : newDevice.value.deviceId,
+						"appServerUrl": newDevice.value.appServerUrl,
 					]
 				]
 			)
-			log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
+			log.info "Installed TP-Link $newDeviceModel with alias ${newDevice.value.alias}"
 		}
 	}
 }
