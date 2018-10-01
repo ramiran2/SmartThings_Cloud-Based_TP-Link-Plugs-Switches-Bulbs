@@ -484,7 +484,6 @@ def addDevices() {
 			def oldDeviceModel = device.value.deviceModel.substring(0,5)
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
-			def deviceModel = oldDevice.value.deviceModel.substring(0,5)
 			removeChildDevice(alias, deviceNetworkId)
 			log.info "Removed TP-Link $oldDeviceModel with alias ${oldDevice.value.alias}"
 		}
