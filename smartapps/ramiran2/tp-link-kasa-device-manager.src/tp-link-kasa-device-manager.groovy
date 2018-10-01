@@ -300,7 +300,7 @@ def selectDevices() {
 		name: "selectDevices",
 		title: "TP-Link Kasa - Device Setup Page",
 		install: true,
-		uninstall: true) {
+		uninstall: false) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
@@ -369,7 +369,7 @@ def devMode() {
 	return dynamicPage(
 		name: "devMode",
 		title: "TP-Link Kasa - Developer Page",
-		uninstall: false) {
+		uninstall: true) {
 		section("") {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
@@ -481,7 +481,7 @@ def addDevices() {
 		def isChild = getChildDevice(dni)
 		if (isChild) {
 			def oldDevice = state.devices.find { it.value.deviceMac == dni }
-			def oldDeviceModel = device.value.deviceModel.substring(0,5)
+			def oldDeviceModel = oldDevice.value.deviceModel.substring(0,5)
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
 			removeChildDevice(alias, deviceNetworkId)
@@ -489,7 +489,7 @@ def addDevices() {
 		}
 		if (!isChild) {
 			def newDevice = state.devices.find { it.value.deviceMac == dni }
-			def newDeviceModel = device.value.deviceModel.substring(0,5)
+			def newDeviceModel = newDevice.value.deviceModel.substring(0,5)
 			addChildDevice(
 				"ramiran2",
 				tpLinkModel["${newDeviceModel}"],
