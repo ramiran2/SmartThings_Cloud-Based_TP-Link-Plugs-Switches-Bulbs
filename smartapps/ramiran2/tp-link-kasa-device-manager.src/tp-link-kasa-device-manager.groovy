@@ -267,8 +267,12 @@ def selectDevices() {
 	def devices = state.devices
 	def errorMsg = ""
 	def newDevices = [:]
+	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
@@ -338,8 +342,8 @@ def selectDevices() {
 					"selectedDevices", "enum",
 					required: true,
 					multiple: true,
-					title: "Select Devices (${isChild.size() ?: 0} found)",
-					options: isChild,
+					title: "Select Devices (${oldDevices.size() ?: 0} found)",
+					options: oldDevices,
 					image: getAppImg("devices.png")
 				)
 			}
