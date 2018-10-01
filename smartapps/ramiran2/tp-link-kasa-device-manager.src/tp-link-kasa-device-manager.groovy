@@ -479,18 +479,6 @@ def addDevices() {
 	def hubId = hub.id
 	selectedDevices.each { dni ->
 		def isChild = getChildDevice(dni)
-		if (isChild) {
-			def oldDevice = state.devices.find { it.value.deviceMac == dni }
-			def oldDeviceModel = oldDevice.value.deviceModel.substring(0,5)
-			def alias = oldDevice.value.alias
-			def deviceNetworkId = oldDevice.value.deviceId
-			try {
-				deleteChildDevice(deviceNetworkId)
-				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
-			} catch (Exception e) {
-				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
-			}
-		}
 		if (!isChild) {
 			def device = state.devices.find { it.value.deviceMac == dni }
 			def deviceModel = device.value.deviceModel.substring(0,5)
@@ -508,6 +496,17 @@ def addDevices() {
 				]
 			)
 			log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
+		} else {
+			def oldDevice = state.devices.find { it.value.deviceMac == dni }
+			def oldDeviceModel = oldDevice.value.deviceModel.substring(0,5)
+			def alias = oldDevice.value.alias
+			def deviceNetworkId = oldDevice.value.deviceId
+			try {
+				deleteChildDevice(deviceNetworkId)
+				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
+			} catch (Exception e) {
+				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
+			}
 		}
 	}
 }
