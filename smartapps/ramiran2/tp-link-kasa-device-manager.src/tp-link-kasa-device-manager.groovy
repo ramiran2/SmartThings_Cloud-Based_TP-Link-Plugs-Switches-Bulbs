@@ -485,7 +485,7 @@ def addDevices() {
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
 			try {
-				deleteChildDevice(it.deviceNetworkId)
+				deleteChildDevice(deviceNetworkId)
 				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
 			} catch (Exception e) {
 				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
