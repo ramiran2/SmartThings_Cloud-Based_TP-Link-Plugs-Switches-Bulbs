@@ -244,11 +244,6 @@ def mainPage() {
 					image: getAppImg("settings.png")
 				)
 			}
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				image: getAppImg("developer.png")
-			)
 			if (userSelectedDevMode == true){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
