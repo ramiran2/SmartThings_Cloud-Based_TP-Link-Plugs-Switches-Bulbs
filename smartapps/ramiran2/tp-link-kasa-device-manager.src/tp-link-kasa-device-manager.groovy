@@ -484,26 +484,30 @@ def addDevices() {
 			def oldDeviceModel = oldDevice.value.deviceModel.substring(0,5)
 			def alias = oldDevice.value.alias
 			def deviceNetworkId = oldDevice.value.deviceId
-			removeChildDevice(alias, deviceNetworkId)
-			log.info "Removed TP-Link $oldDeviceModel with alias ${oldDevice.value.alias}"
+			try {
+				deleteChildDevice(it.deviceNetworkId)
+				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
+			} catch (Exception e) {
+				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
+			}
 		}
 		if (!isChild) {
-			def newDevice = state.devices.find { it.value.deviceMac == dni }
-			def newDeviceModel = newDevice.value.deviceModel.substring(0,5)
+			def device = state.devices.find { it.value.deviceMac == dni }
+			def deviceModel = device.value.deviceModel.substring(0,5)
 			addChildDevice(
 				"ramiran2",
-				tpLinkModel["${newDeviceModel}"],
-				newDevice.value.deviceMac,
+				tpLinkModel["${deviceModel}"],
+				device.value.deviceMac,
 				hubId, [
-					"label": newDevice.value.alias,
-						"name": newDevice.value.newDeviceModel,
+					"label": device.value.alias,
+						"name": device.value.deviceModel,
 					"data": [
-						"deviceId" : newDevice.value.deviceId,
-						"appServerUrl": newDevice.value.appServerUrl,
+						"deviceId" : device.value.deviceId,
+						"appServerUrl": device.value.appServerUrl,
 					]
 				]
 			)
-			log.info "Installed TP-Link $newDeviceModel with alias ${newDevice.value.alias}"
+			log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
 		}
 	}
 }
