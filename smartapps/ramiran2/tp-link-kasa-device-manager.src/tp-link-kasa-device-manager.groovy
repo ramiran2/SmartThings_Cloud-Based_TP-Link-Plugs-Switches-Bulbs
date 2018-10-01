@@ -97,12 +97,14 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
+	settings.userSelectedOption = null
+	settings.selectedDevices = null
 }
 
 def oauthVerification() {
     if(!atomicState?.accessToken) { getAccessToken() }
 	if(!atomicState?.accessToken) {
-		return dynamicPage(name: "startPage", title: "Status Page", nextPage: "", install: false, uninstall: true) {
+		return dynamicPage(name: "oauthVerification", title: "OAuth Verification Page", nextPage: "", install: false, uninstall: true) {
 			section ("Status Page:") {
 				def title = ""
                 def desc = ""
@@ -136,8 +138,8 @@ def authPage() {
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Update Account: Updates the token."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "2.3.0" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
-		def hideInfoDiagDescCont = (true)
-		def hideInfoDiagDescStat = (state.TpLinkToken != null)
+	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
 		name: "authPage",
 		title: "TP-Link Kasa - Login Page",
@@ -191,7 +193,7 @@ def mainPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add Devices: Only add devices.\n\r" +
-		"Update Token: Updates the token." +
+		"Update Token: Updates the token.\n\r" +
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
@@ -226,7 +228,7 @@ def mainPage() {
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && isChild != null || state.currentError == "none" && isChild != null) {
+			if (state.currentError != null && isChild != null || state.currentError != "none" && isChild != null) {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
@@ -241,23 +243,27 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
-					options: ["Initial Install", "Add Devices", "Remove Devices", "Update Token"],
+					options: ["Initial Install", "Add Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
 			}
+		}
+		section("Help and Feedback:") {
 			if (userSelectedDevMode == true){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 	}
 }
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Remove Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
 		return authPage()
 	}
-	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Remove Devices" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
+	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
 		return mainPage()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
@@ -267,17 +273,12 @@ def selectDevices() {
 	def devices = state.devices
 	def errorMsg = ""
 	def newDevices = [:]
-	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	settings.selectedDevices = null
 	if (devices == [:]) {
 		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
@@ -315,7 +316,7 @@ def selectDevices() {
 		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
 			section("Account Configuration Page:") {
 				input(
-					"userSelected", "enum",
+					"userSelectedOption", "enum",
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
@@ -336,18 +337,6 @@ def selectDevices() {
 				)
 			}
 		}
-		if (userSelectedOption == "Remove Devices") {
-			section("Device Configuration Page:") {
-				input(
-					"selectedDevices", "enum",
-					required: true,
-					multiple: true,
-					title: "Select Devices (${oldDevices.size() ?: 0} found)",
-					options: oldDevices,
-					image: getAppImg("devices.png")
-				)
-			}
-		}
 	}
 }
 
@@ -356,8 +345,12 @@ def devMode() {
 	getDevices()
 	def devices = state.devices
 	def newDevices = [:]
+	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
@@ -384,12 +377,8 @@ def devMode() {
 			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
-			paragraph title: "Managed Devices:", "${devices}"
+			paragraph title: "Managed Devices:", "${oldDevices}"
 			paragraph title: "New Devices:", "${newDevices}"
-		}
-		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 	}
 }
@@ -479,18 +468,6 @@ def addDevices() {
 	def hubId = hub.id
 	selectedDevices.each { dni ->
 		def isChild = getChildDevice(dni)
-		if (isChild) {
-			def isChildMac = getChildDevice(it.value.deviceMac)
-			def oldDevice = state.devices.find { it.value.deviceMac == isChildMac }
-			def alias = oldDevice.value.alias
-			def deviceNetworkId = oldDevice.value.deviceId
-			try {
-				deleteChildDevice(deviceNetworkId)
-				sendEvent(name: "DeviceDelete", value: "${alias} deleted")
-			} catch (Exception e) {
-				sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
-			}
-		}
 		if (!isChild) {
 			def device = state.devices.find { it.value.deviceMac == dni }
 			def deviceModel = device.value.deviceModel.substring(0,5)
