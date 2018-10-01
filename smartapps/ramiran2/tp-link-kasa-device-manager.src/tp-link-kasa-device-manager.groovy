@@ -479,6 +479,13 @@ def addDevices() {
 	def hubId = hub.id
 	selectedDevices.each { dni ->
 		def isChild = getChildDevice(dni)
+		if (isChild) {
+			def alias = device.value.alias
+			def deviceNetworkId = device.value.deviceId
+			def deviceModel = device.value.deviceModel.substring(0,5)
+			def removeChildDevice(alias, deviceNetworkId)
+			log.info "Removed TP-Link $deviceModel with alias ${device.value.alias}"
+		}
 		if (!isChild) {
 			def device = state.devices.find { it.value.deviceMac == dni }
 			def deviceModel = device.value.deviceModel.substring(0,5)
