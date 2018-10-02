@@ -105,7 +105,10 @@ def oauthVerification() {
     if(!atomicState?.accessToken) { getAccessToken() }
 	if(!atomicState?.accessToken) {
 		return dynamicPage(name: "oauthVerification", title: "OAuth Verification Page", nextPage: "", install: false, uninstall: true) {
-			section ("Status Page:") {
+			section("") {
+				paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+			}
+			section ("Application Information:") {
 				def title = ""
                 def desc = ""
 				if(!atomicState?.accessToken) { title="OAUTH Error"; desc = "OAuth is not Enabled for ${app?.label} application.  Please click remove and review the installation directions again"; }
@@ -175,12 +178,14 @@ def authPage() {
 				title: "What do you want to do?",
 				required: true,
 				multiple: false,
+				submitOnChange: true,
 				options: ["Activate Account", "Update Account"],
 				image: getAppImg("settings.png")
 			)
 			input(
 				"userSelectedDevMode", "bool",
 				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
 				image: getAppImg("developer.png")
 			)
 		}
@@ -197,17 +202,21 @@ def mainPage() {
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
+	def hideInfoDiagDescStat = (state.currentError == null || state.currentError == "none")
 	def errorMsg = ""
 	getDevices()
 	def devices = state.devices
+	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
 	}
 	if (state.currentError != null){
 		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
-		}
+	}
 	return dynamicPage(
 		name: "mainPage",
 		title: "TP-Link Kasa - Settings Page",
@@ -220,20 +229,21 @@ def mainPage() {
 			if (state.currentError == null || state.currentError == "none"){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null || state.currentError == "none"){
+			if (state.currentError != null || state.currentError != "none"){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (userSelectedOption == "Communication Error"){
+			if (userSelectedOption == "Communication Error" || userSelectedOption == "Developer Page"){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && isChild != null || state.currentError != "none" && isChild != null) {
+			if (state.currentError != null && oldDevices != [:] || state.currentError != "none" && oldDevices != [:]) {
 				input(
 					"userSelectedOption", "enum",
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
+					submitOnChange: true,
 					options: ["Communication Error", "Developer Page"],
 					image: getAppImg("error.png")
 				)
@@ -243,6 +253,7 @@ def mainPage() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
+					submitOnChange: true,
 					options: ["Initial Install", "Add Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
@@ -260,11 +271,14 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Developer Page" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
 		return authPage()
 	}
-	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account") {
+	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account" && userSelectedOption != "Developer Page") {
 		return mainPage()
+	}
+	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Initial Install" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+		return devMode()
 	}
 	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
 		getToken()
@@ -320,6 +334,7 @@ def selectDevices() {
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
+					submitOnChange: true,
 					options: ["Update Token"],
 					image: getAppImg("token.png")
 					)
@@ -331,6 +346,7 @@ def selectDevices() {
 					"selectedDevices", "enum",
 					required: true,
 					multiple: true,
+					submitOnChange: true,
 					title: "Select Devices (${newDevices.size() ?: 0} found)",
 					options: newDevices,
 					image: getAppImg("devices.png")
@@ -367,10 +383,8 @@ def devMode() {
 			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Error Count:", "${state.currentError}"
+			paragraph title: "Error Count:", "${state.errorCount}"
 			paragraph title: "Current Error:", "${state.currentError}"
-			paragraph title: "Command Response:", "${cmdResponse}"
-			paragraph title: "Request Data:", "${command}"
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
 			paragraph title: "Hub:", "${hub}"
 			paragraph title: "Hub ID:", "${hubId}"
