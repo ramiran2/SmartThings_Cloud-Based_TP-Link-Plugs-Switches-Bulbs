@@ -446,7 +446,7 @@ def devMode() {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
-			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceUninstallPage.png")
+			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceuninstallpage.png")
 		}
 		section("Configuration:") {
 			input(
