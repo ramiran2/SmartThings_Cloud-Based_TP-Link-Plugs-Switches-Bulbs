@@ -364,8 +364,7 @@ def selectDevices() {
 					image: getAppImg("token.png")
 					)
 				}
-			}
-		if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices" || devModeLoaded) {
+			} else if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices" || devModeLoaded) {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
