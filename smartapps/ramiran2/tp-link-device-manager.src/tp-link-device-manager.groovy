@@ -134,7 +134,7 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}" =~ null || "${userPassword}" =~ null){
+	if ("${userName}" ==~ null || "${userPassword}" ==~ null){
 		return authPage()
 	} else {
 		return mainPage()
@@ -235,7 +235,7 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError =~ null || devModeLoaded){
+			if (state.currentError ==~ null || devModeLoaded){
 				paragraph title: "Information:", mainPageText
 			}
 			if (state.currentError != null || devModeLoaded){
@@ -292,16 +292,16 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero =~ "Initial Install") {
+	if (userSelectedOptionZero ==~ "Initial Install") {
 		return authPage()
 	}
-	if (userSelectedOptionTwo =~ "Developer Page") {
+	if (userSelectedOptionTwo ==~ "Developer Page") {
 		return devMode()
 	}
-	if (userSelectedOptionOne =~ "Communication Error") {
+	if (userSelectedOptionOne ==~ "Communication Error") {
 		return mainPage()
 	}
-	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
+	if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionTwo ==~ "Update Account") {
 		getToken()
 	}
 	getDevices()
@@ -345,14 +345,14 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "" || devModeLoaded){
+				if (errorMsg ==~ "" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
 				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || devModeLoaded) {
+		if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Update Account" || devModeLoaded) {
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -365,7 +365,7 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || devModeLoaded) {
+		if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices" || devModeLoaded) {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
@@ -544,14 +544,14 @@ def getApiURL() {
 void settingUpdate(name, value, type=null) {
 	log.trace "settingUpdate($name, $value, $type)..."
 	if(name) {
-		if(value =~ "" || value =~ null || value == []) {
+		if(value ==~ "" || value ==~ null || value == []) {
 			settingRemove(name)
 			return
 		}
 	}
 	if(name && type) {
 		app?.updateSetting("$name", [type: "$type", value: value])
-	} else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
+	} else if (name && type ==~ null){ app?.updateSetting(name.toString(), value) }
 }
 
 void settingRemove(name) {
@@ -858,7 +858,7 @@ def checkError() {
 	def errMsg = state.currentError.msg
 	log.info "Attempting to solve error: ${errMsg}"
 	state.errorCount = state.errorCount +1
-	if (errMsg =~ "Token expired" && state.errorCount < 6) {
+	if (errMsg ==~ "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
 		if (state.currentError == null) {
