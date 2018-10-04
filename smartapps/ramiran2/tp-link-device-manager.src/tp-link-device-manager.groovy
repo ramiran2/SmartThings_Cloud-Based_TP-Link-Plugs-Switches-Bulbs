@@ -111,9 +111,9 @@ def setInitialStates() {
 	settings.userSelectedOptionOne = "Communication Error"
 	settings.userSelectedOptionTwo = "Activate Account"
 	settings.userSelectedOptionThree = "Update Token"
-	settings.userSelectedRemoveMode = false
+	settings.userSelectedRemoveMode = (false)
 	settings.selectedDevices = null
-	settings.devModeLoaded = false
+	settings.devModeLoaded = (false)
 }
 
 def oauthVerification() {
