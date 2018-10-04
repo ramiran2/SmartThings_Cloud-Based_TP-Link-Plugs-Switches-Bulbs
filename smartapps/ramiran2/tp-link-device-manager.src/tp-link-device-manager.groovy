@@ -126,7 +126,7 @@ def oauthVerification() {
 			section ("Application Information:") {
 				def title = ""
                 def desc = ""
-				if(!atomicState?.accessToken) { title="OAUTH Error"; desc = "OAuth is not Enabled for ${app?.label} application.  Please click remove and review the installation directions again"; }
+				if(!atomicState?.accessToken) { title="OAuth Error"; desc = "OAuth is not Enabled for ${app?.label} application.  Please click remove and review the installation directions again"; }
 				else { title="Unknown Error"; desc = "Application Status has not received any messages to display";	}
 				log.warn "Status Message: $desc"
 				paragraph title: "$title", "$desc", required: true, state: null
