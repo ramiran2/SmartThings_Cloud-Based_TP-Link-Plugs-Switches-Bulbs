@@ -455,13 +455,18 @@ def devMode() {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
-		section("Configuration Page:") {
+		section("Configuration:") {
 			input(
 				"devModeLoaded", "bool",
 				title: "Do you want to enable developer mode?",
 				submitOnChange: true,
 				image: getAppImg("developer.png")
 			)
+		}
+		section("Security:") {
+			paragraph title:"What does resetting do?", "If you share a url with someone and want to remove their access you can reset your token and this will invalidate any URL you shared and create a new one for you."
+			input (name: "resetSTAccessToken", type: "bool", title: "Reset SmartThings Access Token?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("reset.png"))
+			resetSTAccessToken(settings?.resetSTAccessToken == true)
 		}
 	}
 }
