@@ -64,7 +64,30 @@ definition(
 	iconX2Url: "${getAppImg("kasa.png")}",
 	iconX3Url: "${getAppImg("kasa.png")}",
 	singleInstance: true
-	)
+)
+
+{
+	appSetting "clientId"
+	appSetting "clientSecret"
+	appSetting "devOpt"
+}
+
+def appVersion() { return "2.5.0" }
+def appVerDate() { return "10-03-2018" }
+def driverVersionsMin() {
+	return [
+		"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"colorbulb":["val":230, "desc":"2.3.0"],
+		"dimmingswitch":["val":230, "desc":"2.3.0"],
+		"energymonitorplug":["val":230, "desc":"2.3.0"],
+		"plug":["val":230, "desc":"2.3.0"],
+		"switch":["val":230, "desc":"2.3.0"],
+		"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"softwhitebulb":["val":230, "desc":"2.3.0"],
+		"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"tunablewhitebulb":["val":230, "desc":"2.3.0"]
+	]
+}
 
 preferences {
 	page(name: "oauthVerification")
@@ -910,8 +933,6 @@ def appInfoDesc()	{
 	str += "\n" + "• Updated: ${appVerDate()}"
 	return str
 }
-def appVersion() { return "2.5.0" }
-def appVerDate() { return "10-03-2018" }
 def appAuthor() { return "Anthony Ramirez" }
 def getServerUrl()			{ return "https://graph.api.smartthings.com" }
 def getShardUrl()			{ return getApiServerUrl() }
@@ -919,20 +940,6 @@ def getCallbackUrl()		{ return "https://graph.api.smartthings.com/oauth/callback
 def getBuildRedirectUrl() { return "${serverUrl}/oauth/initialize?appId=${app.id}&access_token=${atomicState?.accessToken}&apiServerUrl=${shardUrl}" }
 private Integer convertHexToInt(hex) { Integer.parseInt(hex,16) }
 private String convertHexToIP(hex) { [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".") }
-def driverVersionsMin() {
-	return [
-		"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"colorbulb":["val":230, "desc":"2.3.0"],
-		"dimmingswitch":["val":230, "desc":"2.3.0"],
-		"energymonitorplug":["val":230, "desc":"2.3.0"],
-		"plug":["val":230, "desc":"2.3.0"],
-		"switch":["val":230, "desc":"2.3.0"],
-		"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"softwhitebulb":["val":230, "desc":"2.3.0"],
-		"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"tunablewhitebulb":["val":230, "desc":"2.3.0"]
-	]
-}
 def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def textVerInfo()	{ return "${appVerInfo()}" }
