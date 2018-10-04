@@ -55,7 +55,7 @@ primarily various users on GitHub.com.
 */
 
 definition(
-	name: "${appName()}",
+	name: "${appLabel()}",
 	namespace: "${appNamespace()}",
 	author: "${appAuthor()}",
 	description: "${textDesc()}",
