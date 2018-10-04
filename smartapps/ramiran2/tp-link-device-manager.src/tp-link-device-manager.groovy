@@ -352,7 +352,7 @@ def selectDevices() {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Update Account" || devModeLoaded) {
+		if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Update Account") {
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -364,7 +364,7 @@ def selectDevices() {
 					image: getAppImg("token.png")
 					)
 				}
-			} else if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices" || devModeLoaded) {
+			} else if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices") {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
