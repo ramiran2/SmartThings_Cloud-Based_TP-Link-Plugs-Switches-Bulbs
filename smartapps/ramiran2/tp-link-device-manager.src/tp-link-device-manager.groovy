@@ -495,7 +495,7 @@ def uninstallPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section() {
+		section("Information:") {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
 		section("Did You Get an Error?") {
@@ -511,10 +511,11 @@ def forceUninstallPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section() {
+		section("Information:") {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
-		section() {
+		section("Deleted Child Applications:") {
+			paragraph "Removed Child App: NULL"
 			getChildApps()?.each {
 				deleteChildApp(it)
 				paragraph "Removed Child App: ${it?.label}"
