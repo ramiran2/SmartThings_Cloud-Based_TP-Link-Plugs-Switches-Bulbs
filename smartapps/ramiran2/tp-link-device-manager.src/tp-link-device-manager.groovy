@@ -98,6 +98,7 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 }
 
+//	----- OAUTH PAGE -----
 def oauthVerification() {
     if(!atomicState?.accessToken) { getAccessToken() }
 	if(!atomicState?.accessToken) {
@@ -130,7 +131,7 @@ def startPage() {
 	}
 }
 
-//	----- LOGIN PAGE -----
+//	----- AUTH PAGE -----
 def authPage() {
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
@@ -190,7 +191,7 @@ def authPage() {
 	}
 }
 
-//	----- SETTINGS PAGE -----
+//	----- MAIN PAGE -----
 def mainPage() {
 	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
@@ -198,7 +199,7 @@ def mainPage() {
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
 		"Update Token: Updates the token.\n\r" +
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
-	def errorRetuInfo = "We may not be unable to load Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
+	def errorRetuInfo = "We may not be unable to load Device Manager Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = "null"
@@ -327,7 +328,7 @@ def selectDevices() {
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices",
-		title: "Device Settings Page",
+		title: "Device Manager Page",
 		install: true,
 		uninstall: false) {
 		section("") {
@@ -430,7 +431,7 @@ def devMode() {
 			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
 			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
 			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
-			href "selectDevices", title: "Device Settings Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
@@ -452,9 +453,10 @@ def devMode() {
 	}
 }
 
+//	----- ABOUT PAGE -----
 def aboutPage() {
 	dynamicPage(name: "aboutPage", title: "About Page", install: false, uninstall: false) {
-		section("About this App:") {
+		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
@@ -474,8 +476,12 @@ def aboutPage() {
 	}
 }
 
+//	----- CHANGELOG PAGE -----
 def changeLogPage () {
 	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
 		section() {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
@@ -483,8 +489,12 @@ def changeLogPage () {
 	}
 }
 
+//	----- UNINSTALL PAGE -----
 def uninstallPage() {
-	dynamicPage(name: "uninstallPage", title: "Uninstall", install: false, uninstall: true) {
+	dynamicPage(name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
 		section() {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
@@ -495,8 +505,15 @@ def uninstallPage() {
 	}
 }
 
+//	----- FORCE UNINSTALL PAGE -----
 def forceUninstallPage() {
-	dynamicPage(name: "forceUninstallPage", title: "Uninstall Pre Cleanup", install: false, uninstall: true) {
+	dynamicPage(name: "forceUninstallPage", title: "Force Uninstall Page", install: false, uninstall: true) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section() {
+			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+		}
 		section() {
 			getChildApps()?.each {
 				deleteChildApp(it)
@@ -587,7 +604,7 @@ def getDevices() {
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
 		}
-		log.info "Device ${it.alias} added to devices array"
+		//log.info "Device ${it.alias} added to devices array"
 	}
 }
 

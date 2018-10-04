@@ -10,6 +10,8 @@
 2.0.0 - 2018-01-31 - Updated for new release of Device Handlers
 
 ##### TP-Link Smart Plug - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -26,6 +28,8 @@
 			function enabling.
 			
 ##### TP-Link Smart Energy Monitor Plug - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -49,6 +53,8 @@
 2018-04-22	Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Tunable White Bulb - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -64,6 +70,8 @@
 			function enabling.
 
 ##### TP-Link Smart Tunable White Bulb Energy Monitor - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -87,6 +95,8 @@
 2018-04-22	Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Soft White Bulb - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -102,6 +112,8 @@
 			function enabling.
 
 ##### TP-Link Smart Soft White Bulb Energy Monitor - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -125,6 +137,8 @@
 2018-04-22	Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Color Bulb - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -140,6 +154,8 @@
 			function enabling.
 
 ##### TP-Link Smart Color Bulb Energy Monitor - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -163,6 +179,8 @@
 2018-04-22	Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Dimming Switch - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
@@ -178,6 +196,8 @@
 			function enabling.
 
 ##### TP-Link Smart Switch - Kasa Account #####
+2018-10-01	Update to Version 3.1.0
+		a.	Added Device Health Check refreash device status
 2018-09-28	Update to Version 2.9.0
 		a.	Added Device Health Check
 		b.	Tweek from Dave Gutheinz for support for new tp-link devices
