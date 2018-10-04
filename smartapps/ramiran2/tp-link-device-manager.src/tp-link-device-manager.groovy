@@ -107,10 +107,17 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settings.userSelectedOptionZero = "Add/Remove Devices"
-	settings.userSelectedOptionOne = "Communication Error"
-	settings.userSelectedOptionTwo = "Activate Account"
-	settings.userSelectedOptionThree = "Update Token"
+	if ("${userName}" == "" || "${userPassword}" == "" || "${userName}" == null || "${userPassword}" == null){
+		settings.userSelectedOptionZero = "Initial Install"
+		settings.userSelectedOptionOne = "Communication Error"
+		settings.userSelectedOptionTwo = "Activate Account"
+		settings.userSelectedOptionThree = "Update Token"
+		} else {
+		settings.userSelectedOptionZero = "Add/Remove Devices"
+		settings.userSelectedOptionOne = "Communication Error"
+		settings.userSelectedOptionTwo = "Update Account"
+		settings.userSelectedOptionThree = "Update Token"
+	}
 	settings.userSelectedRemoveMode = (false)
 	settings.selectedDevices = null
 	settings.devModeLoaded = (false)
@@ -141,7 +148,7 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userPassword}" == "" || "${userPassword}" == "" ){
+	if ("${userName}" == "" || "${userPassword}" == "" || "${userName}" == null || "${userPassword}" == null){
 		authPage()
 	} else {
 		mainPage()
