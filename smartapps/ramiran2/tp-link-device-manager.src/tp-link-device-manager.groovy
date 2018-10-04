@@ -338,7 +338,7 @@ def selectDevices() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg != "")
+	def hideInfoDiagDescStat = (errorMsg == "")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -944,14 +944,12 @@ def getServerUrl()			{ return "https://graph.api.smartthings.com" }
 def getShardUrl()			{ return getApiServerUrl() }
 def getCallbackUrl()		{ return "https://graph.api.smartthings.com/oauth/callback" }
 def getBuildRedirectUrl() { return "${serverUrl}/oauth/initialize?appId=${app.id}&access_token=${atomicState?.accessToken}&apiServerUrl=${shardUrl}" }
-private Integer convertHexToInt(hex) { Integer.parseInt(hex,16) }
-private String convertHexToIP(hex) { [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".") }
 def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
-def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/app_license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textDonateLink(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=" }
+def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
+def textDonateLink(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
 def stIdeLink()		{ return "https://graph.api.smartthings.com" }
 def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
