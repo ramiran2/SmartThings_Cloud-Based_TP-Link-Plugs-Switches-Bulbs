@@ -355,14 +355,14 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "" || devModeLoaded){
+				if (errorMsg =~ "" || !devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded) {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || !devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || devModeLoaded) {
+		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || !devModeLoaded) {
 			section("Account Configuration Page:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -375,7 +375,7 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || devModeLoaded) {
+		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || !devModeLoaded) {
 			section("Device Configuration Page:") {
 				if (userSelectedRemoveMode) {
 					input(
