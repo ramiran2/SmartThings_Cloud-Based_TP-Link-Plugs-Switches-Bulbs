@@ -670,6 +670,27 @@ def removeDevices() {
 	}
 }
 
+def getWebData(params, desc, text=true) {
+	try {
+		log.info "getWebData: ${desc} data"
+		httpGet(params) { resp ->
+			if(resp.data) {
+				if(text) {
+					return resp?.data?.text.toString()
+				} else { return resp?.data }
+			}
+		}
+	}
+	catch (ex) {
+		if(ex instanceof groovyx.net.http.HttpResponseException) {
+			log.warn "${desc} file not found"
+		} else {
+			log.error "getWebData(params: $params, desc: $desc, text: $text) Exception:", ex
+		}
+		return "${label} info not found"
+	}
+}
+
 def addDevices() {
 	def tpLinkModel = [:]
 	//	Plug-Switch Devices (no energy monitor capability)
