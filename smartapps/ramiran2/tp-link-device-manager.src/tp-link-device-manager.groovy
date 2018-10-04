@@ -212,7 +212,7 @@ def mainPage() {
 	def errorRetuInfo = "We may not be unable to load Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
-	def errorMsg = ""
+	def errorMsg = null
 	getDevices()
 	def devices = state.devices
 	def oldDevices = [:]
@@ -306,7 +306,7 @@ def selectDevices() {
 	}
 	getDevices()
 	def devices = state.devices
-	def errorMsg = ""
+	def errorMsg = null
 	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
@@ -328,7 +328,7 @@ def selectDevices() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "")
+	def hideInfoDiagDescStat = (!errorMsg)
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -345,10 +345,10 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg ==~ "" || devModeLoaded){
+				if (!errorMsg || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded) {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
