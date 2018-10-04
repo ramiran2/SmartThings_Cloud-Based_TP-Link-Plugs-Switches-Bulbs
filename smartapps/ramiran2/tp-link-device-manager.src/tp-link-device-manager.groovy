@@ -482,7 +482,7 @@ def changeLogPage () {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section() {
+		section("Changelog:") {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
 		}
