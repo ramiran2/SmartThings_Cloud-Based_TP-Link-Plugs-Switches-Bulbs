@@ -43,7 +43,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
-2018-10-03 Improved UI Elements with other small changes
+2018-10-04 Improved UI Elements with other small changes + Added a changelog page + Added a uninstall page + Added a about page + Improved logic
 2018-10-01 Improved UI Elements with other small changes + Added a developer page
 2018-09-28 Improved UI Elements with other small changes + Added a login page + Updated Driver Version Variables + Added a New Device Handler
 2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
@@ -72,8 +72,8 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "2.5.0" }
-def appVerDate() { return "10-03-2018" }
+def appVersion() { return "2.9.0" }
+def appVerDate() { return "10-04-2018" }
 def driverVersionsMin() {
 	return [
 		"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
@@ -545,6 +545,26 @@ def getEndpointUrl() {
 
 def getApiURL() {
 	return apiServerUrl("/api/token/${atomicState?.accessToken}/smartapps/installations/${app.id}") ?: null
+}
+
+
+void settingUpdate(name, value, type=null) {
+	log.trace "settingUpdate($name, $value, $type)..."
+	if(name) {
+		if(value =~ "" || value =~ null || value == []) {
+			settingRemove(name)
+			return
+		}
+	}
+	if(name && type) {
+		app?.updateSetting("$name", [type: "$type", value: value])
+	}
+	else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
+}
+
+void settingRemove(name) {
+	log.trace "settingRemove($name)..."
+	if(name) { app?.deleteSetting("$name") }
 }
 
 void resetSTAccessToken(reset) {
