@@ -515,7 +515,7 @@ def forceUninstallPage() {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
 		section("Deleted Child Applications:") {
-			paragraph "Removed Child App: NULL"
+			paragraph "This will uninstall any related child application that is still installed."
 			getChildApps()?.each {
 				deleteChildApp(it)
 				paragraph "Removed Child App: ${it?.label}"
