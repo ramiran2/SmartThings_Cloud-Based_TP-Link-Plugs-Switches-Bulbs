@@ -165,7 +165,7 @@ def authPage() {
 		"Update Account: Updates the token and credentials."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.TpLinkToken)
+	def hideInfoDiagDescStat = (!state.TpLinkToken)
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
@@ -249,13 +249,13 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError =~ null || !devModeLoaded){
+			if (state.currentError =~ null || devModeLoaded){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null || !devModeLoaded){
+			if (state.currentError != null || devModeLoaded){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (state.currentError != null || !devModeLoaded){
+			if (state.currentError != null || devModeLoaded){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 		}
@@ -298,17 +298,17 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero =~ "Initial Install" || !devModeLoaded) {
+	if (userSelectedOptionZero =~ "Initial Install" || devModeLoaded) {
 		return authPage()
 	}
-	if (userSelectedOptionOne =~ "Communication Error" || !devModeLoaded) {
+	if (userSelectedOptionOne =~ "Communication Error" || devModeLoaded) {
 		return mainPage()
 	}
-	if (userSelectedOptionOne =~ "Reset Status" || !devModeLoaded) {
+	if (userSelectedOptionOne =~ "Reset Status" || devModeLoaded) {
 		setInitialStates()
 		return mainPage()
 	}
-	if (userSelectedOptionTwo =~ "Developer Page" || !devModeLoaded) {
+	if (userSelectedOptionTwo =~ "Developer Page" || devModeLoaded) {
 		return devMode()
 	}
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
@@ -355,14 +355,14 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "" || !devModeLoaded){
+				if (errorMsg =~ "" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || !devModeLoaded) {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || !devModeLoaded) {
+		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || devModeLoaded) {
 			section("Account Configuration Page:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -375,7 +375,7 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || !devModeLoaded) {
+		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || devModeLoaded) {
 			section("Device Configuration Page:") {
 				if (userSelectedRemoveMode) {
 					input(
