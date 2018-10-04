@@ -494,9 +494,6 @@ def changeLogPage () {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
 		}
-		def iData = atomicState?.installData
-		iData["shownChgLog"] = true
-		atomicState?.installData = iData
 	}
 }
 
