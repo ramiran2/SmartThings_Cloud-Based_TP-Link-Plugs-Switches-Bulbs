@@ -298,17 +298,17 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero =~ "Initial Install" && !devModeLoaded) {
+	if (userSelectedOptionZero =~ "Initial Install" || !devModeLoaded) {
 		return authPage()
 	}
-	if (userSelectedOptionOne =~ "Communication Error" && !devModeLoaded) {
+	if (userSelectedOptionOne =~ "Communication Error" || !devModeLoaded) {
 		return mainPage()
 	}
-	if (userSelectedOptionOne =~ "Reset Status" && !devModeLoaded) {
+	if (userSelectedOptionOne =~ "Reset Status" || !devModeLoaded) {
 		setInitialStates()
 		return mainPage()
 	}
-	if (userSelectedOptionTwo =~ "Developer Page" && !devModeLoaded) {
+	if (userSelectedOptionTwo =~ "Developer Page" || !devModeLoaded) {
 		return devMode()
 	}
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
