@@ -260,7 +260,7 @@ def mainPage() {
 					required: true,
 					multiple: false,
 					submitOnChange: true,
-					options: ["Add/Remove Devices", "Reset Status"],
+					options: ["Communication Error", "Reset Status", "Add/Remove Devices"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -296,7 +296,9 @@ def selectDevices() {
 	}  else if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
-	if (userSelectedOptionOne =~ "Reset Status") {
+	if (userSelectedOptionOne =~ "Communication Error" && state.currentError != null) {
+		return mainPage()
+	} else if (userSelectedOptionOne =~ "Reset Status") {
 		setInitialStates()
 		return mainPage()
 	}
