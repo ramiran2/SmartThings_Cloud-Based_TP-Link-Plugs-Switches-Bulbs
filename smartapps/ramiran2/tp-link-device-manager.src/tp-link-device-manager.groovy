@@ -543,106 +543,19 @@ def getEndpointUrl() {
 	}
 }
 
-def getRestHost() {
-	def res = null
-	def autoHost = settings?.selectedRestDevice ?: null
-	def ip = settings?.restStreamIp ?: null
-	def port = settings?.restStreamPort ?: 3000
-	log.trace "getRestHost: autoHost: ${autoHost} ip: ${ip} port: ${port}"
-	if(autoHost) {
-		res = autoHost
-	} else {
-		if(ip) {
-			res = "${ip}:${port}"
-		} else {
-			atomicState.restStreamingOn = false
-		}
-	}
-	return res
-}
-
 def getApiURL() {
 	return apiServerUrl("/api/token/${atomicState?.accessToken}/smartapps/installations/${app.id}") ?: null
-}
-
-def restStreamHandler(close = false) {
-	log.trace "restStreamHandler: close: ${close}"
-	def toClose = close
-	def host = getRestHost()
-	if(!host) {
-		atomicState.restStreamingOn = false;
-		host = atomicState?.lastRestHost ?: null
-		atomicState.lastRestHost = null
-		if(!host) { return }
-		toClose = true
-	} else {
-		atomicState.lastRestHost = host
-	}
-	if(!close && !atomicState?.authToken) {
-		log.trace "No authToken", "warn"
-		atomicState.restStreamingOn = false
-		return
-	}
-	log.trace "restStreamHandler(close: ${close}) host: ${host} lastRestHost: ${atomicState?.lastRestHost}"
-	def connStatus = toClose ? false : true
-	log.trace "restStreamHandler(${connStatus ? "Start" : "Stop"}) Event to local node service"
-	String hubIp = settings?.restStreamLocalHub?.getLocalIP()
-	Boolean localStream = (settings?.restStreamLocal && hubIp)
-	try {
-		def hubAction = new physicalgraph.device.HubAction(
-			method: "POST",
-			headers: [
-				"HOST": host,
-				"tplinktoken": "${atomicState?.authToken}",
-				"stHubIp": "${hubIp}",
-				"localStream": "${localStream}",
-				"connStatus": "${connStatus}",
-				"callback": "${getApiURL()}",
-				"sttoken": "${atomicState?.accessToken}",
-				"structure": "${atomicState?.structures}"
-			],
-			path: "/stream",
-			body: ""
-		)
-		sendHubCommand(hubAction)
-	}
-	catch (Exception e) {
-		log.error "restStreamHandler Exception $e on $hubAction"
-		atomicState.restStreamingOn = false
-	}
-}
-
-void settingUpdate(name, value, type=null) {
-	log.trace "settingUpdate($name, $value, $type)..."
-	if(name) {
-		if(value =~ "" || value =~ null || value == []) {
-			settingRemove(name)
-			return
-		}
-	}
-	if(name && type) {
-		app?.updateSetting("$name", [type: "$type", value: value])
-	}
-	else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
-}
-
-void settingRemove(name) {
-	log.trace "settingRemove($name)..."
-	if(name) { app?.deleteSetting("$name") }
 }
 
 void resetSTAccessToken(reset) {
 	if(reset != true) { return }
 	log.info "Resetting SmartApp Access Token...."
-	restStreamHandler(true)
-	atomicState?.restStreamingOn = false
 	revokeAccessToken()
 	atomicState?.accessToken = null
 	if(getAccessToken()) {
 		log.info "Reset SmartApp Access Token... Successful"
 		settingUpdate("resetSTAccessToken", "false", "bool")
 	}
-	startStopStream()
 }
 
 def getAccessToken() {
