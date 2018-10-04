@@ -543,6 +543,28 @@ def getEndpointUrl() {
 	}
 }
 
+def getRestHost() {
+	def res = null
+	def autoHost = settings?.selectedRestDevice ?: null
+	def ip = settings?.restStreamIp ?: null
+	def port = settings?.restStreamPort ?: 3000
+	log.trace "getRestHost: autoHost: ${autoHost} ip: ${ip} port: ${port}"
+	if(autoHost) {
+		res = autoHost
+	} else {
+		if(ip) {
+			res = "${ip}:${port}"
+		} else {
+			atomicState.restStreamingOn = false
+		}
+	}
+	return res
+}
+
+def getApiURL() {
+	return apiServerUrl("/api/token/${atomicState?.accessToken}/smartapps/installations/${app.id}") ?: null
+}
+
 def restStreamHandler(close = false) {
 	log.trace "restStreamHandler: close: ${close}"
 	def toClose = close
@@ -662,7 +684,7 @@ def removeDevices() {
 			def delete = app.getChildDevices(true).findAll { selectedDevices?.toString()?.contains(it?.deviceNetworkId) }
 			if(delete?.size() > 0) {
 				updTimestampMap("lastAnalyticUpdDt", null)
-				LogAction("Removing ${delete.size()} devices: ${delete}", "debug", true)
+				log.debug "Removing ${delete.size()} devices: ${delete}"
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
 			}
 		}
