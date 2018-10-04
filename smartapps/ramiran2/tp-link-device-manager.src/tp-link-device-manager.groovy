@@ -107,14 +107,6 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settings.userSelectedOptionZero = null
-	settings.userSelectedOptionOne = null
-	settings.userSelectedOptionTwo = null
-	settings.userSelectedOptionThree = null
-	settings.selectedDevices = null
-	settings.userSelectedRemoveMode = false
-	settings.devModeLoaded = false
-	settings.userSelectedReload = false
 }
 
 def oauthVerification() {
@@ -446,12 +438,15 @@ def devMode() {
 			paragraph title: "New Devices:", "${newDevices}"
 		}
 		section("Page Selector:") {
+			href "oauthVerification", title: "OAuth Verification Page", description: "Tap to view", image: getAppImg("oauthverification.png")
+			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
 			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
 			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
 			href "selectDevices", title: "Device Settings Page", description: "Tap to view", image: getAppImg("selectdevices.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
+			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceUninstallPage.png")
 		}
 		section("Configuration:") {
 			input(
