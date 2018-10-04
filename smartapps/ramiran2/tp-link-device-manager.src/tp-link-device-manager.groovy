@@ -107,20 +107,13 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	if ("${userName}" =~ null || "${userPassword}" =~ null){
-		settings.userSelectedOptionZero = "Initial Install"
-		settings.userSelectedOptionOne = "Communication Error"
-		settings.userSelectedOptionTwo = "Activate Account"
-		settings.userSelectedOptionThree = "Update Token"
-	} else {
-		settings.userSelectedOptionZero = "Add/Remove Devices"
-		settings.userSelectedOptionOne = "Communication Error"
-		settings.userSelectedOptionTwo = "Update Account"
-		settings.userSelectedOptionThree = "Update Token"
-	}
-	settings.userSelectedRemoveMode = "false"
+	settings.userSelectedOptionZero = null
+	settings.userSelectedOptionOne = null
+	settings.userSelectedOptionTwo = null
+	settings.userSelectedOptionThree = null
+	settings.userSelectedRemoveMode = false
 	settings.selectedDevices = null
-	settings.devModeLoaded = "false"
+	settings.devModeLoaded = false
 }
 
 def oauthVerification() {
