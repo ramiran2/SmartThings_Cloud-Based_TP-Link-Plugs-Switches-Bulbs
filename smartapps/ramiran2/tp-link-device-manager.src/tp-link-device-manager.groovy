@@ -293,19 +293,17 @@ def mainPage() {
 def selectDevices() {
 	if (userSelectedOptionZero =~ "Initial Install") {
 		return authPage()
+	}  else if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
+		getToken()
 	}
 	if (userSelectedOptionOne =~ "Communication Error") {
 		return mainPage()
-	}
-	if (userSelectedOptionOne =~ "Reset Status") {
+	} else if (userSelectedOptionOne =~ "Reset Status") {
 		setInitialStates()
 		return mainPage()
 	}
 	if (userSelectedOptionTwo =~ "Developer Page") {
 		return devMode()
-	}
-	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
-		getToken()
 	}
 	getDevices()
 	def devices = state.devices
@@ -551,8 +549,7 @@ void settingUpdate(name, value, type=null) {
 	}
 	if(name && type) {
 		app?.updateSetting("$name", [type: "$type", value: value])
-	}
-	else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
+	} else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
 }
 
 void settingRemove(name) {
