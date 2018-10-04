@@ -107,20 +107,20 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	if ("${userName}" == "" || "${userPassword}" == "" || "${userName}" == null || "${userPassword}" == null){
+	if ("${userName}" =~ null || "${userPassword}" =~ null){
 		settings.userSelectedOptionZero = "Initial Install"
 		settings.userSelectedOptionOne = "Communication Error"
 		settings.userSelectedOptionTwo = "Activate Account"
 		settings.userSelectedOptionThree = "Update Token"
-		} else {
+	} else {
 		settings.userSelectedOptionZero = "Add/Remove Devices"
 		settings.userSelectedOptionOne = "Communication Error"
 		settings.userSelectedOptionTwo = "Update Account"
 		settings.userSelectedOptionThree = "Update Token"
 	}
-	settings.userSelectedRemoveMode = (false)
+	settings.userSelectedRemoveMode = "false"
 	settings.selectedDevices = null
-	settings.devModeLoaded = (false)
+	settings.devModeLoaded = "false"
 }
 
 def oauthVerification() {
@@ -148,10 +148,10 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}" == "" || "${userPassword}" == "" || "${userName}" == null || "${userPassword}" == null){
-		authPage()
+	if ("${userName}" =~ null || "${userPassword}" =~ null){
+		return authPage()
 	} else {
-		mainPage()
+		return mainPage()
 	}
 }
 
@@ -165,12 +165,12 @@ def authPage() {
 		"Update Account: Updates the token and credentials."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.TpLinkToken != null)
+	def hideInfoDiagDescStat = (state.TpLinkToken)
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
 		nextPage: "selectDevices",
-		install: (atomicState?.isInstalled == true ? true : false),
+		install: (atomicState?.isInstalled == "true" ? true : false),
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -225,7 +225,7 @@ def mainPage() {
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
 	def errorRetuInfo = "We may not be unable to load Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null || state.currentError == "none")
+	def hideInfoDiagDescStat = (state.currentError == null)
 	def errorMsg = ""
 	getDevices()
 	def devices = state.devices
@@ -249,18 +249,18 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError == null || state.currentError == "none" || devModeLoaded == true){
+			if (state.currentError =~ null || !devModeLoaded){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null || state.currentError != "none" || devModeLoaded == true){
+			if (state.currentError != null || !devModeLoaded){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (state.currentError == null || state.currentError == "none" || devModeLoaded == true){
+			if (state.currentError != null || !devModeLoaded){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && oldDevices != [:] || state.currentError != "none" && oldDevices != [:] || devModeLoaded == true) {
+			if (state.currentError != null && oldDevices != [:] && oldDevices != [:]) {
 				input(
 					"userSelectedOptionOne", "enum",
 					title: "What do you want to do?",
@@ -284,7 +284,7 @@ def mainPage() {
 			input ("disAppIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
 		}
 		section("Help and Feedback:") {
-			if (userSelectedDevMode == true){
+			if (userSelectedDevMode){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
@@ -298,20 +298,20 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero == "Initial Install" && devModeLoaded == false) {
+	if (userSelectedOptionZero =~ "Initial Install" && !devModeLoaded) {
 		return authPage()
 	}
-	if (userSelectedOptionOne == "Communication Error" && devModeLoaded == false) {
+	if (userSelectedOptionOne =~ "Communication Error" && !devModeLoaded) {
 		return mainPage()
 	}
-	if (userSelectedOptionOne == "Reset Status" && devModeLoaded == false) {
+	if (userSelectedOptionOne =~ "Reset Status" && !devModeLoaded) {
 		setInitialStates()
 		return mainPage()
 	}
-	if (userSelectedDevMode == true && devModeLoaded == false) {
+	if (userSelectedOptionTwo =~ "Developer Page" && !devModeLoaded) {
 		return devMode()
 	}
-	if (userSelectedOptionZero == "Update Token" || userSelectedOptionTwo == "Activate Account" || userSelectedOptionTwo == "Update Account") {
+	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
 	getDevices()
@@ -338,7 +338,7 @@ def selectDevices() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "")
+	def hideInfoDiagDescStat = (errorMsg != "")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -355,14 +355,14 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg == "" || devModeLoaded == true){
+				if (errorMsg =~ "" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded == true) {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero == "Update Token" || userSelectedOptionTwo == "Update Account" || devModeLoaded == true) {
+		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || devModeLoaded) {
 			section("Account Configuration Page:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -375,9 +375,9 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOptionZero == "Add/Remove Devices" || userSelectedOptionTwo == "Activate Account" || userSelectedOptionOne == "Add/Remove Devices" || devModeLoaded == true) {
+		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || devModeLoaded) {
 			section("Device Configuration Page:") {
-				if (userSelectedRemoveMode == true) {
+				if (userSelectedRemoveMode) {
 					input(
 						"selectedDevices", "enum",
 						required: true,
@@ -427,7 +427,7 @@ def devMode() {
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null || state.currentError == "none")
+	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "devMode",
 		title: "Developer Page",
@@ -472,8 +472,7 @@ def aboutPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
-			href url: textDonateLink(), style:"external", required: false, title:"Donations",
-				description:"Tap to open in browser", state: "complete", image: getAppImg("donate.png")
+			href url: textDonateLink(), style:"external", required: false, title:"Donations", description:"Tap to open in browser", state: "complete", image: getAppImg("donate.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete"
@@ -507,7 +506,7 @@ def uninstallPage() {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
 		section("Did You Get an Error?") {
-			href "forceUninstallPage", title: "Perform Some Cleanup Steps", description: "Tap to force uninstall", image: getAppImg("forceuninstallpage.png")
+			href "forceUninstallPage", title: "Perform Some Cleanup Steps", description: "Tap to force uninstall", image: getAppImg("forceuninstall.png")
 		}
 		remove("Remove ${appName()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
@@ -564,7 +563,7 @@ def restStreamHandler(close = false) {
 	def connStatus = toClose ? false : true
 	log.trace "restStreamHandler(${connStatus ? "Start" : "Stop"}) Event to local node service"
 	String hubIp = settings?.restStreamLocalHub?.getLocalIP()
-	Boolean localStream = (settings?.restStreamLocal == true && hubIp)
+	Boolean localStream = (settings?.restStreamLocal && hubIp)
 	try {
 		def hubAction = new physicalgraph.device.HubAction(
 			method: "POST",
@@ -592,7 +591,7 @@ def restStreamHandler(close = false) {
 void settingUpdate(name, value, type=null) {
 	log.trace "settingUpdate($name, $value, $type)..."
 	if(name) {
-		if(value == "" || value == null || value == []) {
+		if(value =~ "" || value =~ null || value == []) {
 			settingRemove(name)
 			return
 		}
@@ -600,7 +599,7 @@ void settingUpdate(name, value, type=null) {
 	if(name && type) {
 		app?.updateSetting("$name", [type: "$type", value: value])
 	}
-	else if (name && type == null){ app?.updateSetting(name.toString(), value) }
+	else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
 }
 
 void settingRemove(name) {
@@ -868,7 +867,7 @@ def initialize() {
 	runEvery5Minutes(checkError)
 	schedule("0 30 2 ? * WED", getToken)
 	if (selectedDevices) {
-		if (userSelectedRemoveMode == true){
+		if (userSelectedRemoveMode){
 			removeDevices()
 		} else {
 			addDevices()
@@ -882,14 +881,14 @@ def uninstalled() {
 
 //	----- PERIODIC CLOUD MX TASKS -----
 def checkError() {
-	if (state.currentError == null || state.currentError == "none") {
+	if (state.currentError == null) {
 		log.info "TP-Link Connect did not have any set errors."
 		return
 	}
 	def errMsg = state.currentError.msg
 	log.info "Attempting to solve error: ${errMsg}"
 	state.errorCount = state.errorCount +1
-	if (errMsg == "Token expired" && state.errorCount < 6) {
+	if (errMsg =~ "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
 		if (state.currentError == null) {
