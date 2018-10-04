@@ -114,6 +114,7 @@ def setInitialStates() {
 	settings.selectedDevices = null
 	settings.userSelectedRemoveMode = false
 	settings.devModeLoaded = false
+	settings.userSelectedReload = false
 }
 
 def oauthVerification() {
@@ -172,7 +173,7 @@ def authPage() {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Driver Version:", driverVersionText
 		}
-		section("Login Page:") {
+		section("Login:") {
 			input(
 				"userName", "email",
 				title: "TP-Link Kasa Email Address",
@@ -188,7 +189,7 @@ def authPage() {
 				image: getAppImg("password.png")
 			)
 		}
-		section("Configuration Page:") {
+		section("Configuration:") {
 			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
@@ -252,7 +253,7 @@ def mainPage() {
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 		}
-		section("Configuration Page:") {
+		section("Configuration:") {
 			if (state.currentError != null && oldDevices != [:] && oldDevices != [:]) {
 				input(
 					"userSelectedOptionOne", "enum",
@@ -260,7 +261,7 @@ def mainPage() {
 					required: true,
 					multiple: false,
 					submitOnChange: true,
-					options: ["Communication Error", "Reset Status", "Add/Remove Devices"],
+					options: ["Communication Error", "Add/Remove Devices"],
 					image: getAppImg("error.png")
 				)
 			} else {
@@ -280,8 +281,16 @@ def mainPage() {
 			if (userSelectedDevMode){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedReload){
+				setInitialStates()
+			}
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+		}
+		section("About and Changelog:") {
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("Uninstall:") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstall.png")
@@ -293,17 +302,15 @@ def mainPage() {
 def selectDevices() {
 	if (userSelectedOptionZero =~ "Initial Install") {
 		return authPage()
-	}  else if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
-		getToken()
-	}
-	if (userSelectedOptionOne =~ "Communication Error" && state.currentError != null) {
-		return mainPage()
-	} else if (userSelectedOptionOne =~ "Reset Status") {
-		setInitialStates()
-		return mainPage()
 	}
 	if (userSelectedOptionTwo =~ "Developer Page") {
 		return devMode()
+	}
+	if (userSelectedOptionOne =~ "Communication Error") {
+		return mainPage()
+	}
+	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
+		getToken()
 	}
 	getDevices()
 	def devices = state.devices
@@ -354,7 +361,7 @@ def selectDevices() {
 				}
 		}
 		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account" || devModeLoaded) {
-			section("Account Configuration Page:") {
+			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
 					title: "What do you want to do?",
@@ -367,7 +374,7 @@ def selectDevices() {
 				}
 			}
 		if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices" || devModeLoaded) {
-			section("Device Configuration Page:") {
+			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
 						"selectedDevices", "enum",
