@@ -14,7 +14,7 @@ either express or implied. See the License for the specific
 language governing permissions and limitations under the 
 License.
 
-TP-Link Kasa Device Manager, 2018 Version 2
+TP-Link Kasa Device Manager, 2018 Version 3
 
 Copyright 2018 Anthony Ramirez
 
@@ -35,20 +35,6 @@ Handlers are in no way sanctioned or supported by TP-Link.
 All  development is based upon open-source data on the 
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
-	===== History =============================================
-2018-09-28	Update to Version 2.3.0
-		a.	Added Device Health Check
-		b.	Tweek from Dave Gutheinz for support for new tp-link devices
-		c.	Added support for the new Smart Things app
-2018-08-11	Update to Version 2.1.1
-		a.	Added Support for update from a repo on smartthings website
-		b.	Improved driver names
-		c.	Added driver version
-2018-01-31	Update to Version 2
-		a.	Common file content for all bulb implementations,
-			using separate files by model only.
-		b.	User file-internal selection of Energy Monitor
-			function enabling.
 	===== Bulb Identifier.  DO NOT EDIT ====================*/
 	//def deviceType = "Soft White Bulb"	//	Soft White
 	def deviceType = "Tunable White Bulb"	//	ColorTemp
@@ -58,7 +44,10 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 	//def installType = "Node.js Applet"
 //	==========================================================
 
-def devVer() { return "2.3.0" }
+import java.text.SimpleDateFormat
+import groovy.time.*
+
+def devVer() { return "3.1.0" }
 
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
@@ -176,6 +165,45 @@ def initialize() {
 
 def ping() {
 	log.trace "Ping..."
+	keepAwakeEvent()
+}
+
+def keepAwakeEvent() {
+	def lastDt = state?.lastUpdatedDtFmt
+	if(lastDt) {
+		def ldtSec = getTimeDiffSeconds(lastDt)
+		//log.debug "ldtSec: $ldtSec"
+		if(ldtSec < 1900) {
+			refresh()
+		}
+	}
+}
+
+
+def lastUpdatedEvent(sendEvt=false) {
+	def now = new Date()
+	def formatVal = state?.useMilitaryTime ? "MMM d, yyyy - HH:mm:ss" : "MMM d, yyyy - h:mm:ss a"
+	def tf = new SimpleDateFormat(formatVal)
+		tf.setTimeZone(getTimeZone())
+	def lastDt = "${tf?.format(now)}"
+	state?.lastUpdatedDt = lastDt?.toString()
+	state?.lastUpdatedDtFmt = getDtNow()
+	if(sendEvt) {
+		log.trace "Last Parent Refresh time: (${lastDt}) | Previous Time: (${lastUpd})"
+		sendEvent(name: 'lastUpdatedDt', value: getDtNow()?.toString(), displayed: false, isStateChange: true)
+	}
+}
+
+def getDtNow() {
+	def now = new Date()
+	return formatDt(now)
+}
+
+def getTimeZone() {
+	def tz = null
+	if(location?.timeZone) { tz = location?.timeZone }
+	if(!tz) { log.warn "getTimeZone: Hub TimeZone is not found ..." }
+	return tz
 }
 
 //	===== Update when installed or setting changed =====

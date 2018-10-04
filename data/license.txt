@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.
 
-TP-Link Device Manager, 2018 Version 2
+TP-Link Device Manager, 2018 Version 3
 
 Copyright 2018 Anthony Ramirez
 
@@ -29,3 +29,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.
+
+##### Discalimer: This Service Manager and the associated Device
+Handlers are in no way sanctioned or supported by TP-Link. All
+development is based upon open-source data on the TP-Link Kasa Devices;
+primarily various users on GitHub.com.

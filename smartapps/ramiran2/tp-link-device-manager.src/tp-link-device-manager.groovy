@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.
 
-TP-Link Device Manager, 2018 Version 2
+TP-Link Device Manager, 2018 Version 3
 
 Copyright 2018 Anthony Ramirez
 
@@ -40,18 +40,7 @@ primarily various users on GitHub.com.
 1.	This Service Manager is designed to install and manage TP-Link
 	bulbs, plugs, and switches using their respective device handlers.
 2.	Please direct comments to the SmartThings community thread
-	'Cloud TP-Link Device SmartThings Integration'.
-
-##### History #####
-2018-10-04 Improved UI Elements with other small changes + Added a changelog page + Added a uninstall page + Added a about page + Improved logic
-2018-10-01 Improved UI Elements with other small changes + Added a developer page
-2018-09-28 Improved UI Elements with other small changes + Added a login page + Updated Driver Version Variables + Added a New Device Handler
-2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
-2018-08-28 Improved UI Elements with other small changes
-2018-08-27 Improved UI Elements with other large changes
-2018-08-22 Improved UI Elements and updated the app logo plus other small changes
-2018-08-11 Updated for Added Support for update from a repo on smartthings website + Improved app name + Added app version
-2018-01-31 Updated for new release of Device Handlers
+	'TP-Link Device Manager SmartThings Integration'.
 */
 
 definition(
@@ -72,20 +61,20 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "2.9.0" }
+def appVersion() { return "3.1.0" }
 def appVerDate() { return "10-04-2018" }
 def driverVersionsMin() {
 	return [
-		"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"colorbulb":["val":230, "desc":"2.3.0"],
-		"dimmingswitch":["val":230, "desc":"2.3.0"],
-		"energymonitorplug":["val":230, "desc":"2.3.0"],
-		"plug":["val":230, "desc":"2.3.0"],
-		"switch":["val":230, "desc":"2.3.0"],
-		"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"softwhitebulb":["val":230, "desc":"2.3.0"],
-		"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-		"tunablewhitebulb":["val":230, "desc":"2.3.0"]
+		"colorbulbenergymonitor":["val":310, "desc":"3.1.0"],
+		"colorbulb":["val":310, "desc":"3.1.0"],
+		"dimmingswitch":["val":310, "desc":"3.1.0"],
+		"energymonitorplug":["val":310, "desc":"3.1.0"],
+		"plug":["val":310, "desc":"3.1.0"],
+		"switch":["val":310, "desc":"3.1.0"],
+		"softwhitebulbenergymonitor":["val":310, "desc":"3.1.0"],
+		"softwhitebulb":["val":310, "desc":"3.1.0"],
+		"tunablewhitebulbenergymonitor":["val":310, "desc":"3.1.0"],
+		"tunablewhitebulb":["val":310, "desc":"3.1.0"]
 	]
 }
 
@@ -212,7 +201,7 @@ def mainPage() {
 	def errorRetuInfo = "We may not be unable to load Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
-	def errorMsg = null
+	def errorMsg = "null"
 	getDevices()
 	def devices = state.devices
 	def oldDevices = [:]
@@ -306,7 +295,7 @@ def selectDevices() {
 	}
 	getDevices()
 	def devices = state.devices
-	def errorMsg = null
+	def errorMsg = "null"
 	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
@@ -328,7 +317,7 @@ def selectDevices() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (!errorMsg)
+	def hideInfoDiagDescStat = (errorMsg == "null")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -345,10 +334,10 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (!errorMsg || devModeLoaded){
+				if (errorMsg ==~ "null" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg || devModeLoaded) {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
@@ -665,7 +654,7 @@ def addDevices() {
 	tpLinkModel << ["KB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KB130
 	tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB130
 	tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KL130
-	tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB230
+	tpLinkModel << ["LB310" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB310
 
 	def hub = location.hubs[0]
 	def hubId = hub.id
@@ -903,7 +892,7 @@ def developerVer()	{ return false }
 def betaMarker() { return false }
 def appInfoDesc()	{
 	def str = ""
-	str += "TP-Link Device Manager"
+	str += "${appLabel()}"
 	str += "\n" + "• Version: ${appVersion()}"
 	str += "\n" + "• Updated: ${appVerDate()}"
 	return str
