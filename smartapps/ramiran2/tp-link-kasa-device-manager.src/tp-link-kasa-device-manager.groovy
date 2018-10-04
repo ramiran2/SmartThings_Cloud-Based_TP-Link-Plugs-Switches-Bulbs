@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.
 
-TP-Link Kasa Device Manager, 2018 Version 2
+TP-Link Device Manager, 2018 Version 2
 
 Copyright 2018 Anthony Ramirez
 
@@ -43,6 +43,7 @@ primarily various users on GitHub.com.
 	'Cloud TP-Link Device SmartThings Integration'.
 
 ##### History #####
+2018-10-03 Improved UI Elements with other small changes
 2018-10-01 Improved UI Elements with other small changes + Added a developer page
 2018-09-28 Improved UI Elements with other small changes + Added a login page + Updated Driver Version Variables + Added a New Device Handler
 2018-09-27 Improved UI Elements with other small changes + Updated for new Device Handlers + Add Support for the new Smart Thing Application
@@ -54,34 +55,16 @@ primarily various users on GitHub.com.
 */
 
 definition(
-	name: "TP-Link Kasa Device Manager",
-	namespace: "ramiran2",
-	author: "Dave Gutheinz (Modified by xKillerMaverick)",
-	description: "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers",
+	name: "${appName()}",
+	namespace: "${appNamespace()}",
+	author: "${appAuthor()}",
+	description: "${textDesc()}",
 	category: "Convenience",
-	iconUrl: "${getAppImg("kasa_logo.png")}",
-	iconX2Url: "${getAppImg("kasa_logo.png")}",
-	iconX3Url: "${getAppImg("kasa_logo.png")}",
+	iconUrl: "${getAppImg("kasa.png")}",
+	iconX2Url: "${getAppImg("kasa.png")}",
+	iconX3Url: "${getAppImg("kasa.png")}",
 	singleInstance: true
 	)
-
-	def appVersion() { "2.5.0" }
-	def appVerDate() { "10-01-2018" }
-	def appAuthor() { "Dave Gutheinz (Modified by xKillerMaverick)" }
-	def driverVersionsMin() {
-		return [
-			"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
-			"colorbulb":["val":230, "desc":"2.3.0"],
-			"dimmingswitch":["val":230, "desc":"2.3.0"],
-			"energymonitorplug":["val":230, "desc":"2.3.0"],
-			"plug":["val":230, "desc":"2.3.0"],
-			"switch":["val":230, "desc":"2.3.0"],
-			"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-			"softwhitebulb":["val":230, "desc":"2.3.0"],
-			"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
-			"tunablewhitebulb":["val":230, "desc":"2.3.0"]
-		]
-	}
 
 preferences {
 	page(name: "oauthVerification")
@@ -90,6 +73,10 @@ preferences {
 	page(name: "mainPage")
 	page(name: "selectDevices")
 	page(name: "devMode")
+	page(name: "aboutPage")
+	page(name: "changeLogPage")
+	page(name: "uninstallPage")
+	page(name: "forceUninstallPage")
 }
 
 def setInitialStates() {
@@ -97,8 +84,13 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settings.userSelectedOption = null
+	settings.userSelectedOptionZero = "Add/Remove Devices"
+	settings.userSelectedOptionOne = "Communication Error"
+	settings.userSelectedOptionTwo = "Activate Account"
+	settings.userSelectedOptionThree = "Update Token"
+	settings.userSelectedRemoveMode = false
 	settings.selectedDevices = null
+	settings.devModeLoaded = false
 }
 
 def oauthVerification() {
@@ -106,7 +98,7 @@ def oauthVerification() {
 	if(!atomicState?.accessToken) {
 		return dynamicPage(name: "oauthVerification", title: "OAuth Verification Page", nextPage: "", install: false, uninstall: true) {
 			section("") {
-				paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+				paragraph appInfoDesc(), image: getAppImg("kasa.png")
 			}
 			section ("Application Information:") {
 				def title = ""
@@ -115,6 +107,7 @@ def oauthVerification() {
 				else { title="Unknown Error"; desc = "Application Status has not received any messages to display";	}
 				log.warn "Status Message: $desc"
 				paragraph title: "$title", "$desc", required: true, state: null
+				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
 		}
 	}
@@ -139,18 +132,18 @@ def authPage() {
 		"action you want to complete. " + "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Update Account: Updates the token."
-	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "2.3.0" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+		"Update Account: Updates the token and credentials."
+	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.TpLinkToken != null)
 	return dynamicPage(
 		name: "authPage",
-		title: "TP-Link Kasa - Login Page",
+		title: "Login Page",
 		nextPage: "selectDevices",
 		install: (atomicState?.isInstalled == true ? true : false),
 		uninstall: false) {
 		section("") {
-			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Driver Version:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Information:", authPageText
@@ -174,12 +167,12 @@ def authPage() {
 		}
 		section("Configuration Page:") {
 			input(
-				"userSelectedOption", "enum",
+				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Activate Account", "Update Account"],
+				options: ["Activate Account", "Update Account", "Developer Page"],
 				image: getAppImg("settings.png")
 			)
 			input(
@@ -197,10 +190,10 @@ def mainPage() {
 	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Add Devices: Only add devices.\n\r" +
+		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
 		"Update Token: Updates the token.\n\r" +
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
-	def errorRetuInfo = "We will not be unable to load TP-Link Kasa - Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this will end up in a blank screen."
+	def errorRetuInfo = "We may not be unable to load Device Settings Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null || state.currentError == "none")
 	def errorMsg = ""
@@ -219,45 +212,46 @@ def mainPage() {
 	}
 	return dynamicPage(
 		name: "mainPage",
-		title: "TP-Link Kasa - Settings Page",
+		title: "Settings Page",
 		nextPage: "selectDevices",
 		uninstall: false) {
 		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError == null || state.currentError == "none"){
+			if (state.currentError == null || state.currentError == "none" || devModeLoaded == true){
 				paragraph title: "Information:", mainPageText
 			}
-			if (state.currentError != null || state.currentError != "none"){
+			if (state.currentError != null || state.currentError != "none" || devModeLoaded == true){
 				paragraph title: "Communication Error:", errorMsg
 			}
-			if (userSelectedOption == "Communication Error" || userSelectedOption == "Developer Page"){
+			if (state.currentError == null || state.currentError == "none" || devModeLoaded == true){
 				paragraph title: "Loading Error:", errorRetuInfo
 			}
 		}
 		section("Configuration Page:") {
-			if (state.currentError != null && oldDevices != [:] || state.currentError != "none" && oldDevices != [:]) {
+			if (state.currentError != null && oldDevices != [:] || state.currentError != "none" && oldDevices != [:] || devModeLoaded == true) {
 				input(
-					"userSelectedOption", "enum",
+					"userSelectedOptionOne", "enum",
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
 					submitOnChange: true,
-					options: ["Communication Error", "Developer Page"],
+					options: ["Communication Error", "Reset Status", "Add/Remove Devices"],
 					image: getAppImg("error.png")
 				)
 			} else {
 				input(
-					"userSelectedOption", "enum",
+					"userSelectedOptionZero", "enum",
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
 					submitOnChange: true,
-					options: ["Initial Install", "Add Devices", "Update Token"],
+					options: ["Initial Install", "Add/Remove Devices", "Update Token"],
 					image: getAppImg("settings.png")
 				)
 			}
+			input ("disAppIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
 		}
 		section("Help and Feedback:") {
 			if (userSelectedDevMode == true){
@@ -266,29 +260,40 @@ def mainPage() {
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
+		section("Uninstall:") {
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstall.png")
+		}
 	}
 }
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Developer Page" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if (userSelectedOptionZero == "Initial Install" && devModeLoaded == false) {
 		return authPage()
 	}
-	if (userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && userSelectedOption != "Activate Account" && userSelectedOption != "Developer Page") {
+	if (userSelectedOptionOne == "Communication Error" && devModeLoaded == false) {
 		return mainPage()
 	}
-	if (userSelectedOption != "Activate Account" && userSelectedOption != "Add Devices" && userSelectedOption != "Update Token" && userSelectedOption != "Initial Install" && userSelectedOption != "Update Account" && userSelectedOption != "Communication Error") {
+	if (userSelectedOptionOne == "Reset Status" && devModeLoaded == false) {
+		setInitialStates()
+		return mainPage()
+	}
+	if (userSelectedDevMode == true && devModeLoaded == false) {
 		return devMode()
 	}
-	if (userSelectedOption == "Update Token" || userSelectedOption == "Activate Account" || userSelectedOption == "Update Account") {
+	if (userSelectedOptionZero == "Update Token" || userSelectedOptionTwo == "Activate Account" || userSelectedOptionTwo == "Update Account") {
 		getToken()
 	}
 	getDevices()
 	def devices = state.devices
 	def errorMsg = ""
 	def newDevices = [:]
+	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
@@ -309,28 +314,28 @@ def selectDevices() {
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
-		"wish to add, thenpress Done again to install the devices. Press	<	" +
+		"wish to add, thenpress Done again to install the devices. Press < " +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices",
-		title: "TP-Link Kasa - Device Setup Page",
+		title: "Device Settings Page",
 		install: true,
 		uninstall: false) {
 		section("") {
-			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg == ""){
+				if (errorMsg == "" || devModeLoaded == true){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOption != "Update Token" && userSelectedOption != "Update Account" && errorMsg != "") {
+				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "" || devModeLoaded == true) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOption == "Update Token" || userSelectedOption == "Update Account") {
+		if (userSelectedOptionZero == "Update Token" || userSelectedOptionTwo == "Update Account" || devModeLoaded == true) {
 			section("Account Configuration Page:") {
 				input(
-					"userSelectedOption", "enum",
+					"userSelectedOptionThree", "enum",
 					title: "What do you want to do?",
 					required: true,
 					multiple: false,
@@ -340,16 +345,34 @@ def selectDevices() {
 					)
 				}
 			}
-		if (userSelectedOption == "Add Devices" || userSelectedOption == "Activate Account") {
+		if (userSelectedOptionZero == "Add/Remove Devices" || userSelectedOptionTwo == "Activate Account" || userSelectedOptionOne == "Add/Remove Devices" || devModeLoaded == true) {
 			section("Device Configuration Page:") {
+				if (userSelectedRemoveMode == true) {
+					input(
+						"selectedDevices", "enum",
+						required: true,
+						multiple: true,
+						submitOnChange: true,
+						title: "Select Devices (${oldDevices.size() ?: 0} found)",
+						options: oldDevices,
+						image: getAppImg("devices.png")
+					)
+				} else {
+					input(
+						"selectedDevices", "enum",
+						required: true,
+						multiple: true,
+						submitOnChange: true,
+						title: "Select Devices (${newDevices.size() ?: 0} found)",
+						options: newDevices,
+						image: getAppImg("devices.png")
+					)
+				}
 				input(
-					"selectedDevices", "enum",
-					required: true,
-					multiple: true,
+					"userSelectedRemoveMode", "bool",
+					title: "Do you want to enable device removal mode?",
 					submitOnChange: true,
-					title: "Select Devices (${newDevices.size() ?: 0} found)",
-					options: newDevices,
-					image: getAppImg("devices.png")
+					image: getAppImg("deviceremover.png")
 				)
 			}
 		}
@@ -374,13 +397,13 @@ def devMode() {
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = ("${state.currentError}")
+	def hideInfoDiagDescStat = (state.currentError == null || state.currentError == "none")
 	return dynamicPage(
 		name: "devMode",
-		title: "TP-Link Kasa - Developer Page",
-		uninstall: true) {
+		title: "Developer Page",
+		uninstall: false) {
 		section("") {
-			paragraph appSmallInfoDesc(), image: getAppImg("kasa_logo.png")
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 			paragraph title: "Error Count:", "${state.errorCount}"
@@ -394,6 +417,81 @@ def devMode() {
 			paragraph title: "Managed Devices:", "${oldDevices}"
 			paragraph title: "New Devices:", "${newDevices}"
 		}
+		section("Page Selector:") {
+			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
+			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
+			href "selectDevices", title: "Device Settings Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
+		}
+		section("Configuration Page:") {
+			input(
+				"devModeLoaded", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+		}
+	}
+}
+
+def aboutPage() {
+	dynamicPage(name: "aboutPage", title: "About Page", install: false, uninstall: false) {
+		section("About this App:") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
+		}
+		section("Donations:") {
+			href url: textDonateLink(), style:"external", required: false, title:"Donations",
+				description:"Tap to open in browser", state: "complete", image: getAppImg("donate.png")
+		}
+		section("Credits:") {
+			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete"
+			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete"
+			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete"
+		}
+		section("App Change Details:") {
+			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
+		}
+		section("Licensing Info:") {
+			paragraph "${textCopyright()}\n${textLicense()}"
+		}
+	}
+}
+
+def changeLogPage () {
+	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false) {
+		section() {
+			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
+			paragraph appVerInfo()
+		}
+		def iData = atomicState?.installData
+		iData["shownChgLog"] = true
+		atomicState?.installData = iData
+	}
+}
+
+def uninstallPage() {
+	dynamicPage(name: "uninstallPage", title: "Uninstall", install: false, uninstall: true) {
+		section() {
+			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+		}
+		section("Did You Get an Error?") {
+			href "forceUninstallPage", title: "Perform Some Cleanup Steps", description: "Tap to force uninstall", image: getAppImg("forceuninstallpage.png")
+		}
+		remove("Remove ${appName()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
+	}
+}
+
+def forceUninstallPage() {
+	dynamicPage(name: "forceUninstallPage", title: "Uninstall Pre Cleanup", install: false, uninstall: true) {
+		section() {
+			getChildApps()?.each {
+				deleteChildApp(it)
+				paragraph "Removed Child App: ${it?.label}"
+			}
+		}
+		remove("Try Removing Again!!!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
 }
 
@@ -406,13 +504,92 @@ def getEndpointUrl() {
 	]
 	try {
 		httpGet(params) { resp ->
-			LogAction("EndPoint URL: ${resp?.data?.uri}", "trace", false)
+			log.trace "EndPoint URL: ${resp?.data?.uri}"
 			return resp?.data?.uri
 		}
 	} catch (ex) {
 		log.error "getEndpointUrl Exception:", ex
-		sendExceptionData(ex, "getEndpointUrl")
 	}
+}
+
+def restStreamHandler(close = false) {
+	log.trace "restStreamHandler: close: ${close}"
+	def toClose = close
+	def host = getRestHost()
+	if(!host) {
+		atomicState.restStreamingOn = false;
+		host = atomicState?.lastRestHost ?: null
+		atomicState.lastRestHost = null
+		if(!host) { return }
+		toClose = true
+	} else {
+		atomicState.lastRestHost = host
+	}
+	if(!close && !atomicState?.authToken) {
+		log.trace "No authToken", "warn"
+		atomicState.restStreamingOn = false
+		return
+	}
+	log.trace "restStreamHandler(close: ${close}) host: ${host} lastRestHost: ${atomicState?.lastRestHost}"
+	def connStatus = toClose ? false : true
+	log.trace "restStreamHandler(${connStatus ? "Start" : "Stop"}) Event to local node service"
+	String hubIp = settings?.restStreamLocalHub?.getLocalIP()
+	Boolean localStream = (settings?.restStreamLocal == true && hubIp)
+	try {
+		def hubAction = new physicalgraph.device.HubAction(
+			method: "POST",
+			headers: [
+				"HOST": host,
+				"tplinktoken": "${atomicState?.authToken}",
+				"stHubIp": "${hubIp}",
+				"localStream": "${localStream}",
+				"connStatus": "${connStatus}",
+				"callback": "${getApiURL()}",
+				"sttoken": "${atomicState?.accessToken}",
+				"structure": "${atomicState?.structures}"
+			],
+			path: "/stream",
+			body: ""
+		)
+		sendHubCommand(hubAction)
+	}
+	catch (Exception e) {
+		log.error "restStreamHandler Exception $e on $hubAction"
+		atomicState.restStreamingOn = false
+	}
+}
+
+void settingUpdate(name, value, type=null) {
+	log.trace "settingUpdate($name, $value, $type)..."
+	if(name) {
+		if(value == "" || value == null || value == []) {
+			settingRemove(name)
+			return
+		}
+	}
+	if(name && type) {
+		app?.updateSetting("$name", [type: "$type", value: value])
+	}
+	else if (name && type == null){ app?.updateSetting(name.toString(), value) }
+}
+
+void settingRemove(name) {
+	log.trace "settingRemove($name)..."
+	if(name) { app?.deleteSetting("$name") }
+}
+
+void resetSTAccessToken(reset) {
+	if(reset != true) { return }
+	log.info "Resetting SmartApp Access Token...."
+	restStreamHandler(true)
+	atomicState?.restStreamingOn = false
+	revokeAccessToken()
+	atomicState?.accessToken = null
+	if(getAccessToken()) {
+		log.info "Reset SmartApp Access Token... Successful"
+		settingUpdate("resetSTAccessToken", "false", "bool")
+	}
+	startStopStream()
 }
 
 def getAccessToken() {
@@ -421,11 +598,9 @@ def getAccessToken() {
 		else { return true }
 	}
 	catch (ex) {
-		def msg = "Error: OAuth is not Enabled for TP-Link Kasa Device Manager!. Please click remove and Enable Oauth under the SmartApp App Settings in the IDE"
+		def msg = "Error: OAuth is not Enabled for TP-Link Device Manager!. Please click remove and Enable Oauth under the SmartApp App Settings in the IDE"
 		sendPush(msg)
 		log.error "getAccessToken Exception", ex
-		LogAction("getAccessToken Exception | $msg", "warn", true)
-		//sendExceptionData(ex, "getAccessToken")
 		return false
 	}
 }
@@ -447,6 +622,22 @@ def getDevices() {
 			isChild.syncAppServerUrl(it.appServerUrl)
 		}
 		log.info "Device ${it.alias} added to devices array"
+	}
+}
+
+def removeDevices() {
+	childDevices.each {
+		try{
+			def delete = app.getChildDevices(true).findAll { selectedDevices?.toString()?.contains(it?.deviceNetworkId) }
+			if(delete?.size() > 0) {
+				updTimestampMap("lastAnalyticUpdDt", null)
+				LogAction("Removing ${delete.size()} devices: ${delete}", "debug", true)
+				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
+			}
+		}
+		catch (e) {
+			log.debug "Error deleting ${it.deviceNetworkId}: ${e}"
+		}
 	}
 }
 
@@ -619,7 +810,19 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 	return cmdResponse
 }
 
-//	----- INSTALL, UPDATE, INITIALIZE -----
+
+def uninstManagerApp() {
+	try {
+		//Revokes Smartthings endpoint token
+		revokeAccessToken()
+		//Revokes TP-Link Auth Token
+		state.TpLinkToken = null
+	} catch (ex) {
+		log.error "uninstManagerApp Exception:", ex
+	}
+}
+
+//	----- INSTALL, UPDATE, INITIALIZE, UNINSTALLED -----
 def installed() {
 	initialize()
 }
@@ -635,8 +838,16 @@ def initialize() {
 	runEvery5Minutes(checkError)
 	schedule("0 30 2 ? * WED", getToken)
 	if (selectedDevices) {
-		addDevices()
+		if (userSelectedRemoveMode == true){
+			removeDevices()
+		} else {
+			addDevices()
+		}
 	}
+}
+
+def uninstalled() {
+	uninstManagerApp()
 }
 
 //	----- PERIODIC CLOUD MX TASKS -----
@@ -678,23 +889,56 @@ def removeChildDevice(alias, deviceNetworkId) {
 	}
 }
 
-def gitBranch() { return "master" }
-def getAppImg(file) { return "https://raw.githubusercontent.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/${gitBranch()}/images/$file" }
+def gitBranch() { return betaMarker() ? "beta" : "master"  }
+def getAppImg(imgName, on = null)	{ return (!disAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
 def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
 def getAppEndpointUrl(subPath) { return "${apiServerUrl("/api/smartapps/installations/${app.id}${subPath ? "/${subPath}" : ""}?access_token=${atomicState.accessToken}")}" }
+def appName() { return "${parent ? "${autoAppName()}" : "${appLabel()}"}${appDevName()}" }
+def appLabel() { return "TP-Link Device Manager" }
+def appDevName() { return appDevType() ? " (Dev)" : "" }
+def appDevType() { return false }
+def appNamespace() { return "ramiran2" }
+def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
+def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
+def developerVer()	{ return false }
+def betaMarker() { return false }
 def appInfoDesc()	{
 	def str = ""
-	str += "TP-Link Kasa Device Manager"
+	str += "TP-Link Device Manager"
 	str += "\n" + "• Version: ${appVersion()}"
 	str += "\n" + "• Updated: ${appVerDate()}"
-	str += "\n" + "• Author: ${appAuthor()}"
 	return str
 }
-def appSmallInfoDesc() {
-	def strTwo = ""
-	strTwo += "TP-Link Kasa Device Manager"
-	strTwo += "\n" + "• Version: ${appVersion()}"
-	strTwo += "\n" + "• Updated: ${appVerDate()}"
-	return strTwo
+def appVersion() { return "2.5.0" }
+def appVerDate() { return "10-03-2018" }
+def appAuthor() { return "Anthony Ramirez" }
+def getServerUrl()			{ return "https://graph.api.smartthings.com" }
+def getShardUrl()			{ return getApiServerUrl() }
+def getCallbackUrl()		{ return "https://graph.api.smartthings.com/oauth/callback" }
+def getBuildRedirectUrl() { return "${serverUrl}/oauth/initialize?appId=${app.id}&access_token=${atomicState?.accessToken}&apiServerUrl=${shardUrl}" }
+private Integer convertHexToInt(hex) { Integer.parseInt(hex,16) }
+private String convertHexToIP(hex) { [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".") }
+def driverVersionsMin() {
+	return [
+		"colorbulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"colorbulb":["val":230, "desc":"2.3.0"],
+		"dimmingswitch":["val":230, "desc":"2.3.0"],
+		"energymonitorplug":["val":230, "desc":"2.3.0"],
+		"plug":["val":230, "desc":"2.3.0"],
+		"switch":["val":230, "desc":"2.3.0"],
+		"softwhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"softwhitebulb":["val":230, "desc":"2.3.0"],
+		"tunablewhitebulbenergymonitor":["val":230, "desc":"2.3.0"],
+		"tunablewhitebulb":["val":230, "desc":"2.3.0"]
+	]
 }
+def textVersion()	{ return "Version: ${appVersion()}" }
+def textModified()	{ return "Updated: ${appVerDate()}" }
+def textVerInfo()	{ return "${appVerInfo()}" }
+def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
+def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/app_license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
+def textDonateLink(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=" }
+def stIdeLink()		{ return "https://graph.api.smartthings.com" }
+def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
+def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
