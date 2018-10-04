@@ -917,7 +917,7 @@ def getAppImg(imgName, on = null)	{ return (!disAppIcons || on) ? "https://raw.g
 def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
 def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
 def getAppEndpointUrl(subPath) { return "${apiServerUrl("/api/smartapps/installations/${app.id}${subPath ? "/${subPath}" : ""}?access_token=${atomicState.accessToken}")}" }
-def appName() { return "${parent ? "${autoAppName()}" : "${appLabel()}"}${appDevName()}" }
+def appName() { return "${"${appLabel()}"}${appDevName()}" }
 def appLabel() { return "TP-Link Device Manager" }
 def appDevName() { return appDevType() ? " (Dev)" : "" }
 def appDevType() { return false }
