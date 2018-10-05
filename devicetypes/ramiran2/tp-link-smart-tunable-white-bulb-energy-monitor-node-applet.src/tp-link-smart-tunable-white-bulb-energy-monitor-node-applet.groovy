@@ -52,7 +52,7 @@ def devVer() { return "3.1.0" }
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} Energy Monitor - ${installType}",
 				namespace: "ramiran2",
-				author: "Dave Gutheinz (Modified by xKillerMaverick)",
+				author: "Anthony Ramirez",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Energy Monitor",
 				ocfDeviceType: "oic.d.light",
