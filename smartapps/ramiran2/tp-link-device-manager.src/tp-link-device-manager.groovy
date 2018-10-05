@@ -124,7 +124,7 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}" ==~ null || "${userPassword}" ==~ null){
+	if ("${userName}" == null || "${userPassword}" == null){
 		return authPage()
 	} else {
 		return mainPage()
@@ -225,7 +225,7 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError ==~ null || devModeLoaded){
+			if (state.currentError == null || devModeLoaded){
 				paragraph title: "Information:", mainPageText
 			}
 			if (state.currentError != null || devModeLoaded){
@@ -550,14 +550,14 @@ def getApiURL() {
 void settingUpdate(name, value, type=null) {
 	log.trace "settingUpdate($name, $value, $type)..."
 	if(name) {
-		if(value ==~ "" || value ==~ null || value == []) {
+		if(value ==~ "" || value == null || value == []) {
 			settingRemove(name)
 			return
 		}
 	}
 	if(name && type) {
 		app?.updateSetting("$name", [type: "$type", value: value])
-	} else if (name && type ==~ null){ app?.updateSetting(name.toString(), value) }
+	} else if (name && type == null){ app?.updateSetting(name.toString(), value) }
 }
 
 void settingRemove(name) {

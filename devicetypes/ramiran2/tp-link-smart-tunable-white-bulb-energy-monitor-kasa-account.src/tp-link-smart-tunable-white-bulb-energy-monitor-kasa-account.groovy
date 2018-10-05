@@ -410,7 +410,7 @@ def energyMeterResponse(cmdResponse) {
 		unschedule(getEnergyStats)
 	} else {
 		def realtime = cmdResponse[state.emeterText]["get_realtime"]
-		if (realtime.power ==~ null) {
+		if (realtime.power == null) {
 			state.powerScale = "power_mw"
 			state.energyScale = "energy_wh"
 		} else {

@@ -271,7 +271,7 @@ def refresh(){
 }
 
 def commandResponse(cmdResponse){
-	if (cmdResponse.system.set_relay_state ==~ null) {
+	if (cmdResponse.system.set_relay_state == null) {
 		def status = cmdResponse.system.get_sysinfo.relay_state
 		if (status == 1) {
 			status = "on"
@@ -293,7 +293,7 @@ def getPower(){
 
 def energyMeterResponse(cmdResponse) {
 	def realtime = cmdResponse["emeter"]["get_realtime"]
-	if (realtime.power ==~ null) {
+	if (realtime.power == null) {
 		state.powerScale = "power_mw"
 		state.energyScale = "energy_wh"
 	} else {
