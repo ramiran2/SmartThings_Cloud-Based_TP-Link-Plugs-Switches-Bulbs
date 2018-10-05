@@ -67,13 +67,13 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
-		if (deviceType == "Tunable White Bulb" || "Color Bulb") {
+		if (deviceType ==~ "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"
 			command "setModeNormal"
 			command "setModeCircadian"
 			attribute "bulbMode", "string"
 		}
-		if (deviceType == "Color Bulb") {
+		if (deviceType ==~ "Color Bulb") {
 			capability "Color Control"
 		}
 	}
@@ -95,7 +95,7 @@ metadata {
 			tileAttribute ("device.level", key: "SLIDER_CONTROL") {
 				attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel"
 			}
-			if (deviceType == "Color Bulb") {
+			if (deviceType ==~ "Color Bulb") {
 				tileAttribute ("device.color", key: "COLOR_CONTROL") {
 					attributeState "color", action:"setColor"
 				}
@@ -106,12 +106,12 @@ metadata {
 			state "default", label:"Refresh", action:"refresh.refresh"
 		}
 		
-		if (deviceType == "Tunable White Bulb") {
+		if (deviceType ==~ "Tunable White Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
 			range:"(2500..6500)") {
 				state "colorTemperature", action:"color temperature.setColorTemperature"
 			}
-		} else if (deviceType == "Color Bulb") {
+		} else if (deviceType ==~ "Color Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
 			range:"(2500..9000)") {
 				state "colorTemperature", action:"color temperature.setColorTemperature"
@@ -128,7 +128,7 @@ metadata {
 		}
 
 		main("switch")
-		if (deviceType == "Soft White Bulb") {
+		if (deviceType ==~ "Soft White Bulb") {
 			details("switch", "refresh")
 		} else {
 				details("switch", "colorTemp", "bulbMode", "refresh", 
@@ -143,7 +143,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes"]
 
 	preferences {
-		if (installType == "Node.js Applet") {
+		if (installType ==~ "Node.js Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -175,7 +175,7 @@ def keepAwakeEvent() {
 		def ldtSec = getTimeDiffSeconds(lastDt)
 		//log.debug "ldtSec: $ldtSec"
 		if(ldtSec < 1900) {
-			refresh()
+			poll()
 		}
 	}
 }
@@ -251,7 +251,7 @@ def update() {
 
 void uninstalled() {
 	log.trace "Uninstalled..."
-	if (state.installType == "Kasa Account") {
+	if (state.installType ==~ "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -303,7 +303,7 @@ def refresh(){
 def commandResponse(cmdResponse){
 	def status
 	def respType = cmdResponse.toString().substring(1,10)
-	if (respType == "smartlife") {
+	if (respType ==~ "smartlife") {
 		status =  cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
 	} else {
 		status = cmdResponse.system.get_sysinfo.light_state
@@ -323,11 +323,11 @@ def commandResponse(cmdResponse){
 	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "switch", value: onOff)
  	sendEvent(name: "level", value: level)
-	if (state.deviceType == "Tunable White Bulb" || "Color Bulb") {
+	if (state.deviceType ==~ "Tunable White Bulb" || "Color Bulb") {
 		sendEvent(name: "bulbMode", value: mode)
 		sendEvent(name: "colorTemperature", value: color_temp)
 	}
-	if (state.deviceType == "Color Bulb") {
+	if (state.deviceType ==~ "Color Bulb") {
 		sendEvent(name: "hue", value: hue)
 		sendEvent(name: "saturation", value: saturation)
 		sendEvent(name: "color", value: colorUtil.hslToHex(hue/3.6 as int, saturation as int))
@@ -336,7 +336,7 @@ def commandResponse(cmdResponse){
 
 //	===== Send the Command =====
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType == "Kasa Account") {
+	if (state.installType ==~ "Kasa Account") {
 		sendCmdtoCloud(command, hubCommand, action)
 	} else {
 		sendCmdtoHub(command, hubCommand, action)
@@ -348,7 +348,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def deviceId = getDataValue("deviceId")
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
-	if (cmdResp.substring(0,5) == "ERROR"){
+	if (cmdResp.substring(0,5) ==~ "ERROR"){
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
@@ -379,7 +379,7 @@ private sendCmdtoHub(command, hubCommand, action){
 def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	if (cmdResponse == "TcpTimeout") {
+	if (cmdResponse ==~ "TcpTimeout") {
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR - OffLine in hubResponseParse")
