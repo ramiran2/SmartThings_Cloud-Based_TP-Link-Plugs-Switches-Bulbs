@@ -1,0 +1,284 @@
+##### TP-Link Device Manager #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Improved UI Elements with other small changes 
+b. Added a changelog page
+c. Added a uninstall page
+d. Added a about page
+e. Improved logic
+
+2018-10-01 - Update to Version 2.9.0
+a. Improved UI Elements with other small changes
+b. Added a developer page
+
+2018-09-28 - Update to Version 2.8.0
+a. Improved UI Elements with other small changes
+b. Added a login page
+c. Updated Driver Version Variables
+d. Added a New Device Handler
+
+2018-09-27 - Update to Version 2.7.0
+a. Improved UI Elements with other small changes
+b. Updated for new Device Handlers
+c. Add Support for the new Smart Thing Application
+
+2018-08-28 - Update to Version 2.6.0
+a. Improved UI Elements with other small changes
+
+2018-08-27 - Update to Version 2.5.0
+a. Improved UI Elements with other large changes
+
+2018-08-22 - Update to Version 2.2.0
+a. Improved UI Elements and updated the app logo plus other small changes
+
+2018-08-11 - Update to Version 2.1.0
+a. Updated for Added Support for update from a repo on smartthings website
+b. Improved app name
+c. Added app version
+
+2018-01-31 - Update to Version 2.0.0
+a. Updated for new release of Device Handlers
+
+##### TP-Link Smart Plug - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+d. Seperated Device Handler of Smart Plug/Switch
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+##### TP-Link Smart Energy Monitor Plug - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+2018-02-17 - Update to Version 1.9.0
+a. Updated Energy Monitor Functions
+b. Allowed for full month collection in previous month
+c. Cleaned-up algorithm to use Groovy date.
+
+2018-02-19 - Update to Version 1.5.0
+a. Completed Energy Monitor tuning
+b. Fixed March 1, 2 issue where data would not be captured
+c. Update remaining code.
+
+2018-04-22 - Initial Release Version 1.0.0
+a. Update setCurrentDate to eliminate error for some users.
+
+##### TP-Link Smart Tunable White Bulb - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+##### TP-Link Smart Tunable White Bulb Energy Monitor - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+2018-02-17 - Update to Version 1.9.0
+a. Updated Energy Monitor Functions
+b. Allowed for full month collection in previous month
+c. Cleaned-up algorithm to use Groovy date.
+
+2018-02-19 - Update to Version 1.5.0
+a. Completed Energy Monitor tuning
+b. Fixed March 1, 2 issue where data would not be captured
+c. Update remaining code.
+
+2018-04-22 - Initial Release Version 1.0.0
+a. Update setCurrentDate to eliminate error for some users.
+
+##### TP-Link Smart Soft White Bulb - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+##### TP-Link Smart Soft White Bulb Energy Monitor - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+2018-02-17 - Update to Version 1.9.0
+a. Updated Energy Monitor Functions
+b. Allowed for full month collection in previous month
+c. Cleaned-up algorithm to use Groovy date.
+
+2018-02-19 - Update to Version 1.5.0
+a. Completed Energy Monitor tuning
+b. Fixed March 1, 2 issue where data would not be captured
+c. Update remaining code.
+
+2018-04-22 - Initial Release Version 1.0.0
+a. Update setCurrentDate to eliminate error for some users.
+
+##### TP-Link Smart Color Bulb - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+##### TP-Link Smart Color Bulb Energy Monitor - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+2018-02-17 - Update to Version 1.9.0
+a. Updated Energy Monitor Functions
+b. Allowed for full month collection in previous month
+c. Cleaned-up algorithm to use Groovy date.
+
+2018-02-19 - Update to Version 1.5.0
+a. Completed Energy Monitor tuning
+b. Fixed March 1, 2 issue where data would not be captured
+c. Update remaining code.
+
+2018-04-22 - Initial Release Version 1.0.0
+a. Update setCurrentDate to eliminate error for some users.
+
+##### TP-Link Smart Dimming Switch - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
+
+##### TP-Link Smart Switch - Kasa Account #####
+
+2018-10-04 - Update to Version 3.1.0
+a. Added Device Health Check refreash device status
+
+2018-09-28 - Update to Version 2.9.0
+a. Added Device Health Check
+b. Tweek from Dave Gutheinz for support for new tp-link devices
+c. Added support for the new Smart Things app
+d. Seperated Device Handler of Smart Plug/Switch
+
+2018-08-11 - Update to Version 2.5.0
+a. Added Support for update from a repo on smartthings website
+b. Improved driver names
+c. Added driver version
+
+2018-01-31 - Update to Version 2.0.0
+a. Common file content for all bulb implementations, using separate files by model only.
+b. User file-internal selection of Energy Monitor function enabling.
