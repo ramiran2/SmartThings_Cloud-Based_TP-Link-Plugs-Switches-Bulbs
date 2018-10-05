@@ -274,6 +274,9 @@ private sendCmdtoServer(command, hubCommand, action) {
 		} else {
 			sendCmdtoCloud(command, hubCommand, action)
 		}
+	} catch (ex) {
+		log.error "Sending Command Exception:", ex
+	}
 }
 
 private sendCmdtoCloud(command, hubCommand, action){
