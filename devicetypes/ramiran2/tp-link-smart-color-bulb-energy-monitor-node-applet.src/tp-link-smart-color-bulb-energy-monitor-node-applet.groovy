@@ -85,7 +85,7 @@ metadata {
 		attribute "weekTotalE", "string"
 		attribute "weekAvgE", "string"
 	}
-	tiles(scale: 6) {
+	tiles(scale: 2) {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
