@@ -77,7 +77,7 @@ metadata {
 			capability "Color Control"
 		}
 	}
-	tiles(scale:2) {
+	tiles(scale: 6) {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
 				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc",
@@ -86,7 +86,7 @@ metadata {
 				nextState:"waiting"
 				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#15EE10",
 				nextState:"waiting"
-				attributeState "commsError", label: 'Comms Error', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#e86d13",
+				attributeState "Unavailable", label: 'Unavailable', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#e86d13",
 				nextState:"waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
@@ -356,7 +356,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
-		sendEvent(name: "switch", value: "commsError", descriptionText: errMsg)
+		sendEvent(name: "switch", value: "Unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		action = ""
 	} else {

@@ -592,8 +592,6 @@ def getDevices() {
 	def currentDevices = getDeviceData()
 	state.devices = [:]
 	def devices = state.devices
-	state.devicesdni = [:]
-	def devicesdni = state.devicesdni
 	currentDevices.each {
 		def device = [:]
 		device["deviceMac"] = it.deviceMac
@@ -601,9 +599,7 @@ def getDevices() {
 		device["deviceModel"] = it.deviceModel
 		device["deviceId"] = it.deviceId
 		device["appServerUrl"] = it.appServerUrl
-		device["dni"] = it.deviceNetworkId
 		devices << ["${it.deviceMac}": device]
-		devicesdni << ["${it.deviceNetworkId}": device]
 		def isChild = getChildDevice(it.deviceMac)
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
@@ -614,11 +610,10 @@ def getDevices() {
 
 def removeDevices() {
 	selectedDevices.each { dni ->
-		def isChild = getChildDevice(dni)
 		try{
-			def delete = state.devicesdni.find { it.value.dni == dni }
-			if(delete?.size() > 0) {
-				log.debug "Removing ${delete.size()} devices: ${delete}"
+			def isChild = getChildDevice(dni)
+			if (isChild) {
+				def delete = isChild
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
 			}
 		} catch (e) {
