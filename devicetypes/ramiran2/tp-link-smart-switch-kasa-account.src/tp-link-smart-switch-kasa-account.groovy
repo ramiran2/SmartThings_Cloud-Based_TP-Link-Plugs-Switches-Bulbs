@@ -41,7 +41,7 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 //	def deviceType = "Dimming Switch"		//	HS220 Only
 //	===== Hub or Cloud Installation =========================*/
 	def installType = "Kasa Account"
-	//def installType = "Node.js Applet"
+	//def installType = "Node Applet"
 //	===========================================================
 
 import java.text.SimpleDateFormat
@@ -108,7 +108,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
 
 	preferences {
-		if (installType =~ "Node.js Applet") {
+		if (installType =~ "Node Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -269,7 +269,7 @@ def refreshResponse(cmdResponse){
 //	----- SEND COMMAND TO CLOUD VIA SM -----
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
-		if (state.installType =~ "Node.js Applet") {
+		if (state.installType =~ "Node Applet") {
 			sendCmdtoHub(command, hubCommand, action)
 		} else {
 			sendCmdtoCloud(command, hubCommand, action)

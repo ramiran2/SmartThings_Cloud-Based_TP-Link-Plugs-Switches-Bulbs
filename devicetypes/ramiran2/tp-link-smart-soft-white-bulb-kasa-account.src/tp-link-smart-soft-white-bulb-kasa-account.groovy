@@ -41,7 +41,7 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 	//def deviceType = "Color Bulb"			//	Color
 //	===== Hub or Cloud Installation ==========================
 	def installType = "Kasa Account"
-	//def installType = "Node.js Applet"
+	//def installType = "Node Applet"
 //	==========================================================
 
 import java.text.SimpleDateFormat
@@ -143,7 +143,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes"]
 
 	preferences {
-		if (installType =~ "Node.js Applet") {
+		if (installType =~ "Node Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}

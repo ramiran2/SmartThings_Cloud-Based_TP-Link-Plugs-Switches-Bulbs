@@ -36,12 +36,12 @@ Handlers are in no way sanctioned or supported by TP-Link.
 All  development is based upon open-source data on the 
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
-	===== Plug Type  DO NOT EDIT ====================*/
-	def deviceType = "Plug"					//	Plug
-//	def deviceType = "Dimming Switch"		//	HS220 Only
+	===== Plug/Switch Type.  DO NOT EDIT ====================*/
+//	def deviceType = "Plug and Switch"		//	Plug/Switch
+	def deviceType = "Dimming Switch"		//	HS220 Only
 //	===== Hub or Cloud Installation =========================*/
-	def installType = "Kasa Account"
-	//def installType = "Node Applet"
+	//def installType = "Kasa Account"
+	def installType = "Node Applet"
 //	===========================================================
 
 import java.text.SimpleDateFormat
@@ -55,9 +55,9 @@ metadata {
 				author: "Dave Gutheinz (Modified by xKillerMaverick)",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
-				ocfDeviceType: "oic.d.smartplug",
+				ocfDeviceType: "oic.d.switch",
 				mnmn: "SmartThings",
-				vid: "generic-switch-power",
+				vid: "generic-dimmer-power",
 				installType: "${installType}") {
 		capability "Switch"
 		capability "refresh"

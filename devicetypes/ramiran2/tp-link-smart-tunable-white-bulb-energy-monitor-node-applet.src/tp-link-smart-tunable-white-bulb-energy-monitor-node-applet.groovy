@@ -36,12 +36,12 @@ All development is based upon open-source data on the
 TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== Bulb Identifier.  DO NOT EDIT ====================*/
-	def deviceType = "Soft White Bulb"	//	Soft White
-	//def deviceType = "Tunable White Bulb"	//	ColorTemp
+	//def deviceType = "Soft White Bulb"	//	Soft White
+	def deviceType = "Tunable White Bulb"	//	ColorTemp
 	//def deviceType = "Color Bulb"			//	Color
 //	===== Hub or Cloud Installation ==========================
-	def installType = "Kasa Account"
-	//def installType = "Node Applet"
+	//def installType = "Kasa Account"
+	def installType = "Node Applet"
 //	==========================================================
 
 import java.text.SimpleDateFormat
