@@ -603,6 +603,8 @@ def getDevices() {
 		def isChild = getChildDevice(it.deviceMac)
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
+			device["dni"] = it.deviceNetworkId
+			devicesdni << ["${it.deviceNetworkId}": device]
 		}
 		//log.info "Device ${it.alias} added to devices array"
 	}
@@ -610,8 +612,9 @@ def getDevices() {
 
 def removeDevices() {
 	selectedDevices.each { dni ->
+		def isChild = getChildDevice(dni)
 		try{
-			def delete = getChildDevice(dni)
+			def delete = state.devicesdni.find { it.value.dni == dni }
 			if(delete?.size() > 0) {
 				log.debug "Removing ${delete.size()} devices: ${delete}"
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
