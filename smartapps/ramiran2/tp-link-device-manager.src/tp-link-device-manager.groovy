@@ -592,6 +592,8 @@ def getDevices() {
 	def currentDevices = getDeviceData()
 	state.devices = [:]
 	def devices = state.devices
+	state.devicesdni = [:]
+	def devicesdni = state.devicesdni
 	currentDevices.each {
 		def device = [:]
 		device["deviceMac"] = it.deviceMac
