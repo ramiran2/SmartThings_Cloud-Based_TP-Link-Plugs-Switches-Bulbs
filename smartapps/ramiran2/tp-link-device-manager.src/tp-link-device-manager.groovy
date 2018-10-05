@@ -601,12 +601,12 @@ def getDevices() {
 		device["deviceModel"] = it.deviceModel
 		device["deviceId"] = it.deviceId
 		device["appServerUrl"] = it.appServerUrl
+		device["dni"] = it.deviceNetworkId
 		devices << ["${it.deviceMac}": device]
+		devicesdni << ["${it.deviceNetworkId}": device]
 		def isChild = getChildDevice(it.deviceMac)
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
-			device["dni"] = it.deviceNetworkId
-			devicesdni << ["${it.deviceNetworkId}": device]
 		}
 		//log.info "Device ${it.alias} added to devices array"
 	}
