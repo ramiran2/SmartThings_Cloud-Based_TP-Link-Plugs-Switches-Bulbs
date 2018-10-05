@@ -73,13 +73,13 @@ metadata {
 	tiles(scale: 2) {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.switch.on", backgroundColor:"#00a0dc",
+				attributeState "on", label:'${name}', action:"switch.off", icon:"st.Home.home30", backgroundColor:"#00a0dc",
 				nextState:"waiting"
-				attributeState "off", label:'${name}', action:"switch.on", icon:"st.switches.switch.off", backgroundColor:"#ffffff",
+				attributeState "off", label:'${name}', action:"switch.on", icon:"st.Home.home30", backgroundColor:"#ffffff",
 				nextState:"waiting"
-				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.switches.switch.off", backgroundColor:"#15EE10",
+				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.Home.home30", backgroundColor:"#15EE10",
 				nextState:"waiting"
-				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"st.switches.switch.off", backgroundColor:"#e86d13",
+				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"st.Home.home30", backgroundColor:"#e86d13",
 				nextState:"waiting"
             }
 			if (deviceType =~ "Dimming Switch") {
