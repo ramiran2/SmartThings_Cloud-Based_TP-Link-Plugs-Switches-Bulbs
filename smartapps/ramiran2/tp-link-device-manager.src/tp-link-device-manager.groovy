@@ -610,11 +610,9 @@ def getDevices() {
 
 def removeDevices() {
 	selectedDevices.each { dni ->
-		def isChild = getChildDevice(dni)
 		try{
-			def delete = isChild.findAll { selectedDevices?.toString()?.contains(it?.deviceNetworkId) }
+			def delete = getChildDevice(dni)
 			if(delete?.size() > 0) {
-				updTimestampMap("lastAnalyticUpdDt", null)
 				log.debug "Removing ${delete.size()} devices: ${delete}"
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
 			}
