@@ -282,16 +282,16 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero ==~ "Initial Install") {
+	if (userSelectedOptionZero =~ "Initial Install") {
 		return authPage()
 	}
-	if (userSelectedOptionTwo ==~ "Developer Page") {
+	if (userSelectedOptionTwo =~ "Developer Page") {
 		return devMode()
 	}
-	if (userSelectedOptionOne ==~ "Communication Error") {
+	if (userSelectedOptionOne =~ "Communication Error") {
 		return mainPage()
 	}
-	if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionTwo ==~ "Update Account") {
+	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
 	getDevices()
@@ -335,14 +335,14 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg ==~ "null" || devModeLoaded){
+				if (errorMsg =~ "null" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
 				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
-		if (userSelectedOptionZero ==~ "Update Token" || userSelectedOptionTwo ==~ "Update Account") {
+		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
@@ -354,7 +354,7 @@ def selectDevices() {
 					image: getAppImg("token.png")
 					)
 				}
-			} else if (userSelectedOptionZero ==~ "Add/Remove Devices" || userSelectedOptionTwo ==~ "Activate Account" || userSelectedOptionOne ==~ "Add/Remove Devices") {
+			} else if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices") {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
@@ -550,7 +550,7 @@ def getApiURL() {
 void settingUpdate(name, value, type=null) {
 	log.trace "settingUpdate($name, $value, $type)..."
 	if(name) {
-		if(value ==~ "" || value == null || value == []) {
+		if(value =~ "" || value == null || value == []) {
 			settingRemove(name)
 			return
 		}
@@ -864,7 +864,7 @@ def checkError() {
 	def errMsg = state.currentError.msg
 	log.info "Attempting to solve error: ${errMsg}"
 	state.errorCount = state.errorCount +1
-	if (errMsg ==~ "Token expired" && state.errorCount < 6) {
+	if (errMsg =~ "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
 		if (state.currentError == null) {

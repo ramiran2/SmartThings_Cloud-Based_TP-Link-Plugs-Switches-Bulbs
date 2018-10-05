@@ -66,7 +66,7 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
-		if (deviceType ==~ "Dimming Switch") {
+		if (deviceType =~ "Dimming Switch") {
 			capability "Switch Level"
 		}
 	}
@@ -82,7 +82,7 @@ metadata {
 				attributeState "commsError", label:'Comms Error', action:"switch.on", icon:"st.switches.switch.off", backgroundColor:"#e86d13",
 				nextState:"waiting"
             }
-			if (deviceType ==~ "Dimming Switch") {
+			if (deviceType =~ "Dimming Switch") {
 				tileAttribute ("device.level", key: "SLIDER_CONTROL") {
 					attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel", range: "(1..100)"
 				}
@@ -108,7 +108,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
 
 	preferences {
-		if (installType ==~ "Node.js Applet") {
+		if (installType =~ "Node.js Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -213,7 +213,7 @@ def update() {
 
 void uninstalled() {
 	log.trace "Uninstalled..."
-	if (state.installType ==~ "Kasa Account") {
+	if (state.installType =~ "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -259,7 +259,7 @@ def refreshResponse(cmdResponse){
 	}
 	sendEvent(name: "switch", value: onOff)
 	def level = "0"
-	if (state.deviceType ==~ "Dimming Switch") {
+	if (state.deviceType =~ "Dimming Switch") {
 		level = cmdResponse.system.get_sysinfo.brightness
 	 	sendEvent(name: "level", value: level)
 	}
@@ -268,7 +268,7 @@ def refreshResponse(cmdResponse){
 
 //	----- SEND COMMAND TO CLOUD VIA SM -----
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType ==~ "Node.js Applet") {
+	if (state.installType =~ "Node.js Applet") {
 		sendCmdtoHub(command, hubCommand, action)
 	} else {
 		sendCmdtoCloud(command, hubCommand, action)
@@ -280,7 +280,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def deviceId = getDataValue("deviceId")
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
-	if (cmdResp.substring(0,5) ==~ "ERROR"){
+	if (cmdResp.substring(0,5) =~ "ERROR"){
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
@@ -311,7 +311,7 @@ private sendCmdtoHub(command, hubCommand, action){
 def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	if (cmdResponse ==~ "TcpTimeout") {
+	if (cmdResponse =~ "TcpTimeout") {
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR at hubResponseParse TCP Timeout")

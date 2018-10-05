@@ -134,7 +134,7 @@ metadata {
 	rates << ["30" : "Refresh every 30 minutes"]
 
 	preferences {
-		if (installType ==~ "Node.js Applet") {
+		if (installType =~ "Node.js Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
@@ -242,7 +242,7 @@ def update() {
 
 void uninstalled() {
 	log.trace "Uninstalled..."
-	if (state.installType ==~ "Kasa Account") {
+	if (state.installType =~ "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -301,7 +301,7 @@ def energyMeterResponse(cmdResponse) {
 		state.energyScale = "energy"
 	}
 	def powerConsumption = realtime."${state.powerScale}"
-		if (state.powerScale ==~ "power_mw") {
+		if (state.powerScale =~ "power_mw") {
 			powerConsumption = Math.round(powerConsumption/10) / 100
 		} else {
 		powerConsumption = Math.round(100*powerConsumption) / 100
@@ -321,11 +321,11 @@ def useTodayResponse(cmdResponse) {
 	def dayList = cmdResponse["emeter"]["get_daystat"].day_list
 	for (int i = 0; i < dayList.size(); i++) {
 		wattHrData = dayList[i]
-		if(wattHrData.day ==~ state.dayToday) {
+		if(wattHrData.day =~ state.dayToday) {
 			wattHrToday = wattHrData."${state.energyScale}"
  		}
 	}
-	if (state.powerScale ==~ "power") {
+	if (state.powerScale =~ "power") {
 		wattHrToday = Math.round(1000*wattHrToday)
 	}
 	sendEvent(name: "energy", value: wattHrToday)
@@ -401,7 +401,7 @@ def engrStatsResponse(cmdResponse) {
 				wkTotDays -= 1
 			}
 		}
-	} else if (state.handleFeb ==~ "yes" && dataMonth == 2) {
+	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
     	startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
@@ -414,7 +414,7 @@ def engrStatsResponse(cmdResponse) {
 				wkTotDays += 1
 			}
 		}
-	} else if (state.handleFeb ==~ "yes" && dataMonth == 1) {
+	} else if (state.handleFeb =~ "yes" && dataMonth == 1) {
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -448,7 +448,7 @@ def engrStatsResponse(cmdResponse) {
 	}
 	def monAvgEnergy = monTotEnergy/monTotDays
 	def wkAvgEnergy = wkTotEnergy/wkTotDays
-	if (state.powerScale ==~ "power_mw") {
+	if (state.powerScale =~ "power_mw") {
 		monAvgEnergy = Math.round(monAvgEnergy/10)/100
 		wkAvgEnergy = Math.round(wkAvgEnergy/10)/100
 		monTotEnergy = Math.round(monTotEnergy/10)/100
@@ -486,7 +486,7 @@ def currentDateResponse(cmdResponse) {
 
 //	----- SEND COMMAND TO CLOUD VIA SM -----
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType ==~ "Node.js Applet") {
+	if (state.installType =~ "Node.js Applet") {
 		sendCmdtoHub(command, hubCommand, action)
 	} else {
 		sendCmdtoCloud(command, hubCommand, action)
@@ -498,7 +498,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def deviceId = getDataValue("deviceId")
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
-	if (cmdResp.substring(0,5) ==~ "ERROR"){
+	if (cmdResp.substring(0,5) =~ "ERROR"){
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
@@ -529,7 +529,7 @@ private sendCmdtoHub(command, hubCommand, action){
 def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	if (cmdResponse ==~ "TcpTimeout") {
+	if (cmdResponse =~ "TcpTimeout") {
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR at hubResponseParse TCP Timeout")
