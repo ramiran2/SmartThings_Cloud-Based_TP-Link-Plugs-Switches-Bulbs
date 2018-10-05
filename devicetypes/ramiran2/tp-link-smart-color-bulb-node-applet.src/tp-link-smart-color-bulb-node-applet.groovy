@@ -335,10 +335,14 @@ def commandResponse(cmdResponse){
 
 //	===== Send the Command =====
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType =~ "Kasa Account") {
-		sendCmdtoCloud(command, hubCommand, action)
-	} else {
-		sendCmdtoHub(command, hubCommand, action)
+	try {
+		if (state.installType =~ "Kasa Account") {
+			sendCmdtoCloud(command, hubCommand, action)
+		} else {
+			sendCmdtoHub(command, hubCommand, action)
+		}
+	} catch (ex) {
+		log.error "Sending Command Exception:", ex
 	}
 }
 

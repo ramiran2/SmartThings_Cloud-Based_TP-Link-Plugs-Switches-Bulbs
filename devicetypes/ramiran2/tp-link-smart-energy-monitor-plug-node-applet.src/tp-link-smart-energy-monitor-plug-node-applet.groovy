@@ -486,10 +486,14 @@ def currentDateResponse(cmdResponse) {
 
 //	----- SEND COMMAND TO CLOUD VIA SM -----
 private sendCmdtoServer(command, hubCommand, action) {
-	if (state.installType =~ "Node Applet") {
-		sendCmdtoHub(command, hubCommand, action)
-	} else {
-		sendCmdtoCloud(command, hubCommand, action)
+	try {
+		if (state.installType =~ "Node Applet") {
+			sendCmdtoHub(command, hubCommand, action)
+		} else {
+			sendCmdtoCloud(command, hubCommand, action)
+		}
+	} catch (ex) {
+		log.error "Sending Command Exception:", ex
 	}
 }
 
