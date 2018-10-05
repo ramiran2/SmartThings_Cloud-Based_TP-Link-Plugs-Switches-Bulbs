@@ -580,8 +580,7 @@ def getAccessToken() {
 	try {
 		if(!atomicState?.accessToken) { atomicState?.accessToken = createAccessToken() }
 		else { return true }
-	}
-	catch (ex) {
+	} catch (ex) {
 		def msg = "Error: OAuth is not Enabled for TP-Link Device Manager! Please click remove and Enable OAuth under the SmartApp App Settings in the IDE"
 		sendPush(msg)
 		log.error "getAccessToken Exception", ex
@@ -610,16 +609,16 @@ def getDevices() {
 }
 
 def removeDevices() {
-	childDevices.each {
+	selectedDevices.each { dni ->
+		def isChild = getChildDevice(dni)
 		try{
-			def delete = app.getChildDevices(true).findAll { selectedDevices?.toString()?.contains(it?.deviceNetworkId) }
+			def delete = isChild.findAll { selectedDevices?.toString()?.contains(it?.deviceNetworkId) }
 			if(delete?.size() > 0) {
 				updTimestampMap("lastAnalyticUpdDt", null)
 				log.debug "Removing ${delete.size()} devices: ${delete}"
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			log.debug "Error deleting ${it.deviceNetworkId}: ${e}"
 		}
 	}
@@ -677,24 +676,28 @@ def addDevices() {
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	selectedDevices.each { dni ->
-		def isChild = getChildDevice(dni)
-		if (!isChild) {
-			def device = state.devices.find { it.value.deviceMac == dni }
-			def deviceModel = device.value.deviceModel.substring(0,5)
-			addChildDevice(
-				"ramiran2",
-				tpLinkModel["${deviceModel}"],
-				device.value.deviceMac,
-				hubId, [
-					"label": device.value.alias,
-						"name": device.value.deviceModel,
-					"data": [
-						"deviceId" : device.value.deviceId,
-						"appServerUrl": device.value.appServerUrl,
+		try {
+			def isChild = getChildDevice(dni)
+			if (!isChild) {
+				def device = state.devices.find { it.value.deviceMac == dni }
+				def deviceModel = device.value.deviceModel.substring(0,5)
+				addChildDevice(
+					"ramiran2",
+					tpLinkModel["${deviceModel}"],
+					device.value.deviceMac,
+					hubId, [
+						"label": device.value.alias,
+							"name": device.value.deviceModel,
+						"data": [
+							"deviceId" : device.value.deviceId,
+							"appServerUrl": device.value.appServerUrl,
+						]
 					]
-				]
-			)
-			log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
+				)
+				log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
+			}
+		} catch (e) {
+			log.debug "Error Adding ${deviceModel}: ${e}"
 		}
 	}
 }
