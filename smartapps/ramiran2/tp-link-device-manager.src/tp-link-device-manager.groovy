@@ -62,7 +62,7 @@ definition(
 }
 
 def appVersion() { return "3.1.1" }
-def appVerDate() { return "10-04-2018" }
+def appVerDate() { return "10-08-2018" }
 def driverVersionsMin() {
 	return [
 		"colorbulbenergymonitor":["val":310, "desc":"3.1.0"],
@@ -124,10 +124,10 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}" != null || "${userPassword}" != null ){
-		return mainPage()
-	} else {
+	if ("${userName}" =~ null || "${userPassword}" =~ null ){
 		return authPage()
+	} else {
+		return mainPage()
 	}
 }
 
