@@ -61,7 +61,7 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "3.1.1" }
+def appVersion() { return "3.1.2" }
 def appVerDate() { return "10-08-2018" }
 def driverVersionsMin() {
 	return [
@@ -282,11 +282,10 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero =~ "Initial Install") {
-		return authPage()
-	}
 	if (userSelectedOptionTwo =~ "Developer Page") {
 		return devMode()
+	} else if (userSelectedOptionZero =~ "Initial Install") {
+		return authPage()
 	}
 	if (userSelectedOptionOne =~ "Communication Error") {
 		return mainPage()
