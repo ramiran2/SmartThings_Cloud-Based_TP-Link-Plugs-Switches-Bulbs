@@ -283,9 +283,16 @@ def mainPage() {
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
 	if (userSelectedOptionTwo =~ "Developer Page") {
-		return devMode()
-	} else if (userSelectedOptionZero =~ "Initial Install") {
-		return authPage()
+		if (userSelectedOptionZero =~ "Initial Install") {
+		} else {
+			return devMode()
+		}
+	}
+	if (userSelectedOptionZero =~ "Initial Install") {
+		if (userSelectedOptionTwo =~ "Developer Page") {
+		} else {
+			return authPage()
+		}
 	}
 	if (userSelectedOptionOne =~ "Communication Error") {
 		return mainPage()
