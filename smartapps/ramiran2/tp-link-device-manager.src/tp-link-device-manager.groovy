@@ -124,10 +124,10 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}"|| "${userPassword}"){
-		return authPage()
-	} else {
+	if ("${userName}" != null || "${userPassword}" != null ){
 		return mainPage()
+	} else {
+		return authPage()
 	}
 }
 
