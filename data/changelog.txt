@@ -1,5 +1,8 @@
 ##### TP-Link Device Manager #####
 
+2018-10-04 - Update to Version 3.1.1
+a. Fixed a bug that sent users to the main page instead of the login page if username or password is null
+
 2018-10-04 - Update to Version 3.1.0
 a. Improved UI Elements with other small changes 
 b. Added a changelog page
