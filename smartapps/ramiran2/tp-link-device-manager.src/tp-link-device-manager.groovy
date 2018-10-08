@@ -61,7 +61,7 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "3.1.0" }
+def appVersion() { return "3.1.1" }
 def appVerDate() { return "10-04-2018" }
 def driverVersionsMin() {
 	return [
@@ -124,7 +124,7 @@ def oauthVerification() {
 def startPage() {
 	atomicState?.isParent = true
 	setInitialStates()
-	if ("${userName}" == null || "${userPassword}" == null){
+	if ("${userName}"|| "${userPassword}"){
 		return authPage()
 	} else {
 		return mainPage()
