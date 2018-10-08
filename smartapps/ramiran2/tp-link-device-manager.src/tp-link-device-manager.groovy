@@ -178,7 +178,7 @@ def authPage() {
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Activate Account", "Update Account", "Developer Page"],
+				options: ["Activate Account", "Update Account"],
 				image: getAppImg("settings.png")
 			)
 			input(
@@ -282,17 +282,8 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionTwo =~ "Developer Page") {
-		if (userSelectedOptionZero =~ "Initial Install") {
-		} else {
-			return devMode()
-		}
-	}
 	if (userSelectedOptionZero =~ "Initial Install") {
-		if (userSelectedOptionTwo =~ "Developer Page") {
-		} else {
-			return authPage()
-		}
+		return authPage()
 	}
 	if (userSelectedOptionOne =~ "Communication Error") {
 		return mainPage()
@@ -364,7 +355,7 @@ def selectDevices() {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
-						"selectedDevices", "enum",
+						"userSelectedDevices", "enum",
 						required: true,
 						multiple: true,
 						submitOnChange: true,
@@ -374,7 +365,7 @@ def selectDevices() {
 					)
 				} else {
 					input(
-						"selectedDevices", "enum",
+						"userSelectedDevices", "enum",
 						required: true,
 						multiple: true,
 						submitOnChange: true,
@@ -615,7 +606,7 @@ def getDevices() {
 }
 
 def removeDevices() {
-	selectedDevices.each { dni ->
+	userSelectedDevices.each { dni ->
 		try{
 			def isChild = getChildDevice(dni)
 			if (isChild) {
@@ -679,7 +670,7 @@ def addDevices() {
 
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	selectedDevices.each { dni ->
+	userSelectedDevices.each { dni ->
 		try {
 			def isChild = getChildDevice(dni)
 			if (!isChild) {

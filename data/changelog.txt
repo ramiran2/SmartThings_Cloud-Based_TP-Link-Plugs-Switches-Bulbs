@@ -1,7 +1,7 @@
 ##### TP-Link Device Manager #####
 
 2018-10-08 - Update to Version 3.1.2
-a. Fixed a bug that sent users to the login page instead of the developer page
+a. Removed developer page from login page as a selectable option as there is no need for it
 
 2018-10-08 - Update to Version 3.1.1
 a. Fixed a bug that sent users to the main page instead of the login page if username or password is null
