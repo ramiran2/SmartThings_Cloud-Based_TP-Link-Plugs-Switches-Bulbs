@@ -61,7 +61,7 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "3.1.2" }
+def appVersion() { return "3.1.3" }
 def appVerDate() { return "10-08-2018" }
 def driverVersionsMin() {
 	return [
@@ -139,14 +139,14 @@ def authPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Update Account: Updates the token and credentials."
-	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.TpLinkToken == null)
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
 		nextPage: "selectDevices",
-		install: (atomicState?.isInstalled == "true" ? true : false),
+		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -160,14 +160,12 @@ def authPage() {
 				"userName", "email",
 				title: "TP-Link Kasa Email Address",
 				required: true,
-				displayDuringSetup: true,
 				image: getAppImg("email.png")
 			)
 			input(
 				"userPassword", "password",
 				title: "TP-Link Kasa Account Password",
 				required: true,
-				displayDuringSetup: true,
 				image: getAppImg("password.png")
 			)
 		}
@@ -220,6 +218,7 @@ def mainPage() {
 		name: "mainPage",
 		title: "Settings Page",
 		nextPage: "selectDevices",
+		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -407,6 +406,7 @@ def devMode() {
 	return dynamicPage(
 		name: "devMode",
 		title: "Developer Page",
+		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -475,7 +475,7 @@ def aboutPage() {
 
 //	----- CHANGELOG PAGE -----
 def changeLogPage () {
-	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false) {
+	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
