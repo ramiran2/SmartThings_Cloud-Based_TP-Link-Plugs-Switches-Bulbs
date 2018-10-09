@@ -65,16 +65,16 @@ def appVersion() { return "3.1.3" }
 def appVerDate() { return "10-08-2018" }
 def driverVersionsMin() {
 	return [
-		"colorbulbenergymonitor":["val":310, "desc":"3.1.0"],
-		"colorbulb":["val":310, "desc":"3.1.0"],
-		"dimmingswitch":["val":310, "desc":"3.1.0"],
-		"energymonitorplug":["val":310, "desc":"3.1.0"],
-		"plug":["val":310, "desc":"3.1.0"],
-		"switch":["val":310, "desc":"3.1.0"],
-		"softwhitebulbenergymonitor":["val":310, "desc":"3.1.0"],
-		"softwhitebulb":["val":310, "desc":"3.1.0"],
-		"tunablewhitebulbenergymonitor":["val":310, "desc":"3.1.0"],
-		"tunablewhitebulb":["val":310, "desc":"3.1.0"]
+		"colorbulbenergymonitor":["val":313, "desc":"3.1.3"],
+		"colorbulb":["val":313, "desc":"3.1.3"],
+		"dimmingswitch":["val":313, "desc":"3.1.3"],
+		"energymonitorplug":["val":313, "desc":"3.1.3"],
+		"plug":["val":313, "desc":"3.1.3"],
+		"switch":["val":313, "desc":"3.1.3"],
+		"softwhitebulbenergymonitor":["val":313, "desc":"3.1.3"],
+		"softwhitebulb":["val":313, "desc":"3.1.3"],
+		"tunablewhitebulbenergymonitor":["val":313, "desc":"3.1.3"],
+		"tunablewhitebulb":["val":313, "desc":"3.1.3"]
 	]
 }
 
@@ -636,6 +636,7 @@ def addDevices() {
 	def tpLinkModel = [:]
 	//	Plug-Switch Devices (no energy monitor capability)
 	tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
+	tpLinkModel << ["HS103" : "TP-Link Smart Plug - Kasa Account"]						//	HS103
 	tpLinkModel << ["HS105" : "TP-Link Smart Plug - Kasa Account"]						//	HS105
 	tpLinkModel << ["HS200" : "TP-Link Smart Switch - Kasa Account"]					//	HS200
 	tpLinkModel << ["HS210" : "TP-Link Smart Switch - Kasa Account"]					//	HS210
@@ -658,7 +659,7 @@ def addDevices() {
 	tpLinkModel << ["KB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KB130
 	tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB130
 	tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KL130
-	tpLinkModel << ["LB310" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB310
+	tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB230
 
 	def hub = location.hubs[0]
 	def hubId = hub.id
