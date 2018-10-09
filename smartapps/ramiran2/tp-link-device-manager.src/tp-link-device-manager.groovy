@@ -290,7 +290,7 @@ def selectDevices() {
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
-	def userTokenUpdate = false
+	def userTokenUpdate = (false)
 	getDevices()
 	def devices = state.devices
 	def errorMsg = "null"
@@ -340,7 +340,7 @@ def selectDevices() {
 				}
 		}
 		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
-			userTokenUpdate = true
+			userTokenUpdate = (true)
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
