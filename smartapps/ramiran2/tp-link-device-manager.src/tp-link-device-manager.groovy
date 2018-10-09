@@ -380,7 +380,7 @@ def selectDevices() {
 	}
 }
 
-//	----- DEVELOPER MODE PAGE -----
+//	----- DEVELOPER PAGE -----
 def devMode() {
 	getDevices()
 	def devices = state.devices
@@ -447,7 +447,7 @@ def devMode() {
 	}
 }
 
-//	----- DEVELOPER MODE PAGE -----
+//	----- DEVELOPER Testing PAGE -----
 def devModeTestingPage() {
 	getDevices()
 	def devices = state.devices
@@ -482,6 +482,8 @@ def devModeTestingPage() {
 	if (oldDevices == [:] && userSelectedRemoveMode) {
 		errorMsgOld = "No current devices to remove from smart things."
 	}
+	def hideInfoDiagDescCont = (true)
+	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "devModeTestingPage",
 		title: "Developer Testing Page",
