@@ -61,8 +61,8 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "3.2.0" }
-def appVerDate() { return "10-08-2018" }
+def appVersion() { return "3.2.5" }
+def appVerDate() { return "10-09-2018" }
 def driverVersionsMin() {
 	return [
 		"colorbulbenergymonitor":["val":313, "desc":"3.1.3"],
@@ -306,11 +306,11 @@ def selectDevices() {
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 	}
-	if (newDevices == [:]) {
+	if (newDevices == [:] && oldDevices == [:]) {
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 	}
-	if (oldDevices == [:]) {
+	if (oldDevices == [:] && userSelectedRemoveMode) {
 		errorMsg = "No current devices to remove from smart things."
 	}
 	def hideInfoDiagDescCont = (true)
@@ -475,11 +475,11 @@ def devModeTestingPage() {
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 	}
-	if (newDevices == [:]) {
+	if (newDevices == [:] && oldDevices == [:]) {
 		errorMsgNew = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 	}
-	if (oldDevices == [:]) {
+	if (oldDevices == [:] && userSelectedRemoveMode) {
 		errorMsgOld = "No current devices to remove from smart things."
 	}
 	return dynamicPage(
@@ -582,6 +582,12 @@ def devModeTestingPage() {
 				submitOnChange: true,
 				image: getAppImg("deviceremover.png")
 			)
+		}
+		section("Help and Feedback:") {
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedReload){
+				setInitialStates()
+			}
 		}
 	}
 }

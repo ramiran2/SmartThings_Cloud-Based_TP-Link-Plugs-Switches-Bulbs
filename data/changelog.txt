@@ -1,4 +1,8 @@
 ##### TP-Link Device Manager #####
+2018-10-09 - Update to Version 3.2.5
+a. Improved developer testing page
+b. Improved error message logic
+
 2018-10-08 - Update to Version 3.2.0
 a. Improved developer testing mode
 b. Added developer testing page
