@@ -1,5 +1,4 @@
 ##### TP-Link Device Manager #####
-
 2018-10-08 - Update to Version 3.1.3
 a. small tweeks to code
 
@@ -49,6 +48,8 @@ c. Added app version
 a. Updated for new release of Device Handlers
 
 ##### TP-Link Smart Plug - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -69,6 +70,8 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling.
 
 ##### TP-Link Smart Energy Monitor Plug - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -101,6 +104,8 @@ c. Update remaining code.
 a. Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Tunable White Bulb - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -120,6 +125,8 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling.
 
 ##### TP-Link Smart Tunable White Bulb Energy Monitor - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -152,6 +159,8 @@ c. Update remaining code.
 a. Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Soft White Bulb - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -171,6 +180,8 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling.
 
 ##### TP-Link Smart Soft White Bulb Energy Monitor - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -203,6 +214,8 @@ c. Update remaining code.
 a. Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Color Bulb - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -222,6 +235,8 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling.
 
 ##### TP-Link Smart Color Bulb Energy Monitor - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -254,6 +269,8 @@ c. Update remaining code.
 a. Update setCurrentDate to eliminate error for some users.
 
 ##### TP-Link Smart Dimming Switch - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status
@@ -273,6 +290,8 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling.
 
 ##### TP-Link Smart Switch - Kasa Account #####
+2018-10-08 - Update to Version 3.1.3
+a. small tweeks to code
 
 2018-10-04 - Update to Version 3.1.0
 a. Added Device Health Check refreash device status

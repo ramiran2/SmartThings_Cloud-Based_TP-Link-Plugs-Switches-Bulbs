@@ -224,7 +224,7 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError == null || devModeLoaded){
+			if (state.currentError =~ null || devModeLoaded){
 				paragraph title: "Information:", mainPageText
 			}
 			if (state.currentError != null || devModeLoaded){
@@ -547,14 +547,14 @@ def getApiURL() {
 void settingUpdate(name, value, type=null) {
 	log.trace "settingUpdate($name, $value, $type)..."
 	if(name) {
-		if(value =~ "" || value == null || value == []) {
+		if(value =~ "" || value =~ null || value == []) {
 			settingRemove(name)
 			return
 		}
 	}
 	if(name && type) {
 		app?.updateSetting("$name", [type: "$type", value: value])
-	} else if (name && type == null){ app?.updateSetting(name.toString(), value) }
+	} else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
 }
 
 void settingRemove(name) {
@@ -855,7 +855,7 @@ def uninstalled() {
 
 //	----- PERIODIC CLOUD MX TASKS -----
 def checkError() {
-	if (state.currentError == null) {
+	if (state.currentError =~ null) {
 		log.info "TP-Link Connect did not have any set errors."
 		return
 	}
@@ -865,13 +865,13 @@ def checkError() {
 	if (errMsg =~ "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
-		if (state.currentError == null) {
+		if (state.currentError =~ null) {
 			log.info "getDevices successful. apiServerUrl updated and token is good."
 			return
 		}
 		log.error "${errMsg} error while attempting getDevices. Will attempt getToken"
 		getToken()
-		if (state.currentError == null) {
+		if (state.currentError =~ null) {
 			log.info "getToken successful. Token has been updated."
 			getDevices()
 			return

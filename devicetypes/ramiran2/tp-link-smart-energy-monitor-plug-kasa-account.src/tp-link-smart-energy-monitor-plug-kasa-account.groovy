@@ -44,7 +44,7 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 import java.text.SimpleDateFormat
 import groovy.time.*
 
-def devVer() { return "3.1.0" }
+def devVer() { return "3.1.3" }
 
 metadata {
 	definition (name: "TP-Link Smart Energy Monitor Plug - ${installType}",
@@ -272,7 +272,7 @@ def refresh(){
 }
 
 def commandResponse(cmdResponse){
-	if (cmdResponse.system.set_relay_state == null) {
+	if (cmdResponse.system.set_relay_state =~ null) {
 		def status = cmdResponse.system.get_sysinfo.relay_state
 		if (status == 1) {
 			status = "on"
@@ -294,7 +294,7 @@ def getPower(){
 
 def energyMeterResponse(cmdResponse) {
 	def realtime = cmdResponse["emeter"]["get_realtime"]
-	if (realtime.power == null) {
+	if (realtime.power =~ null) {
 		state.powerScale = "power_mw"
 		state.energyScale = "energy_wh"
 	} else {

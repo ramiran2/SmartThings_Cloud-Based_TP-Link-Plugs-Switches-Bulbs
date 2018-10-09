@@ -47,7 +47,7 @@ TP-Link Kasa Devices; primarily various users on GitHub.com.
 import java.text.SimpleDateFormat
 import groovy.time.*
 
-def devVer() { return "3.1.0" }
+def devVer() { return "3.1.3" }
 
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
