@@ -290,7 +290,7 @@ def selectDevices() {
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
-	def userTokenUpdate = (false)
+	def userTokenUpdate = "null"
 	getDevices()
 	def devices = state.devices
 	def errorMsg = "null"
@@ -332,15 +332,15 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "null" && !userTokenUpdate || devModeLoaded){
+				if (errorMsg =~ "null" && userTokenUpdate || !userTokenUpdate || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (errorMsg != "null" && !userTokenUpdate || devModeLoaded) {
+				if (errorMsg != "null" && userTokenUpdate || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
 		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
-			userTokenUpdate = (true)
+			userTokenUpdate = "Mac5089"
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
