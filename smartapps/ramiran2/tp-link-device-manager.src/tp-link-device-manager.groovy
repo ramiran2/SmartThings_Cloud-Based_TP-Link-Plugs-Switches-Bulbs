@@ -122,14 +122,11 @@ def oauthVerification() {
 
 //This Page is used to load either parent or child app interface code
 def startPage() {
-	def userFirstLogin = "null"
 	atomicState?.isParent = true
 	setInitialStates()
 	if ("${userName}" =~ null || "${userPassword}" =~ null ){
-		userFirstLogin = "BigMac"
 		return authPage()
 	} else {
-		userFirstLogin = "null"
 		return mainPage()
 	}
 }
@@ -144,7 +141,7 @@ def authPage() {
 		"Update Account: Updates the token and credentials."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (userFirstLogin == "BigMac")
+	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
@@ -200,17 +197,20 @@ def mainPage() {
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
 		"Update Token: Updates the token.\n\r" +
 		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
-	def errorRetuInfo = "We may not be unable to load Device Manager Page until you fix any error that show up in diagnostics.\n" + "Attempting to override this may end up in a blank screen."
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (state.currentError == null)
-	def errorMsg = "null"
+	def errorMsg = "None"
 	getDevices()
 	def devices = state.devices
+	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (isChild) {
 			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
 	if (state.currentError != null){
@@ -227,18 +227,11 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			if (state.currentError =~ null || devModeLoaded){
-				paragraph title: "Information:", mainPageText
-			}
-			if (state.currentError != null || devModeLoaded){
-				paragraph title: "Communication Error:", errorMsg
-			}
-			if (state.currentError != null || devModeLoaded){
-				paragraph title: "Loading Error:", errorRetuInfo
-			}
+			paragraph title: "Information:", mainPageText
+			paragraph title: "Communication Error:", errorMsg
 		}
 		section("Configuration:") {
-			if (state.currentError != null && oldDevices != [:] && oldDevices != [:]) {
+			if (state.currentError != null && oldDevices != [:]) {
 				input(
 					"userSelectedOptionOne", "enum",
 					title: "What do you want to do?",
@@ -293,10 +286,9 @@ def selectDevices() {
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
-	def userTokenUpdate = "null"
 	getDevices()
 	def devices = state.devices
-	def errorMsg = "null"
+	def errorMsg = "None"
 	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
@@ -318,7 +310,7 @@ def selectDevices() {
 		"Control Mode?"
 	}
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "null")
+	def hideInfoDiagDescStat = (errorMsg == "None")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -335,15 +327,10 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "null" && userTokenUpdate =~ "null" || userTokenUpdate =~ "null" || devModeLoaded){
-					paragraph title: "Information:", TPLinkDevicesMsg
-				}
-				if (errorMsg != "null" && userTokenUpdate =~ "null" || devModeLoaded) {
-					paragraph title: "Device Error:", errorMsg
-				}
+			paragraph title: "Information:", TPLinkDevicesMsg
+			paragraph title: "Device Error:", errorMsg
 		}
 		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
-			userTokenUpdate = "Mac5089"
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
