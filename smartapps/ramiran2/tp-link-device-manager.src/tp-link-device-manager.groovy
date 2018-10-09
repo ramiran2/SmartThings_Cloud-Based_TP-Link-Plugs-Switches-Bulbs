@@ -333,6 +333,8 @@ def selectDevices() {
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
 				if (errorMsg =~ "null" || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
+				} else if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
+					paragraph title: "Information:", TPLinkDevicesMsg
 				}
 				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
