@@ -310,6 +310,9 @@ def selectDevices() {
 		errorMsg = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 	}
+	if (oldDevices == [:]) {
+		errorMsg = "No current devices to remove from smart things."
+	}
 	def hideInfoDiagDescCont = (true)
 	def hideInfoDiagDescStat = (errorMsg == "None")
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
@@ -347,7 +350,7 @@ def selectDevices() {
 			section("Device Configuration:") {
 				if (userSelectedRemoveMode) {
 					input(
-						"userSelectedDevices", "enum",
+						"userSelectedDevicesRemove", "enum",
 						required: true,
 						multiple: true,
 						submitOnChange: true,
@@ -357,7 +360,7 @@ def selectDevices() {
 					)
 				} else {
 					input(
-						"userSelectedDevices", "enum",
+						"userSelectedDevicesAdd", "enum",
 						required: true,
 						multiple: true,
 						submitOnChange: true,
@@ -405,12 +408,9 @@ def devMode() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-			paragraph title: "Error Count:", "${state.errorCount}"
-			paragraph title: "Current Error:", "${state.currentError}"
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
 			paragraph title: "Hub:", "${hub}"
 			paragraph title: "Hub ID:", "${hubId}"
-			paragraph title: "Error Messages:", "${errMsg}"
 			paragraph title: "Username:", "${userName}"
 			paragraph title: "Password:", "${userPassword}"
 			paragraph title: "Managed Devices:", "${oldDevices}"
@@ -453,6 +453,10 @@ def devModeTestingPage() {
 	def devices = state.devices
 	def newDevices = [:]
 	def oldDevices = [:]
+	def errorMsgCom = "None"
+	def errorMsgDev = "None"
+	def errorMsgNew = "None"
+	def errorMsgOld = "None"
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (isChild) {
@@ -462,11 +466,39 @@ def devModeTestingPage() {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
+	if (state.currentError != null){
+		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
+			"\n\rPlease resolve the error and try again."
+	}
+	if (devices == [:]) {
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+		"that all devices are in 'Local Control Only'. Correct them then " +
+		"rerun the application."
+	}
+	if (newDevices == [:]) {
+		errorMsgNew = "No new devices to add. Are you sure they are in Remote " +
+		"Control Mode?"
+	}
+	if (oldDevices == [:]) {
+		errorMsgOld = "No current devices to remove from smart things."
+	}
 	return dynamicPage(
 		name: "devModeTestingPage",
 		title: "Developer Testing Page",
 		install: false,
 		uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Application State:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+			paragraph title: "Communication Error:", errorMsgCom
+			paragraph title: "Finding Devices Error:", errorMsgDev
+			paragraph title: "New Devices Error:", errorMsgNew
+			paragraph title: "Current Devices Error:", errorMsgOld
+			paragraph title: "Error Count:", "${state.errorCount}"
+			paragraph title: "Current Error:", "${state.currentError}"
+			paragraph title: "Error Messages:", "${errMsg}"
+		}
 		section("User Configuration:") {
 			input(
 				"userSelectedOptionTwo", "enum",
@@ -527,7 +559,7 @@ def devModeTestingPage() {
 		}
 		section("Device Configuration:") {
 			input(
-				"userSelectedDevices", "enum",
+				"userSelectedDevicesRemove", "enum",
 				required: false,
 				multiple: true,
 				submitOnChange: true,
@@ -536,7 +568,7 @@ def devModeTestingPage() {
 				image: getAppImg("devices.png")
 			)
 			input(
-				"userSelectedDevices", "enum",
+				"userSelectedDevicesAdd", "enum",
 				required: false,
 				multiple: true,
 				submitOnChange: true,
@@ -710,7 +742,7 @@ def getDevices() {
 }
 
 def removeDevices() {
-	userSelectedDevices.each { dni ->
+	userSelectedDevicesRemove.each { dni ->
 		try{
 			def isChild = getChildDevice(dni)
 			if (isChild) {
@@ -775,7 +807,7 @@ def addDevices() {
 
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	userSelectedDevices.each { dni ->
+	userSelectedDevicesAdd.each { dni ->
 		try {
 			def isChild = getChildDevice(dni)
 			if (!isChild) {
