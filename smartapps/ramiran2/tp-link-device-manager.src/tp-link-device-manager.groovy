@@ -122,11 +122,14 @@ def oauthVerification() {
 
 //This Page is used to load either parent or child app interface code
 def startPage() {
+	def userFirstLogin = "null"
 	atomicState?.isParent = true
 	setInitialStates()
 	if ("${userName}" =~ null || "${userPassword}" =~ null ){
+		userFirstLogin = "BigMac"
 		return authPage()
 	} else {
+		userFirstLogin = "null"
 		return mainPage()
 	}
 }
@@ -141,7 +144,7 @@ def authPage() {
 		"Update Account: Updates the token and credentials."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.TpLinkToken == null)
+	def hideInfoDiagDescStat = (userFirstLogin == "BigMac")
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
