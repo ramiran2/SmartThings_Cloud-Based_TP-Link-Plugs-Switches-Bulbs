@@ -332,10 +332,10 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "null" || userTokenUpdate || devModeLoaded){
+				if (errorMsg =~ "null" || !userTokenUpdate || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (!userTokenUpdate && errorMsg != "null" || devModeLoaded) {
+				if (userTokenUpdate && errorMsg != "null" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
