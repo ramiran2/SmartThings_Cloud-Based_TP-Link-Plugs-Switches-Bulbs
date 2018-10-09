@@ -290,6 +290,7 @@ def selectDevices() {
 	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
 		getToken()
 	}
+	def userTokenUpdate = false
 	getDevices()
 	def devices = state.devices
 	def errorMsg = "null"
@@ -331,16 +332,15 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
-				if (errorMsg =~ "null" || devModeLoaded){
-					paragraph title: "Information:", TPLinkDevicesMsg
-				} else if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
+				if (errorMsg =~ "null" || userTokenUpdate || devModeLoaded){
 					paragraph title: "Information:", TPLinkDevicesMsg
 				}
-				if (userSelectedOptionZero != "Update Token" && userSelectedOptionTwo != "Update Account" && errorMsg != "null" || devModeLoaded) {
+				if (!userTokenUpdate && errorMsg != "null" || devModeLoaded) {
 					paragraph title: "Device Error:", errorMsg
 				}
 		}
 		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
+			userTokenUpdate = true
 			section("Account Configuration:") {
 				input(
 					"userSelectedOptionThree", "enum",
