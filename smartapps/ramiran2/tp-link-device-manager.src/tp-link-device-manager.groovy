@@ -434,7 +434,7 @@ def devMode() {
 		section("User Configuration:") {
 			input(
 				"devModeLoaded", "bool",
-				title: "Do you want to enable developer testing mode?",
+				title: "Do you want to enable developer testing page?",
 				submitOnChange: true,
 				image: getAppImg("developer.png")
 			)
