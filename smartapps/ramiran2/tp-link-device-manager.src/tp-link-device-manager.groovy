@@ -61,7 +61,7 @@ definition(
 	appSetting "devOpt"
 }
 
-def appVersion() { return "3.1.3" }
+def appVersion() { return "3.2.0" }
 def appVerDate() { return "10-08-2018" }
 def driverVersionsMin() {
 	return [
@@ -85,6 +85,7 @@ preferences {
 	page(name: "mainPage")
 	page(name: "selectDevices")
 	page(name: "devMode")
+	page(name: "devModeTestingPage")
 	page(name: "aboutPage")
 	page(name: "changeLogPage")
 	page(name: "uninstallPage")
@@ -155,7 +156,7 @@ def authPage() {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Driver Version:", driverVersionText
 		}
-		section("Login:") {
+		section("Account Configuration:") {
 			input(
 				"userName", "email",
 				title: "TP-Link Kasa Email Address",
@@ -169,7 +170,7 @@ def authPage() {
 				image: getAppImg("password.png")
 			)
 		}
-		section("Configuration:") {
+		section("User Configuration:") {
 			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
@@ -230,7 +231,7 @@ def mainPage() {
 			paragraph title: "Information:", mainPageText
 			paragraph title: "Communication Error:", errorMsg
 		}
-		section("Configuration:") {
+		section("User Configuration:") {
 			if (state.currentError != null && oldDevices != [:]) {
 				input(
 					"userSelectedOptionOne", "enum",
@@ -421,23 +422,134 @@ def devMode() {
 			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
 			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
 			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+			if (devModeLoaded){
+				href "devModeTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
+			}
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceuninstallpage.png")
 		}
-		section("Configuration:") {
+		section("User Configuration:") {
 			input(
 				"devModeLoaded", "bool",
-				title: "Do you want to enable developer mode?",
+				title: "Do you want to enable developer testing mode?",
 				submitOnChange: true,
 				image: getAppImg("developer.png")
 			)
 		}
-		section("Security:") {
+		section("Security Configuration:") {
 			paragraph title:"What does resetting do?", "If you share a url with someone and want to remove their access you can reset your token and this will invalidate any URL you shared and create a new one for you."
 			input (name: "resetSTAccessToken", type: "bool", title: "Reset SmartThings Access Token?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("reset.png"))
 			resetSTAccessToken(settings?.resetSTAccessToken == true)
+		}
+	}
+}
+
+//	----- DEVELOPER MODE PAGE -----
+def devModeTestingPage() {
+	getDevices()
+	def devices = state.devices
+	def newDevices = [:]
+	def oldDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	return dynamicPage(
+		name: "devModeTestingPage",
+		title: "Developer Testing Page",
+		install: false,
+		uninstall: false) {
+		section("User Configuration:") {
+			input(
+				"userSelectedOptionTwo", "enum",
+				title: "What do you want to do?",
+				required: false,
+				multiple: false,
+				submitOnChange: true,
+				options: ["Activate Account", "Update Account"],
+				image: getAppImg("settings.png")
+			)
+			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+			input(
+				"userSelectedOptionOne", "enum",
+				title: "What do you want to do?",
+				required: false,
+				multiple: false,
+				submitOnChange: true,
+				options: ["Communication Error", "Add/Remove Devices"],
+				image: getAppImg("error.png")
+			)
+			input(
+				"userSelectedOptionZero", "enum",
+				title: "What do you want to do?",
+				required: false,
+				multiple: false,
+				submitOnChange: true,
+				options: ["Initial Install", "Add/Remove Devices", "Update Token"],
+				image: getAppImg("settings.png")
+			)
+		}
+		section("Account Configuration:") {
+			input(
+				"userName", "email",
+				title: "TP-Link Kasa Email Address",
+				required: false,
+				image: getAppImg("email.png")
+			)
+			input(
+				"userPassword", "password",
+				title: "TP-Link Kasa Account Password",
+				required: false,
+				image: getAppImg("password.png")
+			)
+			input(
+				"userSelectedOptionThree", "enum",
+				title: "What do you want to do?",
+				required: false,
+				multiple: false,
+				submitOnChange: true,
+				options: ["Update Token"],
+				image: getAppImg("token.png")
+			)
+		}
+		section("Device Configuration:") {
+			input(
+				"userSelectedDevices", "enum",
+				required: false,
+				multiple: true,
+				submitOnChange: true,
+				title: "Select Devices (${oldDevices.size() ?: 0} found)",
+				options: oldDevices,
+				image: getAppImg("devices.png")
+			)
+			input(
+				"userSelectedDevices", "enum",
+				required: false,
+				multiple: true,
+				submitOnChange: true,
+				title: "Select Devices (${newDevices.size() ?: 0} found)",
+				options: newDevices,
+				image: getAppImg("devices.png")
+			)
+			input(
+				"userSelectedRemoveMode", "bool",
+				title: "Do you want to enable device removal mode?",
+				submitOnChange: true,
+				image: getAppImg("deviceremover.png")
+			)
 		}
 	}
 }
