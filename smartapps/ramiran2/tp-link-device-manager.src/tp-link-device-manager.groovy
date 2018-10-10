@@ -139,6 +139,12 @@ def authPage() {
 		}
 		section("User Configuration:") {
 			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
 				required: true,
@@ -146,12 +152,6 @@ def authPage() {
 				submitOnChange: true,
 				metadata: [values:["Activate Account", "Update Account"]],
 				image: getAppImg("settings.png")
-			)
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
 			)
 		}
 		section("Page Selector:") {
@@ -190,6 +190,7 @@ def mainPage() {
 			paragraph title: "Communication Error:", errorMsgCom
 		}
 		section("User Configuration:") {
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input(
 				"userSelectedOptionOne", "enum",
 				title: "What do you want to do?",
@@ -199,7 +200,6 @@ def mainPage() {
 				metadata: [values:["Initial Install", "Add/Remove Devices", "Update/Remove Token"]],
 				image: getAppImg("settings.png")
 			)
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne =~ "Initial Install") {
@@ -218,10 +218,6 @@ def mainPage() {
 			}
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
-			if (userSelectedReload){
-				setInitialStates()
-			}
 		}
 		section("About and Changelog:") {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -422,6 +418,10 @@ def devMode() {
 			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceuninstallpage.png")
 		}
 		section("User Configuration:") {
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedReload){
+				setInitialStates()
+			}
 			input(
 				"devModeLoaded", "bool",
 				title: "Do you want to enable developer testing page?",
@@ -486,6 +486,12 @@ def devModeTestingPage() {
 		}
 		section("User Configuration:") {
 			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
 				required: false,
@@ -493,12 +499,6 @@ def devModeTestingPage() {
 				submitOnChange: true,
 				metadata: [values:["Activate Account", "Update Account"]],
 				image: getAppImg("settings.png")
-			)
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
 			)
 			input(
 				"userSelectedOptionOne", "enum",
@@ -576,9 +576,6 @@ def devModeTestingPage() {
 				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
 				image: getAppImg("refresh.png")
 			)
-		}
-		section("Help and Feedback:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
 		}
 	}
 }
