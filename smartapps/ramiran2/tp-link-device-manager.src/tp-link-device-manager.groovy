@@ -271,7 +271,7 @@ def selectDevices() {
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
-		"wish to add, thenpress Done again to install the devices. Press < " +
+		"wish to add, then press Done again to install the devices. Press < " +
 		"to return to the previous page."
 	return dynamicPage(
 		name: "selectDevices",
@@ -286,6 +286,12 @@ def selectDevices() {
 			paragraph title: "Device Error:", errorMsgDev
 		}
 		section("Device Configuration:") {
+			input(
+				"userSelectedRemoveMode", "bool",
+				title: "Do you want to enable device removal mode?",
+				submitOnChange: true,
+				image: getAppImg("deviceremover.png")
+			)
 			if (userSelectedRemoveMode) {
 				input(
 					"userSelectedDevicesRemove", "enum",
@@ -308,28 +314,22 @@ def selectDevices() {
 				)
 			}
 			input(
-				"userSelectedRemoveMode", "bool",
-				title: "Do you want to enable device removal mode?",
+				"userLightTransTime", "number",
+				required: true,
+				multiple: false,
 				submitOnChange: true,
-				image: getAppImg("deviceremover.png")
-			)
-						input(
-					"userLightTransTime", "number",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Lighting Transition Time",
-					description: "0 to 60 seconds",
-					image: getAppImg("transition.png")
+				title: "Lighting Transition Time",
+				description: "0 to 60 seconds",
+				image: getAppImg("transition.png")
 			)
 			input(
-					"userRefreshRate", "enum",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Device Refresh Rate",
-					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
-					image: getAppImg("refresh.png")
+				"userRefreshRate", "enum",
+				required: true,
+				multiple: false,
+				submitOnChange: true,
+				title: "Device Refresh Rate",
+				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+				image: getAppImg("refresh.png")
 			)
 			if (userSelectedRemoveMode) {
 				sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
