@@ -174,7 +174,7 @@ def mainPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
-		"Update/Remove Token: Updates the token or you can remove the token.\n\r"
+		"Update Token: Updates the token or you can remove the token.\n\r"
 	def errorMsgCom = "None"
 	if (state.currentError != null){
 		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
@@ -200,7 +200,7 @@ def mainPage() {
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Initial Install", "Add/Remove Devices", "Update/Remove Token"]],
+				metadata: [values:["Initial Install", "Add/Remove Devices", "Update Token"]],
 				image: getAppImg("settings.png")
 			)
 		}
@@ -214,7 +214,7 @@ def mainPage() {
 			if (userSelectedOptionOne =~ "Add/Remove Devices") {
 				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
 			}
-			if (userSelectedOptionOne =~ "Update/Remove Token") {
+			if (userSelectedOptionOne =~ "Update Token") {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			}
 		}
@@ -512,7 +512,7 @@ def devModeTestingPage() {
 				required: false,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Initial Install", "Add/Remove Devices", "Update/Remove Token"]],
+				metadata: [values:["Initial Install", "Add/Remove Devices", "Update Token"]],
 				image: getAppImg("settings.png")
 			)
 		}
