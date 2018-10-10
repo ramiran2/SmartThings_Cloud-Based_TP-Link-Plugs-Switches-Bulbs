@@ -155,7 +155,7 @@ def authPage() {
 			)
 		}
 		section("Page Selector:") {
-			if (userSelectedOptionTwo != "Activate Account" || userSelectedOptionTwo != "Update Account") {
+			if (!userSelectedOptionTwo) {
 				paragraph pageSelectorNullText(), image: getAppImg("error.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
@@ -205,7 +205,7 @@ def mainPage() {
 			)
 		}
 		section("Page Selector:") {
-			if (userSelectedOptionOne != "Initial Install" || userSelectedOptionOne != "Add/Remove Devices" || userSelectedOptionOne != "Update/Remove Token") {
+			if (!userSelectedOptionOne) {
 				paragraph pageSelectorNullText(), image: getAppImg("error.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Install") {
