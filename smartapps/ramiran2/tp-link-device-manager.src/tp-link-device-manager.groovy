@@ -44,7 +44,7 @@ primarily various users on GitHub.com.
 */
 
 definition(
-	name: "${appName()}",
+	name: "${appLabel()}",
 	namespace: "${appNamespace()}",
 	author: "${appAuthor()}",
 	description: "${textDesc()}",
@@ -55,41 +55,34 @@ definition(
 	singleInstance: true
 )
 
-{
-	appSetting "clientId"
-	appSetting "clientSecret"
-	appSetting "devOpt"
-}
-
-def appVersion() { return "3.2.5" }
-def appVerDate() { return "10-09-2018" }
+def appVersion() { return "3.4.0" }
+def appVerDate() { return "10-10-2018" }
 def driverVersionsMin() {
 	return [
-		"colorbulbenergymonitor":["val":313, "desc":"3.1.3"],
-		"colorbulb":["val":313, "desc":"3.1.3"],
-		"dimmingswitch":["val":313, "desc":"3.1.3"],
-		"energymonitorplug":["val":313, "desc":"3.1.3"],
-		"plug":["val":313, "desc":"3.1.3"],
-		"switch":["val":313, "desc":"3.1.3"],
-		"softwhitebulbenergymonitor":["val":313, "desc":"3.1.3"],
-		"softwhitebulb":["val":313, "desc":"3.1.3"],
-		"tunablewhitebulbenergymonitor":["val":313, "desc":"3.1.3"],
-		"tunablewhitebulb":["val":313, "desc":"3.1.3"]
+		"colorbulbenergymonitor":["val":320, "desc":"3.2.0"],
+		"colorbulb":["val":320, "desc":"3.2.0"],
+		"dimmingswitch":["val":320, "desc":"3.2.0"],
+		"energymonitorplug":["val":320, "desc":"3.2.0"],
+		"plug":["val":320, "desc":"3.2.0"],
+		"switch":["val":320, "desc":"3.2.0"],
+		"softwhitebulbenergymonitor":["val":320, "desc":"3.2.0"],
+		"softwhitebulb":["val":320, "desc":"3.2.0"],
+		"tunablewhitebulbenergymonitor":["val":320, "desc":"3.2.0"],
+		"tunablewhitebulb":["val":320, "desc":"3.2.0"]
 	]
 }
 
 preferences {
-	page(name: "oauthVerification")
 	page(name: "startPage")
 	page(name: "authPage")
 	page(name: "mainPage")
 	page(name: "selectDevices")
+	page(name: "tokenPage")
 	page(name: "devMode")
 	page(name: "devModeTestingPage")
 	page(name: "aboutPage")
 	page(name: "changeLogPage")
 	page(name: "uninstallPage")
-	page(name: "forceUninstallPage")
 }
 
 def setInitialStates() {
@@ -99,31 +92,8 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 }
 
-//	----- OAUTH PAGE -----
-def oauthVerification() {
-    if(!atomicState?.accessToken) { getAccessToken() }
-	if(!atomicState?.accessToken) {
-		return dynamicPage(name: "oauthVerification", title: "OAuth Verification Page", nextPage: "", install: false, uninstall: true) {
-			section("") {
-				paragraph appInfoDesc(), image: getAppImg("kasa.png")
-			}
-			section ("Application Information:") {
-				def title = ""
-                def desc = ""
-				if(!atomicState?.accessToken) { title="OAuth Error"; desc = "OAuth is not Enabled for ${app?.label} application.  Please click remove and review the installation directions again"; }
-				else { title="Unknown Error"; desc = "Application Status has not received any messages to display";	}
-				log.warn "Status Message: $desc"
-				paragraph title: "$title", "$desc", required: true, state: null
-				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
-			}
-		}
-	}
-    else { return startPage() }
-}
-
-//This Page is used to load either parent or child app interface code
+//	----- START PAGE -----
 def startPage() {
-	atomicState?.isParent = true
 	setInitialStates()
 	if ("${userName}" =~ null || "${userPassword}" =~ null ){
 		return authPage()
@@ -139,20 +109,17 @@ def authPage() {
 		"action you want to complete. " + "Your current token:" + "${state.TpLinkToken}" +
 		"\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Update Account: Updates the token and credentials."
+		"Update Account: Updates the token and credentials or you can remove the token."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "authPage",
 		title: "Login Page",
-		nextPage: "selectDevices",
 		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Driver Version:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Information and Driver Version:", hideable: true, hidden: true) {
 			paragraph title: "Information:", authPageText
 			paragraph title: "Driver Version:", driverVersionText
 		}
@@ -177,7 +144,7 @@ def authPage() {
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Activate Account", "Update Account"],
+				metadata: [values:["Activate Account", "Update Account"]],
 				image: getAppImg("settings.png")
 			)
 			input(
@@ -186,6 +153,14 @@ def authPage() {
 				submitOnChange: true,
 				image: getAppImg("developer.png")
 			)
+		}
+		section("Page Selector:") {
+			if (userSelectedOptionTwo =~ "Activate Account") {
+				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			}
+			if (userSelectedOptionTwo =~ "Update Account") {
+				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+			}
 		}
 	}
 }
@@ -196,64 +171,46 @@ def mainPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
-		"Update Token: Updates the token.\n\r" +
-		"Communication Error: Disables your capability to go the next page untill you fix the issue at hand."
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
-	def errorMsg = "None"
-	getDevices()
-	def devices = state.devices
-	def newDevices = [:]
-	def oldDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
+		"Update/Remove Token: Updates the token or you can remove the token.\n\r"
+	def errorMsgCom = "None"
 	if (state.currentError != null){
-		errorMsg = "Error communicating with cloud:\n\r" + "${state.currentError}" +
+		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
 	}
 	return dynamicPage(
 		name: "mainPage",
 		title: "Settings Page",
-		nextPage: "selectDevices",
 		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-        section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+        section("Information and Diagnostics:", hideable: true, hidden: true) {
 			paragraph title: "Information:", mainPageText
-			paragraph title: "Communication Error:", errorMsg
+			paragraph title: "Communication Error:", errorMsgCom
 		}
 		section("User Configuration:") {
-			if (state.currentError != null && oldDevices != [:]) {
-				input(
-					"userSelectedOptionOne", "enum",
-					title: "What do you want to do?",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					options: ["Communication Error", "Add/Remove Devices"],
-					image: getAppImg("error.png")
-				)
-			} else {
-				input(
-					"userSelectedOptionZero", "enum",
-					title: "What do you want to do?",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					options: ["Initial Install", "Add/Remove Devices", "Update Token"],
-					image: getAppImg("settings.png")
-				)
+			input(
+				"userSelectedOptionOne", "enum",
+				title: "What do you want to do?",
+				required: true,
+				multiple: false,
+				submitOnChange: true,
+				metadata: [values:["Initial Install", "Add/Remove Devices", "Update/Remove Token"]],
+				image: getAppImg("settings.png")
+			)
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
+		}
+		section("Page Selector:") {
+			if (userSelectedOptionOne =~ "Initial Install") {
+				href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
 			}
-			input ("disAppIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			if (userSelectedOptionOne =~ "Add/Remove Devices") {
+				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			}
+			if (userSelectedOptionOne =~ "Update/Remove Token") {
+				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+			}
 		}
 		section("Help and Feedback:") {
 			if (userSelectedDevMode){
@@ -278,18 +235,12 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionZero =~ "Initial Install") {
-		return authPage()
-	}
-	if (userSelectedOptionOne =~ "Communication Error") {
-		return mainPage()
-	}
-	if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
+	if (userSelectedOptionTwo =~ "Activate Account") {
 		getToken()
 	}
 	getDevices()
 	def devices = state.devices
-	def errorMsg = "None"
+	def errorMsgDev = "None"
 	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
@@ -302,19 +253,19 @@ def selectDevices() {
 		}
 	}
 	if (devices == [:]) {
-		errorMsg = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 	}
 	if (newDevices == [:] && oldDevices == [:]) {
-		errorMsg = "No new devices to add. Are you sure they are in Remote " +
+		errorMsgDev = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 	}
 	if (oldDevices == [:] && userSelectedRemoveMode) {
-		errorMsg = "No current devices to remove from smart things."
+		errorMsgDev = "No current devices to remove from smart things."
 	}
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (errorMsg == "None")
+	settings.userSelectedDevicesRemove = null
+	settings.userSelectedDevicesAdd = null
 	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
 		"Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
@@ -330,51 +281,94 @@ def selectDevices() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
 			paragraph title: "Information:", TPLinkDevicesMsg
-			paragraph title: "Device Error:", errorMsg
+			paragraph title: "Device Error:", errorMsgDev
 		}
-		if (userSelectedOptionZero =~ "Update Token" || userSelectedOptionTwo =~ "Update Account") {
-			section("Account Configuration:") {
-				input(
-					"userSelectedOptionThree", "enum",
-					title: "What do you want to do?",
+		section("Device Configuration:") {
+			input(
+					"userLightTransTime", "number",
 					required: true,
 					multiple: false,
 					submitOnChange: true,
-					options: ["Update Token"],
-					image: getAppImg("token.png")
-					)
-				}
-			} else if (userSelectedOptionZero =~ "Add/Remove Devices" || userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionOne =~ "Add/Remove Devices") {
-			section("Device Configuration:") {
-				if (userSelectedRemoveMode) {
-					input(
-						"userSelectedDevicesRemove", "enum",
-						required: true,
-						multiple: true,
-						submitOnChange: true,
-						title: "Select Devices (${oldDevices.size() ?: 0} found)",
-						options: oldDevices,
-						image: getAppImg("devices.png")
-					)
-				} else {
-					input(
-						"userSelectedDevicesAdd", "enum",
-						required: true,
-						multiple: true,
-						submitOnChange: true,
-						title: "Select Devices (${newDevices.size() ?: 0} found)",
-						options: newDevices,
-						image: getAppImg("devices.png")
-					)
-				}
-				input(
-					"userSelectedRemoveMode", "bool",
-					title: "Do you want to enable device removal mode?",
+					title: "Lighting Transition Time",
+					description: "0 to 60 seconds",
+					image: getAppImg("transition.png")
+			)
+			input(
+					"userRefreshRate", "enum",
+					required: true,
+					multiple: false,
 					submitOnChange: true,
-					image: getAppImg("deviceremover.png")
+					title: "Device Refresh Rate",
+					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+					image: getAppImg("refresh.png")
+			)
+			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
+			if (userSelectedValuesToSend) {
+				if (userSelectedRemoveMode) {
+					sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
+				}
+				if (userSelectedRemoveMode) {
+					sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
+				}
+			}
+			if (userSelectedRemoveMode) {
+				input(
+					"userSelectedDevicesRemove", "enum",
+					required: true,
+					multiple: true,
+					submitOnChange: true,
+					title: "Select Devices (${oldDevices.size() ?: 0} found)",
+					metadata: [values:oldDevices],
+					image: getAppImg("devices.png")
 				)
+			} else {
+				input(
+					"userSelectedDevicesAdd", "enum",
+					required: true,
+					multiple: true,
+					submitOnChange: true,
+					title: "Select Devices (${newDevices.size() ?: 0} found)",
+					metadata: [values:newDevices],
+					image: getAppImg("devices.png")
+				)
+			}
+			input(
+				"userSelectedRemoveMode", "bool",
+				title: "Do you want to enable device removal mode?",
+				submitOnChange: true,
+				image: getAppImg("deviceremover.png")
+			)
+		}
+	}
+}
+
+//	----- TOKEN MANAGER PAGE -----
+def tokenPage () {
+	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
+		"\n\rAvailable actions:\n\r" +
+		"Update Token: Updates the token.\n\r" +
+		"Remove Token: Removes the token.\n\r"
+	dynamicPage(name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Account Configuration:") {
+			input(
+				"userSelectedOptionThree", "enum",
+				title: "What do you want to do?",
+				required: true,
+				multiple: false,
+				submitOnChange: true,
+				metadata: [values:["Update Token", "Delete Token"]],
+				image: getAppImg("token.png")
+			)
+			if (userSelectedOptionThree =~ "Update Token") {
+				getToken()
+			}
+			if (userSelectedOptionThree =~ "Delete Token") {
+				state.TpLinkToken = null
 			}
 		}
 	}
@@ -397,8 +391,6 @@ def devMode() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "devMode",
 		title: "Developer Page",
@@ -407,7 +399,7 @@ def devMode() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Application Information:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Application Information:", hideable: true, hidden: true) {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
 			paragraph title: "Hub:", "${hub}"
 			paragraph title: "Hub ID:", "${hubId}"
@@ -417,11 +409,11 @@ def devMode() {
 			paragraph title: "New Devices:", "${newDevices}"
 		}
 		section("Page Selector:") {
-			href "oauthVerification", title: "OAuth Verification Page", description: "Tap to view", image: getAppImg("oauthverification.png")
 			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
 			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
 			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
 			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			if (devModeLoaded){
 				href "devModeTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
@@ -439,15 +431,10 @@ def devMode() {
 				image: getAppImg("developer.png")
 			)
 		}
-		section("Security Configuration:") {
-			paragraph title:"What does resetting do?", "If you share a url with someone and want to remove their access you can reset your token and this will invalidate any URL you shared and create a new one for you."
-			input (name: "resetSTAccessToken", type: "bool", title: "Reset SmartThings Access Token?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("reset.png"))
-			resetSTAccessToken(settings?.resetSTAccessToken == true)
-		}
 	}
 }
 
-//	----- DEVELOPER Testing PAGE -----
+//	----- DEVELOPER TESTING PAGE -----
 def devModeTestingPage() {
 	getDevices()
 	def devices = state.devices
@@ -482,8 +469,6 @@ def devModeTestingPage() {
 	if (oldDevices == [:] && userSelectedRemoveMode) {
 		errorMsgOld = "No current devices to remove from smart things."
 	}
-	def hideInfoDiagDescCont = (true)
-	def hideInfoDiagDescStat = (state.currentError == null)
 	return dynamicPage(
 		name: "devModeTestingPage",
 		title: "Developer Testing Page",
@@ -492,7 +477,7 @@ def devModeTestingPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Application State:", hideable: hideInfoDiagDescCont, hidden: hideInfoDiagDescStat) {
+		section("Application Information:", hideable: true, hidden: true) {
 			paragraph title: "Communication Error:", errorMsgCom
 			paragraph title: "Finding Devices Error:", errorMsgDev
 			paragraph title: "New Devices Error:", errorMsgNew
@@ -508,7 +493,7 @@ def devModeTestingPage() {
 				required: false,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Activate Account", "Update Account"],
+				metadata: [values:["Activate Account", "Update Account"]],
 				image: getAppImg("settings.png")
 			)
 			input(
@@ -523,16 +508,7 @@ def devModeTestingPage() {
 				required: false,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Communication Error", "Add/Remove Devices"],
-				image: getAppImg("error.png")
-			)
-			input(
-				"userSelectedOptionZero", "enum",
-				title: "What do you want to do?",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				options: ["Initial Install", "Add/Remove Devices", "Update Token"],
+				metadata: [values:["Initial Install", "Add/Remove Devices", "Update/Remove Token"]],
 				image: getAppImg("settings.png")
 			)
 		}
@@ -555,18 +531,37 @@ def devModeTestingPage() {
 				required: false,
 				multiple: false,
 				submitOnChange: true,
-				options: ["Update Token"],
+				metadata: [values:["Update Token", "Delete Token"]],
 				image: getAppImg("token.png")
 			)
 		}
 		section("Device Configuration:") {
+			input(
+					"userLightTransTime", "number",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Lighting Transition Time",
+					description: "0 to 60 seconds",
+					image: getAppImg("transition.png")
+			)
+			input(
+					"userRefreshRate", "enum",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Device Refresh Rate",
+					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+					image: getAppImg("refresh.png")
+			)
+			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
 			input(
 				"userSelectedDevicesRemove", "enum",
 				required: false,
 				multiple: true,
 				submitOnChange: true,
 				title: "Select Devices (${oldDevices.size() ?: 0} found)",
-				options: oldDevices,
+				metadata: [values:oldDevices],
 				image: getAppImg("devices.png")
 			)
 			input(
@@ -575,7 +570,7 @@ def devModeTestingPage() {
 				multiple: true,
 				submitOnChange: true,
 				title: "Select Devices (${newDevices.size() ?: 0} found)",
-				options: newDevices,
+				metadata: [values:newDevices],
 				image: getAppImg("devices.png")
 			)
 			input(
@@ -639,93 +634,7 @@ def uninstallPage() {
 		section("Information:") {
 			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 		}
-		section("Did You Get an Error?") {
-			href "forceUninstallPage", title: "Perform Some Cleanup Steps", description: "Tap to force uninstall", image: getAppImg("forceuninstall.png")
-		}
-		remove("Remove ${appName()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
-	}
-}
-
-//	----- FORCE UNINSTALL PAGE -----
-def forceUninstallPage() {
-	dynamicPage(name: "forceUninstallPage", title: "Force Uninstall Page", install: false, uninstall: true) {
-		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa.png")
-		}
-		section("Information:") {
-			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
-		}
-		section("Deleted Child Applications:") {
-			paragraph "This will uninstall any related child application that is still installed."
-			getChildApps()?.each {
-				deleteChildApp(it)
-				paragraph "Removed Child App: ${it?.label}"
-			}
-		}
-		remove("Try Removing Again!!!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
-	}
-}
-
-//This code really does nothing at the moment but return the dynamic url of the app's endpoints
-def getEndpointUrl() {
-	def params = [
-		uri: "https://graph.api.smartthings.com/api/smartapps/endpoints",
-		query: ["access_token": atomicState?.accessToken],
-		contentType: 'application/json'
-	]
-	try {
-		httpGet(params) { resp ->
-			log.trace "EndPoint URL: ${resp?.data?.uri}"
-			return resp?.data?.uri
-		}
-	} catch (ex) {
-		log.error "getEndpointUrl Exception:", ex
-	}
-}
-
-def getApiURL() {
-	return apiServerUrl("/api/token/${atomicState?.accessToken}/smartapps/installations/${app.id}") ?: null
-}
-
-
-void settingUpdate(name, value, type=null) {
-	log.trace "settingUpdate($name, $value, $type)..."
-	if(name) {
-		if(value =~ "" || value =~ null || value == []) {
-			settingRemove(name)
-			return
-		}
-	}
-	if(name && type) {
-		app?.updateSetting("$name", [type: "$type", value: value])
-	} else if (name && type =~ null){ app?.updateSetting(name.toString(), value) }
-}
-
-void settingRemove(name) {
-	log.trace "settingRemove($name)..."
-	if(name) { app?.deleteSetting("$name") }
-}
-
-void resetSTAccessToken(reset) {
-	if(reset != true) { return }
-	log.info "Resetting SmartApp Access Token...."
-	revokeAccessToken()
-	atomicState?.accessToken = null
-	if(getAccessToken()) {
-		log.info "Reset SmartApp Access Token... Successful"
-		settingUpdate("resetSTAccessToken", "false", "bool")
-	}
-}
-
-def getAccessToken() {
-	try {
-		if(!atomicState?.accessToken) { atomicState?.accessToken = createAccessToken() }
-		else { return true }
-	} catch (ex) {
-		def msg = "Error: OAuth is not Enabled for TP-Link Device Manager! Please click remove and Enable OAuth under the SmartApp App Settings in the IDE"
-		sendPush(msg)
-		log.error "getAccessToken Exception", ex
-		return false
+		remove("Remove ${appLabel()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
 }
 
@@ -745,7 +654,7 @@ def getDevices() {
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
 		}
-		//log.info "Device ${it.alias} added to devices array"
+		log.info "Device ${it.alias} added to devices array"
 	}
 }
 
@@ -1000,23 +909,26 @@ def uninstalled() {
 
 //	----- PERIODIC CLOUD MX TASKS -----
 def checkError() {
-	if (state.currentError =~ null) {
+	if (state.currentError == null || state.currentError == "none") {
 		log.info "TP-Link Connect did not have any set errors."
+		if (state.currentError == "none") {
+			state.currentError = null
+		}
 		return
 	}
 	def errMsg = state.currentError.msg
 	log.info "Attempting to solve error: ${errMsg}"
 	state.errorCount = state.errorCount +1
-	if (errMsg =~ "Token expired" && state.errorCount < 6) {
+	if (errMsg == "Token expired" && state.errorCount < 6) {
 		sendEvent (name: "ErrHandling", value: "Handle comms error attempt ${state.errorCount}")
 		getDevices()
-		if (state.currentError =~ null) {
+		if (state.currentError == null) {
 			log.info "getDevices successful. apiServerUrl updated and token is good."
 			return
 		}
 		log.error "${errMsg} error while attempting getDevices. Will attempt getToken"
 		getToken()
-		if (state.currentError =~ null) {
+		if (state.currentError == null) {
 			log.info "getToken successful. Token has been updated."
 			getDevices()
 			return
@@ -1038,37 +950,27 @@ def removeChildDevice(alias, deviceNetworkId) {
 }
 
 def gitBranch() { return betaMarker() ? "beta" : "master"  }
-def getAppImg(imgName, on = null)	{ return (!disAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+def getAppImg(imgName, on = null)	{ return (!appIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
 def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
-def getAppEndpointUrl(subPath) { return "${apiServerUrl("/api/smartapps/installations/${app.id}${subPath ? "/${subPath}" : ""}?access_token=${atomicState.accessToken}")}" }
-def appName() { return "${"${appLabel()}"}${appDevName()}" }
 def appLabel() { return "TP-Link Device Manager" }
-def appDevName() { return appDevType() ? " (Dev)" : "" }
-def appDevType() { return false }
 def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
-def developerVer()	{ return false }
 def betaMarker() { return false }
 def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
-	str += "\n" + "• Version: ${appVersion()}"
-	str += "\n" + "• Updated: ${appVerDate()}"
+	str += "\n" + "• ${textVersion()}"
+	str += "\n" + "• ${textModified()}"
 	return str
 }
 def appAuthor() { return "Anthony Ramirez" }
-def getServerUrl()			{ return "https://graph.api.smartthings.com" }
-def getShardUrl()			{ return getApiServerUrl() }
-def getCallbackUrl()		{ return "https://graph.api.smartthings.com/oauth/callback" }
-def getBuildRedirectUrl() { return "${serverUrl}/oauth/initialize?appId=${app.id}&access_token=${atomicState?.accessToken}&apiServerUrl=${shardUrl}" }
 def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
 def textDonateLink(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
-def stIdeLink()		{ return "https://graph.api.smartthings.com" }
 def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
