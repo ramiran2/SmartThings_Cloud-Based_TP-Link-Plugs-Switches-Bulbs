@@ -286,33 +286,6 @@ def selectDevices() {
 			paragraph title: "Device Error:", errorMsgDev
 		}
 		section("Device Configuration:") {
-			input(
-					"userLightTransTime", "number",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Lighting Transition Time",
-					description: "0 to 60 seconds",
-					image: getAppImg("transition.png")
-			)
-			input(
-					"userRefreshRate", "enum",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Device Refresh Rate",
-					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
-					image: getAppImg("refresh.png")
-			)
-			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
-			if (userSelectedValuesToSend) {
-				if (userSelectedRemoveMode) {
-					sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
-				}
-				if (userSelectedRemoveMode) {
-					sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
-				}
-			}
 			if (userSelectedRemoveMode) {
 				input(
 					"userSelectedDevicesRemove", "enum",
@@ -340,6 +313,33 @@ def selectDevices() {
 				submitOnChange: true,
 				image: getAppImg("deviceremover.png")
 			)
+						input(
+					"userLightTransTime", "number",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Lighting Transition Time",
+					description: "0 to 60 seconds",
+					image: getAppImg("transition.png")
+			)
+			input(
+					"userRefreshRate", "enum",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Device Refresh Rate",
+					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+					image: getAppImg("refresh.png")
+			)
+			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
+			if (userSelectedValuesToSend) {
+				if (userSelectedRemoveMode) {
+					sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
+				}
+				if (userSelectedRemoveMode) {
+					sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
+				}
+			}
 		}
 	}
 }
@@ -537,25 +537,6 @@ def devModeTestingPage() {
 		}
 		section("Device Configuration:") {
 			input(
-					"userLightTransTime", "number",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Lighting Transition Time",
-					description: "0 to 60 seconds",
-					image: getAppImg("transition.png")
-			)
-			input(
-					"userRefreshRate", "enum",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Device Refresh Rate",
-					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
-					image: getAppImg("refresh.png")
-			)
-			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
-			input(
 				"userSelectedDevicesRemove", "enum",
 				required: false,
 				multiple: true,
@@ -579,6 +560,25 @@ def devModeTestingPage() {
 				submitOnChange: true,
 				image: getAppImg("deviceremover.png")
 			)
+			input(
+					"userLightTransTime", "number",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Lighting Transition Time",
+					description: "0 to 60 seconds",
+					image: getAppImg("transition.png")
+			)
+			input(
+					"userRefreshRate", "enum",
+					required: true,
+					multiple: false,
+					submitOnChange: true,
+					title: "Device Refresh Rate",
+					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+					image: getAppImg("refresh.png")
+			)
+			input (name: "userSelectedValuesToSend", type: "bool", title: "Do you want to send the refresh rate and tansition time to your devices?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("send.png"))
 		}
 		section("Help and Feedback:") {
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
