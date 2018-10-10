@@ -156,7 +156,7 @@ def authPage() {
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionTwo == null) {
-				paragraph "Please selectt a option to continue", image: getAppImg("error.png")
+				paragraph pageSelectorNullText, image: getAppImg("error.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
@@ -206,7 +206,7 @@ def mainPage() {
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne == null) {
-				paragraph "Please selectt a option to continue", image: getAppImg("error.png")
+				paragraph pageSelectorNullText, image: getAppImg("error.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Install") {
 				href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
@@ -955,6 +955,7 @@ def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
+def pageSelectorNullText = "Please select a option to continue"
 def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
