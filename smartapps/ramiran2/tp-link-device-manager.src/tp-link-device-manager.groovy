@@ -216,12 +216,12 @@ def mainPage() {
 			if (userSelectedDevMode){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
 			}
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -289,6 +289,7 @@ def selectDevices() {
 			input(
 				"userSelectedRemoveMode", "bool",
 				title: "Do you want to enable device removal mode?",
+				defaultValue: false,
 				submitOnChange: true,
 				image: getAppImg("deviceremover.png")
 			)
@@ -534,6 +535,12 @@ def devModeTestingPage() {
 		}
 		section("Device Configuration:") {
 			input(
+				"userSelectedRemoveMode", "bool",
+				title: "Do you want to enable device removal mode?",
+				submitOnChange: true,
+				image: getAppImg("deviceremover.png")
+			)
+			input(
 				"userSelectedDevicesRemove", "enum",
 				required: false,
 				multiple: true,
@@ -552,35 +559,26 @@ def devModeTestingPage() {
 				image: getAppImg("devices.png")
 			)
 			input(
-				"userSelectedRemoveMode", "bool",
-				title: "Do you want to enable device removal mode?",
+				"userLightTransTime", "number",
+				required: true,
+				multiple: false,
 				submitOnChange: true,
-				image: getAppImg("deviceremover.png")
+				title: "Lighting Transition Time",
+				description: "0 to 60 seconds",
+				image: getAppImg("transition.png")
 			)
 			input(
-					"userLightTransTime", "number",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Lighting Transition Time",
-					description: "0 to 60 seconds",
-					image: getAppImg("transition.png")
-			)
-			input(
-					"userRefreshRate", "enum",
-					required: true,
-					multiple: false,
-					submitOnChange: true,
-					title: "Device Refresh Rate",
-					metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
-					image: getAppImg("refresh.png")
+				"userRefreshRate", "enum",
+				required: true,
+				multiple: false,
+				submitOnChange: true,
+				title: "Device Refresh Rate",
+				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+				image: getAppImg("refresh.png")
 			)
 		}
 		section("Help and Feedback:") {
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
-			if (userSelectedReload){
-				setInitialStates()
-			}
 		}
 	}
 }
