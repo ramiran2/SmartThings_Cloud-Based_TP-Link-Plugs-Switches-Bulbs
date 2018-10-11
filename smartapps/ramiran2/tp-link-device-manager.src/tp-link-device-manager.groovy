@@ -106,8 +106,7 @@ def startPage() {
 def authPage() {
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. " + "Your current token:" + "${state.TpLinkToken}" +
-		"\n\rAvailable actions:\n\r" +
+		"action you want to complete. " + "\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Update Account: Updates the token and credentials or you can remove the token."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
@@ -120,6 +119,11 @@ def authPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Driver Version:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
 			paragraph title: "Information:", authPageText, image: getAppImg("information.png")
 			paragraph title: "Driver Version:", driverVersionText, image: getAppImg("devices.png")
 		}
@@ -172,8 +176,7 @@ def authPage() {
 
 //	----- MAIN PAGE -----
 def mainPage() {
-	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
-		"\n\rAvailable actions:\n\r" +
+	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
 		"Update Token: Updates the token or you can remove the token."
@@ -191,6 +194,11 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
 			paragraph title: "Information:", mainPageText, image: getAppImg("information.png")
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
@@ -272,8 +280,7 @@ def selectDevices() {
 	}
 	settings.userSelectedDevicesRemove = null
 	settings.userSelectedDevicesAdd = null
-	def TPLinkDevicesMsg = "TP-Link Token is ${state.TpLinkToken}\n\r" +
-		"Devices that have not been previously installed and are not in 'Local " +
+	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
@@ -288,6 +295,11 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
 			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
@@ -656,7 +668,7 @@ def changeLogPage () {
 
 //	----- UNINSTALL PAGE -----
 def uninstallPage() {
-	def uninstallPageText = "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+	def uninstallPageText = "This will uninstall the App, All Child Devices.\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 	dynamicPage(name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
