@@ -350,13 +350,27 @@ def selectDevices() {
 
 //	----- TOKEN MANAGER PAGE -----
 def tokenPage () {
-	def mainPageText = "Your current token:" + "${state.TpLinkToken}" +
-		"\n\rAvailable actions:\n\r" +
+	def mainPageText = "Available actions:\n\r" +
 		"Update Token: Updates the token.\n\r" +
 		"Remove Token: Removes the token.\n\r"
+		def errorMsgToken = "None"
+		if (state.TpLinkToken == null){
+			errorMsgToken = "You will be unable to control your devices until you get a new token."
+		}
 	dynamicPage(name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			paragraph title: "Information:", mainPageText
+			paragraph title: "Account Error:", errorMsgToken
+		}
+		section("Account Status:") {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
 		}
 		section("Account Configuration:") {
 			input(
@@ -959,6 +973,8 @@ def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
+def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
+def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
 def pageSelectorText()	{ return "Please tap below to continue" }
 def pageSelectorNullText()	{ return "Please select a option to continue" }
 def appInfoDesc()	{
