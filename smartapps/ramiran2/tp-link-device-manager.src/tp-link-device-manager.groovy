@@ -176,7 +176,7 @@ def mainPage() {
 		"\n\rAvailable actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
-		"Update Token: Updates the token or you can remove the token.\n\r"
+		"Update Token: Updates the token or you can remove the token."
 	def errorMsgCom = "None"
 	if (state.currentError != null){
 		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
@@ -279,6 +279,8 @@ def selectDevices() {
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Done again to install the devices. Press < " +
 		"to return to the previous page."
+	def sendingDataSuccess()	{ return "Data Sent to All Devices" }
+	def sendingDataFailed()	{ return "Ready to Send Data to All Devices" }
 	return dynamicPage(
 		name: "selectDevices",
 		title: "Device Manager Page",
@@ -291,7 +293,7 @@ def selectDevices() {
 			paragraph title: "Information:", TPLinkDevicesMsg
 			paragraph title: "Device Error:", errorMsgDev
 		}
-		section("Device Configuration:") {
+		section("Device Controller:") {
 			input(
 				"userSelectedRemoveMode", "bool",
 				title: "Do you want to enable device removal mode?",
@@ -320,6 +322,21 @@ def selectDevices() {
 					image: getAppImg("devices.png")
 				)
 			}
+		}
+		section("Saving Settings:") {
+			if (userLightTransTime != null || userRefreshRate != null){
+				if (userLightTransTime) {
+					sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
+				}
+				if (userRefreshRate) {
+					sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
+				}
+				paragraph sendingDataSuccess(), image: getAppImg("send.png")
+			} else {
+				paragraph sendingDataFailed(), image: getAppImg("issue.png")
+			}
+		}
+		section("Device Configuration:") {
 			input(
 				"userLightTransTime", "number",
 				required: true,
@@ -338,12 +355,6 @@ def selectDevices() {
 				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
 				image: getAppImg("refresh.png")
 			)
-			if (userSelectedRemoveMode) {
-				sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
-			}
-			if (userSelectedRemoveMode) {
-				sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
-			}
 		}
 	}
 }
@@ -352,7 +363,7 @@ def selectDevices() {
 def tokenPage () {
 	def mainPageText = "Available actions:\n\r" +
 		"Update Token: Updates the token.\n\r" +
-		"Remove Token: Removes the token.\n\r"
+		"Remove Token: Removes the token."
 		def errorMsgToken = "None"
 		if (state.TpLinkToken == null){
 			errorMsgToken = "You will be unable to control your devices until you get a new token."
