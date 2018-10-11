@@ -359,7 +359,7 @@ def selectDevices() {
 
 //	----- TOKEN MANAGER PAGE -----
 def tokenPage () {
-	def mainPageText = "Available actions:\n\r" +
+	def tokenPageText = "Available actions:\n\r" +
 		"Update Token: Updates the token.\n\r" +
 		"Remove Token: Removes the token."
 		def errorMsgToken = "None"
@@ -371,7 +371,7 @@ def tokenPage () {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", mainPageText, image: getAppImg("information.png")
+			paragraph title: "Information:", tokenPageText, image: getAppImg("information.png")
 			paragraph title: "Account Error:", errorMsgToken, image: getAppImg("error.png")
 		}
 		section("Account Status:") {
@@ -627,15 +627,15 @@ def aboutPage() {
 			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete"
 			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete"
 		}
+		section("Application Changes Details:") {
+			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
+		}
 		section("GitHub:") {
 			href url: textGitHubLinkDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: textGitHubLinkAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: textGitHubLinkAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
-		section("App Change Details:") {
-			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
-		}
-		section("Licensing Info:") {
+		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
 		}
 	}
@@ -656,12 +656,13 @@ def changeLogPage () {
 
 //	----- UNINSTALL PAGE -----
 def uninstallPage() {
+	def uninstallPageText = "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 	dynamicPage(name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information:") {
-			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove.", "", image: getAppImg("information.png")
+			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		remove("Remove ${appLabel()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
