@@ -620,13 +620,17 @@ def aboutPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
-			href url: textDonateLinkDav(), style:"external", required: false, title:"Donations (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
-			href url: textDonateLinkAnt(), style:"external", required: false, title:"Donations (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
+			href url: textDonateLinkAntR(), style:"external", required: false, title:"Donations (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete"
 			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete"
 			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete"
+		}
+		section("GitHub:") {
+			href url: textGitHubLinkDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: textGitHubLinkAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: textGitHubLinkAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("App Change Details:") {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
@@ -976,8 +980,8 @@ def removeChildDevice(alias, deviceNetworkId) {
 
 def gitBranch() { return betaMarker() ? "beta" : "master"  }
 def getAppImg(imgName, on = null)	{ return (!appIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
-def getWikiPageUrl() { return "https://github.com/ramiran2/${gitRepo()}/wiki" }
-def getIssuePageUrl() { return "https://github.com/ramiran2/${gitRepo()}/issues" }
+def getWikiPageUrl() { return "https://github.com/${gitRepo()}/wiki" }
+def getIssuePageUrl() { return "https://github.com/${gitRepo()}/issues" }
 def appLabel() { return "TP-Link Device Manager" }
 def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
@@ -1002,7 +1006,9 @@ def textModified()	{ return "Updated: ${appVerDate()}" }
 def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textDonateLinkAnt(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
-def textDonateLinkDav(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=" }
+def textDonateLinkAntR(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
+def textGitHubLinkDavG(){ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+def textGitHubLinkAntR(){ return "https://github.com/${gitRepo()}/" }
+def textGitHubLinkAntS(){ return "https://github.com/tonesto7/nest-manager" }
 def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
