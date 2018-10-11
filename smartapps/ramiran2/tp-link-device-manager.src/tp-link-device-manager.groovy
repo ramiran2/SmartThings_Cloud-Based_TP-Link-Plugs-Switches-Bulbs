@@ -279,8 +279,6 @@ def selectDevices() {
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Done again to install the devices. Press < " +
 		"to return to the previous page."
-	def sendingDataSuccess()	{ return "Data Sent to All Devices" }
-	def sendingDataFailed()	{ return "Ready to Send Data to All Devices" }
 	return dynamicPage(
 		name: "selectDevices",
 		title: "Device Manager Page",
@@ -984,6 +982,8 @@ def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
+def sendingDataSuccess()	{ return "Data Sent to All Devices" }
+def sendingDataFailed()	{ return "Ready to Send Data to All Devices" }
 def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
 def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
 def pageSelectorText()	{ return "Please tap below to continue" }
