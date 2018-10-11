@@ -1,9 +1,16 @@
 ##### TP-Link Device Manager #####
+2018-10-11 - Update to Version 3.4.0
+a. Added new page
+b. Added icons to paragraph
+c. Added Lighting Transition Time control
+d. Added Device Refresh Rate control
+e. Improved UI Elements
+
 2018-10-10 - Update to Version 3.4.0
 a. Improved UI Elements
 b. Improved logic
 c. Added token page
-d. 
+d. Added Status of token to token page
 
 2018-10-09 - Update to Version 3.2.5
 a. Improved developer testing page

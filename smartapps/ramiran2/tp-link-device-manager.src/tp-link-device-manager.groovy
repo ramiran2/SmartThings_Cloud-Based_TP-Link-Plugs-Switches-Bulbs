@@ -55,8 +55,8 @@ definition(
 	singleInstance: true
 )
 
-def appVersion() { return "3.4.0" }
-def appVerDate() { return "10-10-2018" }
+def appVersion() { return "3.5.0" }
+def appVerDate() { return "10-11-2018" }
 def driverVersionsMin() {
 	return [
 		"colorbulbenergymonitor":["val":320, "desc":"3.2.0"],
@@ -120,8 +120,8 @@ def authPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Driver Version:", hideable: true, hidden: true) {
-			paragraph title: "Information:", authPageText
-			paragraph title: "Driver Version:", driverVersionText
+			paragraph title: "Information:", authPageText, image: getAppImg("information.png")
+			paragraph title: "Driver Version:", driverVersionText, image: getAppImg("devices.png")
 		}
 		section("Account Configuration:") {
 			input(
@@ -191,8 +191,8 @@ def mainPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
         section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", mainPageText
-			paragraph title: "Communication Error:", errorMsgCom
+			paragraph title: "Information:", mainPageText, image: getAppImg("information.png")
+			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
@@ -288,8 +288,8 @@ def selectDevices() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", TPLinkDevicesMsg
-			paragraph title: "Device Error:", errorMsgDev
+			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
 			input(
@@ -371,8 +371,8 @@ def tokenPage () {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", mainPageText
-			paragraph title: "Account Error:", errorMsgToken
+			paragraph title: "Information:", mainPageText, image: getAppImg("information.png")
+			paragraph title: "Account Error:", errorMsgToken, image: getAppImg("error.png")
 		}
 		section("Account Status:") {
 			if (state.TpLinkToken != null){
@@ -427,13 +427,13 @@ def devMode() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Application Information:", hideable: true, hidden: true) {
-			paragraph title: "TP-Link Token:", "${state.TpLinkToken}"
-			paragraph title: "Hub:", "${hub}"
-			paragraph title: "Hub ID:", "${hubId}"
-			paragraph title: "Username:", "${userName}"
-			paragraph title: "Password:", "${userPassword}"
-			paragraph title: "Managed Devices:", "${oldDevices}"
-			paragraph title: "New Devices:", "${newDevices}"
+			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
+			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
+			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
+			paragraph title: "Username:", "${userName}", image: getAppImg("email.png")
+			paragraph title: "Password:", "${userPassword}", image: getAppImg("password.png")
+			paragraph title: "Managed Devices:", "${oldDevices}", image: getAppImg("devices.png")
+			paragraph title: "New Devices:", "${newDevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector:") {
 			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
@@ -509,13 +509,13 @@ def devModeTestingPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Application Information:", hideable: true, hidden: true) {
-			paragraph title: "Communication Error:", errorMsgCom
-			paragraph title: "Finding Devices Error:", errorMsgDev
-			paragraph title: "New Devices Error:", errorMsgNew
-			paragraph title: "Current Devices Error:", errorMsgOld
-			paragraph title: "Error Count:", "${state.errorCount}"
-			paragraph title: "Current Error:", "${state.currentError}"
-			paragraph title: "Error Messages:", "${errMsg}"
+			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
+			paragraph title: "Finding Devices Error:", errorMsgDev, image: getAppImg("error.png")
+			paragraph title: "New Devices Error:", errorMsgNew, image: getAppImg("error.png")
+			paragraph title: "Current Devices Error:", errorMsgOld, image: getAppImg("error.png")
+			paragraph title: "Error Count:", "${state.errorCount}", image: getAppImg("error.png")
+			paragraph title: "Current Error:", "${state.currentError}", image: getAppImg("error.png")
+			paragraph title: "Error Messages:", "${errMsg}", image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
 			input(
@@ -620,7 +620,8 @@ def aboutPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
-			href url: textDonateLink(), style:"external", required: false, title:"Donations", description:"Tap to open in browser", state: "complete", image: getAppImg("donate.png")
+			href url: textDonateLinkDav(), style:"external", required: false, title:"Donations (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
+			href url: textDonateLinkAnt(), style:"external", required: false, title:"Donations (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete"
@@ -656,7 +657,7 @@ def uninstallPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information:") {
-			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+			paragraph "This will uninstall the App, All Automation Apps and Child Devices.\n\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove.", "", image: getAppImg("information.png")
 		}
 		remove("Remove ${appLabel()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
@@ -975,11 +976,11 @@ def removeChildDevice(alias, deviceNetworkId) {
 
 def gitBranch() { return betaMarker() ? "beta" : "master"  }
 def getAppImg(imgName, on = null)	{ return (!appIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
-def getWikiPageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/wiki" }
-def getIssuePageUrl() { return "https://github.com/ramiran2/TP-Link-Kasa-Device-Manager-SmartThings/issues" }
+def getWikiPageUrl() { return "https://github.com/ramiran2/${gitRepo()}/wiki" }
+def getIssuePageUrl() { return "https://github.com/ramiran2/${gitRepo()}/issues" }
 def appLabel() { return "TP-Link Device Manager" }
 def appNamespace() { return "ramiran2" }
-def gitRepo()		{ return "ramiran2/TP-Link-Kasa-Device-Manager-SmartThings"}
+def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
 def sendingDataSuccess()	{ return "Data Sent to All Devices" }
@@ -995,12 +996,13 @@ def appInfoDesc()	{
 	str += "\n" + "• ${textModified()}"
 	return str
 }
-def appAuthor() { return "Anthony Ramirez" }
+def appAuthor() { return "Dave Gutheinz, Anthony Ramirez" }
 def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textDonateLink(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
+def textDonateLinkAnt(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
+def textDonateLinkDav(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=" }
 def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }

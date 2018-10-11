@@ -1,6 +1,6 @@
 Discalimer: This Service Manager and the associated Device
 Handlers are in no way sanctioned or supported by TP-Link. All
-development is based upon open-source data on the TP-Link Kasa Devices;
+development is based upon open-source data on the TP-Link Devices;
 primarily various users on GitHub.com.
 
 TP-Link Connect Service Manager, 2018 Version 2
