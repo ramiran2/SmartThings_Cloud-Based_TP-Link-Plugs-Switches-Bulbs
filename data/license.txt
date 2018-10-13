@@ -3,7 +3,9 @@ Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Devices;
 primarily various users on GitHub.com.
 
-TP-Link Connect Service Manager, 2018 Version 2, TP-Link Device Manager, 2018 Version 3
+TP-Link Connect Service Manager, 2018 Version 2 / TP-Link Device Manager, 2018 Version 3
+TP Link Bulbs Device Handler, 2018 Version 3
+TP-Link Plug and Switch Device Handler, 2018, Version 3
 
 Copyright 2018 Dave Gutheinz, Anthony Ramirez
 

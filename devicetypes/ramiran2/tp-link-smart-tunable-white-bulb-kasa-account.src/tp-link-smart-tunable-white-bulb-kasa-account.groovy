@@ -1,5 +1,6 @@
-/*	TP Link Bulbs Device Handler, 2018 Version 2
-	Copyright 2018 Dave Gutheinz
+/*	
+TP Link Bulbs Device Handler, 2018 Version 3
+Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
 Licensed under the Apache License, Version 2.0(the "License");
 you may not use this  file except in compliance with the
@@ -13,27 +14,6 @@ software distributed under the License is distributed on an
 either express or implied. See the License for the specific 
 language governing permissions and limitations under the 
 License.
-
-TP-Link Kasa Device Manager, 2018 Version 3
-
-Copyright 2018 Anthony Ramirez
-
-Licensed under the Apache License, Version 2.0 (the "License"); you 
-may not use this file except in compliance with the License. You may 
-obtain a copy of the License at:
-
-	http://www.apache.org/licenses/LICENSE-2.0
-		
-Unless required by applicable law or agreed to in writing, software 
-distributed under the License is distributed on an "AS IS" BASIS, 
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-implied. See the License for the specific language governing 
-permissions and limitations under the License.
-
-Discalimer:  This Service Manager and the associated Device 
-Handlers are in no way sanctioned or supported by TP-Link.  
-All  development is based upon open-source data on the 
-TP-Link Kasa Devices; primarily various users on GitHub.com.
 
 	===== Bulb Identifier.  DO NOT EDIT ====================*/
 	//def deviceType = "Soft White Bulb"	//	Soft White
@@ -52,7 +32,7 @@ def devVer() { return "3.1.3" }
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
 				namespace: "ramiran2",
-				author: "Anthony Ramirez",
+				author: "Dave Gutheinz, Anthony Ramirez",
 				deviceType: "${deviceType}",
 				energyMonitorMode: "Standard",
 				ocfDeviceType: "oic.d.light",
@@ -67,6 +47,8 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
+		attribute "lightingTransitionTime", "string"
+		attribute "deviceRefreshRate", "string"
 		if (deviceType =~ "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"
 			command "setModeNormal"
