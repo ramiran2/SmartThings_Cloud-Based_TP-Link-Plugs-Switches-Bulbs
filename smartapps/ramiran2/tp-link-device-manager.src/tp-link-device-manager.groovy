@@ -1,25 +1,9 @@
 /*
-TP-Link Connect Service Manager, 2018 Version 2
+TP-Link Connect Service Manager, 2018 Version 2, TP-Link Device Manager, 2018 Version 3
 
-Copyright 2018 Dave Gutheinz
+Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
-may not use this file except in compliance with the License. You may
-obtain a copy of the License at:
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-implied. See the License for the specific language governing
-permissions and limitations under the License.
-
-TP-Link Device Manager, 2018 Version 3
-
-Copyright 2018 Anthony Ramirez
-
-Licensed under the Apache License, Version 2.0 (the "License"); you 
 may not use this file except in compliance with the License. You may
 obtain a copy of the License at:
 
@@ -49,28 +33,15 @@ definition(
 	author: "${appAuthor()}",
 	description: "${textDesc()}",
 	category: "Convenience",
-	iconUrl: "${getAppImg("kasa.png")}",
-	iconX2Url: "${getAppImg("kasa.png")}",
-	iconX3Url: "${getAppImg("kasa.png")}",
+	iconUrl: "${getAppImg("kasa.png", on)}",
+	iconX2Url: "${getAppImg("kasa.png", on)}",
+	iconX3Url: "${getAppImg("kasa.png", on)}",
 	singleInstance: true
 )
 
 def appVersion() { return "3.5.0" }
 def appVerDate() { return "10-11-2018" }
-def driverVersionsMin() {
-	return [
-		"colorbulbenergymonitor":["val":320, "desc":"3.2.0"],
-		"colorbulb":["val":320, "desc":"3.2.0"],
-		"dimmingswitch":["val":320, "desc":"3.2.0"],
-		"energymonitorplug":["val":320, "desc":"3.2.0"],
-		"plug":["val":320, "desc":"3.2.0"],
-		"switch":["val":320, "desc":"3.2.0"],
-		"softwhitebulbenergymonitor":["val":320, "desc":"3.2.0"],
-		"softwhitebulb":["val":320, "desc":"3.2.0"],
-		"tunablewhitebulbenergymonitor":["val":320, "desc":"3.2.0"],
-		"tunablewhitebulb":["val":320, "desc":"3.2.0"]
-	]
-}
+def driverVersionsMin() { return "3.2.0" }
 
 preferences {
 	page(name: "startPage")
@@ -80,6 +51,7 @@ preferences {
 	page(name: "tokenPage")
 	page(name: "devMode")
 	page(name: "devModeTestingPage")
+	page(name: "hiddenPage")
 	page(name: "aboutPage")
 	page(name: "changeLogPage")
 	page(name: "uninstallPage")
@@ -90,12 +62,16 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
+	settingUpdate("userSelectedReload", "false", "bool")
+	settingUpdate("userSelectedRemoveMode", "false", "bool")
+	settingRemove("userSelectedDevicesRemove")
+	settingRemove("userSelectedDevicesAdd")
 }
 
 //	----- START PAGE -----
 def startPage() {
 	setInitialStates()
-	if ("${userName}" =~ null || "${userPassword}" =~ null ){
+	if ("${userName}" =~ null || "${userPassword}" =~ null){
 		return authPage()
 	} else {
 		return mainPage()
@@ -104,11 +80,18 @@ def startPage() {
 
 //	----- AUTH PAGE -----
 def authPage() {
+	if (userSelectedAssistant){
+		if ("${userName}" =~ null || "${userPassword}" =~ null){
+			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
+		} else {
+			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
+		}
+	}
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\n\rAvailable actions:\n\r" +
 		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Update Account: Updates the token and credentials or you can remove the token."
+		"Update Account: Updates or removes the token and credentials."
 	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
 	return dynamicPage(
 		name: "authPage",
@@ -143,26 +126,24 @@ def authPage() {
 		}
 		section("User Configuration:") {
 			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
-			)
-			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Activate Account", "Update Account"]],
+				metadata: [values:["Activate Account", "Update Account", "About Application"]],
 				image: getAppImg("settings.png")
 			)
 		}
 		section("Page Selector:") {
-			if (userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account") {
-				paragraph pageSelectorText(), image: getAppImg("pageselector.png")
+			if (userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account" || userSelectedOptionTwo =~ "About Application") {
+				if (state.currentError != null){
+					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+				} else {
+					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+				}
 			} else {
-				paragraph pageSelectorNullText(), image: getAppImg("error.png")
+				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
@@ -170,12 +151,35 @@ def authPage() {
 			if (userSelectedOptionTwo =~ "Update Account") {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			}
+			if (userSelectedOptionTwo =~ "About Application") {
+				href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+			}
+		}
+		section("Extra Configuration:") {
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
 		}
 	}
 }
 
 //	----- MAIN PAGE -----
 def mainPage() {
+	if (userSelectedAssistant){
+		if (state.TpLinkToken != null){
+			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
+		} else {
+			if ("${userName}" =~ null || "${userPassword}" =~ null){
+				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
+			} else {
+				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
+			}
+		}
+	}
 	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
@@ -203,7 +207,6 @@ def mainPage() {
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input(
 				"userSelectedOptionOne", "enum",
 				title: "What do you want to do?",
@@ -216,9 +219,13 @@ def mainPage() {
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne =~ "Initial Install" || userSelectedOptionOne =~ "Add/Remove Devices" || userSelectedOptionOne =~ "Update Token") {
-				paragraph pageSelectorText(), image: getAppImg("pageselector.png")
+				if (state.currentError != null){
+					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+				} else {
+					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+				}
 			} else {
-				paragraph pageSelectorNullText(), image: getAppImg("error.png")
+				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Install") {
 				href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
@@ -230,11 +237,14 @@ def mainPage() {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			}
 		}
+		section("Extra Configuration:") {
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
+		}
 		section("Help and Feedback:") {
 			if (userSelectedDevMode){
 				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("wiki.png")
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
@@ -249,6 +259,15 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
+	if (userSelectedAssistant) {
+		if (newDevices == [:]){
+			if (oldDevices != [:]){
+				settingUpdate("userSelectedRemoveMode", "true", "bool")
+			}
+		} else {
+			settingUpdate("userSelectedRemoveMode", "false", "bool")
+		}
+	}
 	if (userSelectedOptionTwo =~ "Activate Account") {
 		getToken()
 	}
@@ -268,18 +287,14 @@ def selectDevices() {
 	}
 	if (devices == [:]) {
 		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
-		"that all devices are in 'Local Control Only'. Correct them then " +
-		"rerun the application."
+		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
-	if (newDevices == [:] && oldDevices == [:]) {
-		errorMsgDev = "No new devices to add. Are you sure they are in Remote " +
-		"Control Mode?"
+	if (newDevices == [:]) {
+		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
 	if (oldDevices == [:] && userSelectedRemoveMode) {
-		errorMsgDev = "No current devices to remove from smart things."
+		errorMsgDev = "There are no devices to remove from the smart things app at this time."
 	}
-	settings.userSelectedDevicesRemove = null
-	settings.userSelectedDevicesAdd = null
 	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
@@ -371,12 +386,32 @@ def selectDevices() {
 
 //	----- TOKEN MANAGER PAGE -----
 def tokenPage () {
-	def tokenPageText = "Available actions:\n\r" +
+	if (userSelectedAssistant) {
+		if (state.currentError != null){
+			settingUpdate("userSelectedOptionThree", "Update Credentials", "enum")
+		} else {
+			if (state.TpLinkToken != null){
+				if (userSelectedOptionTwo =~ "Update Account") {
+					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
+				} else {
+					settingUpdate("userSelectedOptionThree", "Delete Token", "enum")
+				}
+			} else {
+				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
+			}
+		}
+	}
+	def tokenPageText = "Your current token:\n\r\n\r${state.TpLinkToken}" + 
+		"\n\rAvailable actions:\n\r" +
 		"Update Token: Updates the token.\n\r" +
-		"Remove Token: Removes the token."
-		def errorMsgToken = "None"
+		"Remove Token: Removes the token.\n\r" +
+		"Update Credentials: Updates your out of date credentials so you can get a new token."
+		def errorMsgTok = "None"
 		if (state.TpLinkToken == null){
-			errorMsgToken = "You will be unable to control your devices until you get a new token."
+			errorMsgTok = "You will be unable to control your devices until you get a new token."
+		}
+		if (state.currentError != null){
+			errorMsgTok = "You may not be able to control your devices until you update your credentials."
 		}
 	dynamicPage(name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
 		section("") {
@@ -384,7 +419,7 @@ def tokenPage () {
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
 			paragraph title: "Information:", tokenPageText, image: getAppImg("information.png")
-			paragraph title: "Account Error:", errorMsgToken, image: getAppImg("error.png")
+			paragraph title: "Account Error:", errorMsgTok, image: getAppImg("error.png")
 		}
 		section("Account Status:") {
 			if (state.TpLinkToken != null){
@@ -393,14 +428,14 @@ def tokenPage () {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
 		}
-		section("Account Configuration:") {
+		section("User Configuration:") {
 			input(
 				"userSelectedOptionThree", "enum",
 				title: "What do you want to do?",
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Update Token", "Delete Token"]],
+				metadata: [values:["Update Token", "Delete Token", "Update Credentials"]],
 				image: getAppImg("token.png")
 			)
 			if (userSelectedOptionThree =~ "Update Token") {
@@ -410,12 +445,19 @@ def tokenPage () {
 				state.TpLinkToken = null
 			}
 		}
+		section("Extra Configuration:") {
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedReload){
+				setInitialStates()
+			}
+		}
 	}
 }
 
 //	----- DEVELOPER PAGE -----
 def devMode() {
 	getDevices()
+	def hiddenInput = 0
 	def devices = state.devices
 	def newDevices = [:]
 	def oldDevices = [:]
@@ -453,16 +495,17 @@ def devMode() {
 			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
 			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
-			href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089"){
+				href "hiddenPage", title: "xKiller Clan Page", description: "Tap to view", image: getAppImg("xkillerclan.png")
+			}
 			if (devModeLoaded){
 				href "devModeTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
-			href "forceUninstallPage", title: "Force Uninstall Page", description: "Tap to view", image: getAppImg("forceuninstallpage.png")
 		}
-		section("User Configuration:") {
+		section("Extra Configuration:") {
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
@@ -471,8 +514,13 @@ def devMode() {
 				"devModeLoaded", "bool",
 				title: "Do you want to enable developer testing page?",
 				submitOnChange: true,
+				required: false,
 				image: getAppImg("developer.png")
 			)
+			if (devModeLoaded && userSelectedReload || hiddenInput == 1){
+				hiddenInput = 1
+				input (name: "restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
+			}
 		}
 	}
 }
@@ -487,6 +535,10 @@ def devModeTestingPage() {
 	def errorMsgDev = "None"
 	def errorMsgNew = "None"
 	def errorMsgOld = "None"
+	def errorMsgTok = "None"
+		if (state.TpLinkToken == null){
+			errorMsgTok = "You will be unable to control your devices until you get a new token."
+		}
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (isChild) {
@@ -525,17 +577,12 @@ def devModeTestingPage() {
 			paragraph title: "Finding Devices Error:", errorMsgDev, image: getAppImg("error.png")
 			paragraph title: "New Devices Error:", errorMsgNew, image: getAppImg("error.png")
 			paragraph title: "Current Devices Error:", errorMsgOld, image: getAppImg("error.png")
+			paragraph title: "Account Error:", errorMsgTok, image: getAppImg("error.png")
 			paragraph title: "Error Count:", "${state.errorCount}", image: getAppImg("error.png")
 			paragraph title: "Current Error:", "${state.currentError}", image: getAppImg("error.png")
 			paragraph title: "Error Messages:", "${errMsg}", image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
-			)
 			input(
 				"userSelectedOptionTwo", "enum",
 				title: "What do you want to do?",
@@ -554,6 +601,31 @@ def devModeTestingPage() {
 				metadata: [values:["Initial Install", "Add/Remove Devices", "Update Token"]],
 				image: getAppImg("settings.png")
 			)
+			input(
+				"userSelectedOptionThree", "enum",
+				title: "What do you want to do?",
+				required: true,
+				multiple: false,
+				submitOnChange: true,
+				metadata: [values:["Update Token", "Delete Token", "Update Credentials"]],
+				image: getAppImg("token.png")
+			)
+		}
+		section("Extra Configuration:") {
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input(
+				"userSelectedDevMode", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+		}
+		section("Page Selector:") {
+			paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+			paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
 		section("Account Configuration:") {
 			input(
@@ -567,15 +639,6 @@ def devModeTestingPage() {
 				title: "TP-Link Kasa Account Password",
 				required: false,
 				image: getAppImg("password.png")
-			)
-			input(
-				"userSelectedOptionThree", "enum",
-				title: "What do you want to do?",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Update Token", "Delete Token"]],
-				image: getAppImg("token.png")
 			)
 		}
 		section("Device Configuration:") {
@@ -622,6 +685,59 @@ def devModeTestingPage() {
 				image: getAppImg("refresh.png")
 			)
 		}
+		section("Saving Settings:") {
+			paragraph sendingDataSuccess(), image: getAppImg("send.png")
+			paragraph sendingDataFailed(), image: getAppImg("issue.png")
+		}
+		section("Account Status:") {
+			paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			paragraph tokenInfoOffline(), image: getAppImg("error.png")
+		}
+	}
+}
+
+//	----- HIDDEN PAGE -----
+def hiddenPage () {
+	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had" 
+	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah, Weirdowack"
+	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
+	dynamicPage(name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("xkillerclan.png")
+		}
+		section("Members:") {
+			paragraph xkMembersInfo, image: getAppImg("information.png")
+			paragraph xkMembers, image: getAppImg("family.png")
+		}
+		section("Games:") {
+			paragraph xkGameInfo, image: getAppImg("information.png")
+			paragraph "Halo 2 For Windows Vista - RIP late 2015", image: getAppImg("halo2.png")
+			paragraph "Battlefield 3", image: getAppImg("battlefield3.png")
+			paragraph "Garrys Mod", image: getAppImg("garrysmod.png")
+			paragraph "Portal 2", image: getAppImg("portal2.png")
+			paragraph "Dead Speace 3", image: getAppImg("deadspace3.png")
+			paragraph "Clash of Clans - Clan Tag: #YYCLJ2YR", image: getAppImg("clashofclans.png")
+			paragraph "Halo The Master Chief Collection", image: getAppImg("halomcc.png")
+			paragraph "Clash Royale - Clan Tag: #209G8L9", image: getAppImg("clashroyale.png")
+			paragraph "Saints Row 3", image: getAppImg("saintsrow3.png")
+			paragraph "Boom Beach - Clan Tag: #92V92QCC", image: getAppImg("boombeach.png")
+			paragraph "Call of Duty Black Ops 2", image: getAppImg("callofdutyblackops2.png")
+			paragraph "Halo 5", image: getAppImg("halo5.png")
+			paragraph "Vainglory", image: getAppImg("vainglory.png")
+			paragraph "Minecraft Bedrock Edition", image: getAppImg("minecraft.png")
+		}
+		section("Easter Eggs:") {
+			href url: linkYoutubeEE1(), style:"external", required: false, title:"Youtube Link #1", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE2(), style:"external", required: false, title:"Youtube Link #2", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE3(), style:"external", required: false, title:"Youtube Link #3", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+		}
+		section("Contact:") {
+			href url: linkDiscord(), style:"external", required: false, title:"Discord", description:"Tap to open in browser", state: "complete", image: getAppImg("discord.png")
+			href url: linkWaypoint(), style:"external", required: false, title:"Halo Waypoint", description:"Tap to open in browser", state: "complete", image: getAppImg("waypoint.ico")
+			href url: linkXbox(), style:"external", required: false, title:"Xbox", description:"Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
+			href url: linkSteam(), style:"external", required: false, title:"Steam", description:"Tap to open in browser", state: "complete", image: getAppImg("steam.png")
+			href url: linkFacebook(), style:"external", required: false, title:"Facebook", description:"Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
+		}
 	}
 }
 
@@ -643,9 +759,9 @@ def aboutPage() {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("GitHub:") {
-			href url: textGitHubLinkDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: textGitHubLinkAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: textGitHubLinkAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
@@ -678,6 +794,25 @@ def uninstallPage() {
 		}
 		remove("Remove ${appLabel()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
 	}
+}
+
+void settingUpdate(name, value, type=null) {
+	log.trace "settingUpdate($name, $value, $type)..."
+	if(name) {
+		if(value == "" || value == null || value == []) {
+			settingRemove(name)
+			return
+		}
+	}
+	if(name && type) {
+		app?.updateSetting("$name", [type: "$type", value: value])
+	}
+	else if (name && type == null){ app?.updateSetting(name.toString(), value) }
+}
+
+void settingRemove(name) {
+	log.trace "settingRemove($name)..."
+	if(name) { app?.deleteSetting("$name") }
 }
 
 def getDevices() {
@@ -1006,6 +1141,7 @@ def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
 def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
 def pageSelectorText()	{ return "Please tap below to continue" }
 def pageSelectorNullText()	{ return "Please select a option to continue" }
+def pageSelectorErrorText()	{ return "Please continue with caution, we have detected a error" }
 def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
@@ -1020,8 +1156,16 @@ def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
 def textDonateLinkAntR(){ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
-def textGitHubLinkDavG(){ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
-def textGitHubLinkAntR(){ return "https://github.com/${gitRepo()}/" }
-def textGitHubLinkAntS(){ return "https://github.com/tonesto7/nest-manager" }
+def linkGitHubDavG(){ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+def linkGitHubAntR(){ return "https://github.com/${gitRepo()}/" }
+def linkGitHubAntS(){ return "https://github.com/tonesto7/nest-manager" }
+def linkYoutubeEE1(){ return "https://www.youtube.com/watch?v=87JPlNk5ves&list=PL0S-Da7zGmE9PRn_YIitvUZEHYQglJw" }
+def linkYoutubeEE2(){ return "https://www.youtube.com/watch?v=0eYTZrucx_o" }
+def linkYoutubeEE3(){ return "https://www.youtube.com/watch?v=4_5kpOeiZyg&index=3&list=PL0S-Da7zGmE-i5MQdHORm6a" }
+def linkDiscord(){ return "https://discord.gg/JDXeV23" }
+def linkXbox(){ return "https://account.xbox.com/en-us/clubs/profile?clubid=3379843591790358" }
+def linkWaypoint(){ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
+def linkSteam(){ return "https://steamcommunity.com/groups/xKillerClan" }
+def linkFacebook(){ return "https://www.facebook.com/groups/xKillerClan/" }
 def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc() { return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
