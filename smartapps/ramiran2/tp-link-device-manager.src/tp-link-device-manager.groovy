@@ -221,7 +221,7 @@ def authPage() {
 //	----- MAIN PAGE -----
 def mainPage() {
 	if (userSelectedAssistant){
-		mainPage()
+		
 	}
 	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
