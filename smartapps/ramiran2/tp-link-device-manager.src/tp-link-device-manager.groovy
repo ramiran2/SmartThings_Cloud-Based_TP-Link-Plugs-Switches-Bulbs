@@ -283,7 +283,7 @@ def mainPage() {
 			if (userSelectedAssistant){
 				input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
 			}
-			if (userSelectedReload){
+			if (mainPageSync){
 				settingUpdate("mainPageSync", "false", "bool")
 			}
 		}
