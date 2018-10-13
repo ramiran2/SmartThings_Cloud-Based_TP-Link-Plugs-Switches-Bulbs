@@ -90,14 +90,11 @@ def setRecommendedOptions() {
 		}
 		if (state.TpLinkToken != null){
 			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
-			return mainPage()
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null){
 				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
-				return mainPage()
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
-				return mainPage()
 			}
 		}
 		if (newDevices != [:]){
@@ -223,6 +220,9 @@ def authPage() {
 
 //	----- MAIN PAGE -----
 def mainPage() {
+	if (userSelectedAssistant){
+		return mainPage()
+	}
 	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
