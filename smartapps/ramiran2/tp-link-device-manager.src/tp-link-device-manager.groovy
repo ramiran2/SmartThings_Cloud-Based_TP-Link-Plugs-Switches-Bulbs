@@ -70,6 +70,19 @@ def setInitialStates() {
 
 def setRecommendedOptions() {
 	if (userSelectedAssistant){
+		getDevices()
+		def devices = state.devices
+		def newDevices = [:]
+		def oldDevices = [:]
+		devices.each {
+			def isChild = getChildDevice(it.value.deviceMac)
+			if (isChild) {
+				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+			if (!isChild) {
+				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null){
 			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
 		} else {
@@ -82,6 +95,13 @@ def setRecommendedOptions() {
 				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
+			}
+		}
+		if (newDevices != [:]){
+			settingUpdate("userSelectedRemoveMode", "false", "bool")
+		} else {
+			if (oldDevices != [:]){
+				settingUpdate("userSelectedRemoveMode", "true", "bool")
 			}
 		}
 		if (state.currentError != null){
@@ -274,15 +294,6 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedAssistant) {
-		if (newDevices == [:]){
-			if (oldDevices != [:]){
-				settingUpdate("userSelectedRemoveMode", "true", "bool")
-			}
-		} else {
-			settingUpdate("userSelectedRemoveMode", "false", "bool")
-		}
-	}
 	if (userSelectedOptionTwo =~ "Activate Account") {
 		getToken()
 	}
