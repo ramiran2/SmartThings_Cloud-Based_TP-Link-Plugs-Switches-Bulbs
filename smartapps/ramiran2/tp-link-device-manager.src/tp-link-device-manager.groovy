@@ -64,6 +64,7 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 	settingUpdate("userSelectedReload", "false", "bool")
 	settingUpdate("userSelectedRemoveMode", "false", "bool")
+	settingUpdate("mainPageSync", "false", "bool")
 	settingUpdate("userSelectedDevicesRemove", "", "enum")
 	settingUpdate("userSelectedDevicesAdd", "", "enum")
 }
@@ -220,9 +221,6 @@ def authPage() {
 
 //	----- MAIN PAGE -----
 def mainPage() {
-	if (userSelectedAssistant){
-		
-	}
 	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
@@ -282,9 +280,11 @@ def mainPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedAssistant){
+				input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
+			}
 			if (userSelectedReload){
-				setInitialStates()
+				settingUpdate("mainPageSync", "false", "bool")
 			}
 		}
 		section("Help and Feedback:") {
@@ -629,6 +629,7 @@ def devModeTestingPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
