@@ -123,10 +123,10 @@ def setRecommendedOptions() {
 //	----- START PAGE -----
 def startPage() {
 	setInitialStates()
-	setRecommendedOptions()
 	if ("${userName}" =~ null || "${userPassword}" =~ null){
 		return authPage()
 	} else {
+		setRecommendedOptions()
 		return mainPage()
 	}
 }
