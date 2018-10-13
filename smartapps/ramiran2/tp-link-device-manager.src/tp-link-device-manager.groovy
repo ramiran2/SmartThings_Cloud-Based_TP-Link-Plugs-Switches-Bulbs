@@ -180,9 +180,12 @@ def authPage() {
 				metadata: [values:["Activate Account", "Update Account", "About Application"]],
 				image: getAppImg("settings.png")
 			)
+			if (userSelectedOptionTwo =~ "Activate Account") {
+				getToken()
+			}
 		}
 		section("Page Selector:") {
-			if (userSelectedOptionTwo =~ "Activate Account" || userSelectedOptionTwo =~ "Update Account" || userSelectedOptionTwo =~ "About Application") {
+			if (userSelectedOptionTwo != null) {
 				if (state.currentError != null){
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
@@ -202,7 +205,7 @@ def authPage() {
 			}
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
 				"userSelectedDevMode", "bool",
 				title: "Do you want to enable developer mode?",
@@ -253,7 +256,7 @@ def mainPage() {
 			)
 		}
 		section("Page Selector:") {
-			if (userSelectedOptionOne =~ "Initial Install" || userSelectedOptionOne =~ "Add/Remove Devices" || userSelectedOptionOne =~ "Update Token") {
+			if (userSelectedOptionOne != null) {
 				if (state.currentError != null){
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
@@ -294,9 +297,6 @@ def mainPage() {
 
 //	----- SELECT DEVICES PAGE -----
 def selectDevices() {
-	if (userSelectedOptionTwo =~ "Activate Account") {
-		getToken()
-	}
 	getDevices()
 	def devices = state.devices
 	def errorMsgDev = "None"
