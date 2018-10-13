@@ -90,11 +90,14 @@ def setRecommendedOptions() {
 		}
 		if (state.TpLinkToken != null){
 			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
+			settingUpdate("userSelectedReload", "true", "bool")
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null){
 				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
+				settingUpdate("userSelectedReload", "true", "bool")
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
+				settingUpdate("userSelectedReload", "true", "bool")
 			}
 		}
 		if (newDevices != [:]){
@@ -279,6 +282,10 @@ def mainPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			if (userSelectedReload){
+				setInitialStates()
+			}
 		}
 		section("Help and Feedback:") {
 			if (userSelectedDevMode){
@@ -455,7 +462,7 @@ def tokenPage () {
 			}
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
 			}
@@ -515,7 +522,7 @@ def devMode() {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
 			}
@@ -622,7 +629,7 @@ def devModeTestingPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
 				"userSelectedDevMode", "bool",
