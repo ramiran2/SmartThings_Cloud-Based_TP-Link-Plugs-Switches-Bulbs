@@ -40,7 +40,7 @@ definition(
 )
 
 def appVersion() { return "3.5.0" }
-def appVerDate() { return "10-11-2018" }
+def appVerDate() { return "10-13-2018" }
 def driverVersionsMin() { return "3.2.0" }
 
 preferences {
@@ -68,9 +68,42 @@ def setInitialStates() {
 	settingRemove("userSelectedDevicesAdd")
 }
 
+def setRecommendedOptions() {
+	if (userSelectedAssistant){
+		if ("${userName}" =~ null || "${userPassword}" =~ null){
+			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
+		} else {
+			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
+		}
+		if (state.TpLinkToken != null){
+			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
+		} else {
+			if ("${userName}" =~ null || "${userPassword}" =~ null){
+				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
+			} else {
+				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
+			}
+		}
+		if (state.currentError != null){
+			settingUpdate("userSelectedOptionThree", "Update Credentials", "enum")
+		} else {
+			if (state.TpLinkToken != null){
+				if (userSelectedOptionTwo =~ "Update Account") {
+					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
+				} else {
+					settingUpdate("userSelectedOptionThree", "Delete Token", "enum")
+				}
+			} else {
+				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
+			}
+		}
+	}
+}
+
 //	----- START PAGE -----
 def startPage() {
 	setInitialStates()
+	setRecommendedOptions()
 	if ("${userName}" =~ null || "${userPassword}" =~ null){
 		return authPage()
 	} else {
@@ -80,13 +113,6 @@ def startPage() {
 
 //	----- AUTH PAGE -----
 def authPage() {
-	if (userSelectedAssistant){
-		if ("${userName}" =~ null || "${userPassword}" =~ null){
-			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
-		} else {
-			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
-		}
-	}
 	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\n\rAvailable actions:\n\r" +
@@ -169,17 +195,6 @@ def authPage() {
 
 //	----- MAIN PAGE -----
 def mainPage() {
-	if (userSelectedAssistant){
-		if (state.TpLinkToken != null){
-			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
-		} else {
-			if ("${userName}" =~ null || "${userPassword}" =~ null){
-				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
-			} else {
-				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
-			}
-		}
-	}
 	def mainPageText = "Available actions:\n\r" +
 		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
 		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
@@ -386,21 +401,6 @@ def selectDevices() {
 
 //	----- TOKEN MANAGER PAGE -----
 def tokenPage () {
-	if (userSelectedAssistant) {
-		if (state.currentError != null){
-			settingUpdate("userSelectedOptionThree", "Update Credentials", "enum")
-		} else {
-			if (state.TpLinkToken != null){
-				if (userSelectedOptionTwo =~ "Update Account") {
-					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
-				} else {
-					settingUpdate("userSelectedOptionThree", "Delete Token", "enum")
-				}
-			} else {
-				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
-			}
-		}
-	}
 	def tokenPageText = "Your current token:\n\r\n\r${state.TpLinkToken}" + 
 		"\n\rAvailable actions:\n\r" +
 		"Update Token: Updates the token.\n\r" +
