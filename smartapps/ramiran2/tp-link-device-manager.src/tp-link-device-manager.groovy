@@ -359,7 +359,7 @@ def selectDevices() {
 					multiple: true,
 					submitOnChange: true,
 					title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)",
-					options: oldDevices,
+					metadata: [values:oldDevices],
 					image: getAppImg("devices.png")
 				)
 			} else {
@@ -369,7 +369,7 @@ def selectDevices() {
 					multiple: true,
 					submitOnChange: true,
 					title: "Select Devices to Add (${newDevices.size() ?: 0} found)",
-					options: newDevices,
+					metadata: [values:newDevices],
 					image: getAppImg("devices.png")
 				)
 			}
@@ -1078,7 +1078,7 @@ def initialize() {
 	unschedule()
 	runEvery5Minutes(checkError)
 	schedule("0 30 2 ? * WED", getToken)
-	if (selectedDevices) {
+	if (userSelectedDevicesAdd || userSelectedDevicesRemove) {
 		if (userSelectedRemoveMode){
 			removeDevices()
 		} else {
