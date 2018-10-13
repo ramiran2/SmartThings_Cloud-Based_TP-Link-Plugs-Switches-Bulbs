@@ -161,12 +161,14 @@ def authPage() {
 				"userName", "email",
 				title: "TP-Link Kasa Email Address",
 				required: true,
+				submitOnChange: true,
 				image: getAppImg("email.png")
 			)
 			input(
 				"userPassword", "password",
 				title: "TP-Link Kasa Account Password",
 				required: true,
+				submitOnChange: true,
 				image: getAppImg("password.png")
 			)
 		}
@@ -205,7 +207,7 @@ def authPage() {
 			}
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
 				"userSelectedDevMode", "bool",
 				title: "Do you want to enable developer mode?",
@@ -276,7 +278,7 @@ def mainPage() {
 			}
 		}
 		section("Extra Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 		}
 		section("Help and Feedback:") {
 			if (userSelectedDevMode){
@@ -453,7 +455,7 @@ def tokenPage () {
 			}
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
 			}
@@ -513,7 +515,7 @@ def devMode() {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		section("Extra Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
 			}
@@ -619,9 +621,9 @@ def devModeTestingPage() {
 			)
 		}
 		section("Extra Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("sync.png"))
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "userSelectedReload", type: "bool", title: "Do you want to resync your devices current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
 				"userSelectedDevMode", "bool",
 				title: "Do you want to enable developer mode?",
