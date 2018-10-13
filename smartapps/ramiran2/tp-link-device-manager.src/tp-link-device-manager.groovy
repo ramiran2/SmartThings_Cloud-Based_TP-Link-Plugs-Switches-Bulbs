@@ -91,22 +91,16 @@ def setRecommendedOptions() {
 		if (state.TpLinkToken != null){
 			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
 			settingUpdate("userSelectedReload", "true", "bool")
-			if (userSelectedReload){
-				setInitialStates()
-			}
+			setInitialStates()
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null){
 				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
 				settingUpdate("userSelectedReload", "true", "bool")
-				if (userSelectedReload){
-					setInitialStates()
-				}
+				setInitialStates()
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
 				settingUpdate("userSelectedReload", "true", "bool")
-				if (userSelectedReload){
-					setInitialStates()
-				}
+				setInitialStates()
 			}
 		}
 		if (newDevices != [:]){
