@@ -358,8 +358,8 @@ def selectDevices() {
 					required: true,
 					multiple: true,
 					submitOnChange: true,
-					title: "Select Devices (${oldDevices.size() ?: 0} found)",
-					metadata: [values:oldDevices],
+					title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)",
+					options: oldDevices,
 					image: getAppImg("devices.png")
 				)
 			} else {
@@ -368,8 +368,8 @@ def selectDevices() {
 					required: true,
 					multiple: true,
 					submitOnChange: true,
-					title: "Select Devices (${newDevices.size() ?: 0} found)",
-					metadata: [values:newDevices],
+					title: "Select Devices to Add (${newDevices.size() ?: 0} found)",
+					options: newDevices,
 					image: getAppImg("devices.png")
 				)
 			}
