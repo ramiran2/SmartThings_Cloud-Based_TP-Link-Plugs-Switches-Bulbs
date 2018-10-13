@@ -64,8 +64,8 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 	settingUpdate("userSelectedReload", "false", "bool")
 	settingUpdate("userSelectedRemoveMode", "false", "bool")
-	settingRemove("userSelectedDevicesRemove")
-	settingRemove("userSelectedDevicesAdd")
+	settingUpdate("userSelectedDevicesRemove", "", "enum")
+	settingUpdate("userSelectedDevicesAdd", "", "enum")
 }
 
 def setRecommendedOptions() {
@@ -375,13 +375,9 @@ def selectDevices() {
 			}
 		}
 		section("Saving Settings:") {
-			if (userLightTransTime != null || userRefreshRate != null){
-				if (userLightTransTime) {
-					sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
-				}
-				if (userRefreshRate) {
-					sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
-				}
+			if (userLightTransTime != null && userRefreshRate != null){
+				sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
+				sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
 				paragraph sendingDataSuccess(), image: getAppImg("send.png")
 			} else {
 				paragraph sendingDataFailed(), image: getAppImg("issue.png")
