@@ -7,8 +7,6 @@ TP-Link Connect Service Manager, 2018 Version 3 / TP-Link Device Manager, 2018 V
 TP Link Bulbs Device Handler, 2018 Version 3
 TP-Link Plug and Switch Device Handler, 2018, Version 3
 
-Copyright 2018 Dave Gutheinz, Anthony Ramirez
-
 Licensed under the Apache License, Version 2.0 (the "License"); you
 may not use this file except in compliance with the License. You may
 obtain a copy of the License at:
