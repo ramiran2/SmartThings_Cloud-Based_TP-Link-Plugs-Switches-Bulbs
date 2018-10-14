@@ -537,7 +537,7 @@ def devMode() {
 			)
 			if (devModeLoaded && userSelectedReload || hiddenInput == 1){
 				hiddenInput = 1
-				input (name: "restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
+				input (name: "restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: Maverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
 		}
 	}
@@ -718,7 +718,7 @@ def devModeTestingPage() {
 //	----- HIDDEN PAGE -----
 def hiddenPage () {
 	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had" 
-	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah, Weirdowack"
+	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah,xKillerSierra, Weirdowack"
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
 	dynamicPage(name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
 		section("") {
@@ -736,13 +736,13 @@ def hiddenPage () {
 			paragraph "Portal 2", image: getAppImg("portal2.png")
 			paragraph "Dead Speace 3", image: getAppImg("deadspace3.png")
 			paragraph "Clash of Clans - Clan Tag: #YYCLJ2YR", image: getAppImg("clashofclans.png")
-			paragraph "Halo The Master Chief Collection", image: getAppImg("halomcc.png")
+			paragraph "Halo: The Master Chief Collection", image: getAppImg("halomcc.png")
 			paragraph "Clash Royale - Clan Tag: #209G8L9", image: getAppImg("clashroyale.png")
 			paragraph "Saints Row 3", image: getAppImg("saintsrow3.png")
 			paragraph "Boom Beach - Clan Tag: #92V92QCC", image: getAppImg("boombeach.png")
 			paragraph "Call of Duty Black Ops 2", image: getAppImg("callofdutyblackops2.png")
-			paragraph "Halo 5", image: getAppImg("halo5.png")
-			paragraph "Vainglory", image: getAppImg("vainglory.png")
+			paragraph "Halo 5 Guardians", image: getAppImg("halo5.png")
+			paragraph "Vainglory - Guild: XKILLER, Team: xKiller Clan", image: getAppImg("vainglory.png")
 			paragraph "Minecraft Bedrock Edition", image: getAppImg("minecraft.png")
 		}
 		section("Easter Eggs:") {
@@ -770,9 +770,12 @@ def aboutPage() {
 			href url: textDonateLinkAntR(), style:"external", required: false, title:"Donations (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
-			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete"
-			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete"
-			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete"
+			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
+			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete", image: getAppImg("bigmac.png")
+			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089"){
+			paragraph title: "Unknown:", "Lindsey M.", state: "complete", image: getAppImg("unknown.png")
+			}
+			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete", image: getAppImg("tonesto7.png")
 		}
 		section("Application Changes Details:") {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
