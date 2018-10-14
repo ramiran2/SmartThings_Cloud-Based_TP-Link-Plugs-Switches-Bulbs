@@ -280,8 +280,10 @@ def mainPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			if (userSelectedAssistant){
+			if (setRecommendedOptions){
 				input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
+			}  else {
+				input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			}
 			if (mainPageSync){
 				settingUpdate("mainPageSync", "false", "bool")
