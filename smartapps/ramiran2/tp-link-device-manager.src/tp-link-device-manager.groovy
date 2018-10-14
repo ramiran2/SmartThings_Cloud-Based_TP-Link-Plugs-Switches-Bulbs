@@ -773,7 +773,7 @@ def aboutPage() {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
 			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete", image: getAppImg("bigmac.png")
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089"){
-			paragraph title: "Unknown:", "Lindsey M.", state: "complete", image: getAppImg("unknown.png")
+			paragraph title: "Unknown:", "Lindsey M. (@Unknown)", state: "complete", image: getAppImg("unknown.png")
 			}
 			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete", image: getAppImg("tonesto7.png")
 		}
