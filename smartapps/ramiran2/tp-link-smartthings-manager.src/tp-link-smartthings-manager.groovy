@@ -519,7 +519,7 @@ def tokenPage () {
 }
 
 //	----- DEVELOPER PAGE -----
-def devMode() {
+def developerPage() {
 	getDevices()
 	def hiddenInput = 0
 	def devices = state.devices
@@ -537,7 +537,7 @@ def devMode() {
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	return dynamicPage(
-		name: "devMode",
+		name: "developerPage",
 		title: "Developer Page",
 		install: false,
 		uninstall: false) {
