@@ -1,8 +1,9 @@
 /*	
 TP Link Bulbs Device Handler, 2018 Version 3
-Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
-Licensed under the Apache License, Version 2.0(the "License");
+	Copyright 2018 Dave Gutheinz, Anthony Ramirez
+
+Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the
 License. You may obtain a copy of the License at:
 
@@ -15,31 +16,28 @@ either express or implied. See the License for the specific
 language governing permissions and limitations under the 
 License.
 
-Discalimer:  This Service Manager and the associated Device 
-Handlers are in no way sanctioned or supported by TP-Link.  
+Discalimer: This Service Manager and the associated Device 
+Handlers are in no way sanctioned or supported by TP-Link. 
 All development is based upon open-source data on the 
-TP-Link Kasa Devices; primarily various users on GitHub.com.
+TP-Link devices; primarily various users on GitHub.com.
 
-	===== Bulb Identifier.  DO NOT EDIT ====================*/
+	===== Bulb Identifier. DO NOT EDIT ====================*/
 	//def deviceType = "Soft White Bulb"	//	Soft White
-	def deviceType = "Tunable White Bulb"	//	ColorTemp
+	def deviceType = "Tunable White Bulb"	//	Color Temp
 	//def deviceType = "Color Bulb"			//	Color
 //	===== Hub or Cloud Installation ==========================
 	def installType = "Kasa Account"
 	//def installType = "Node Applet"
 //	==========================================================
 
-import java.text.SimpleDateFormat
-import groovy.time.*
-
-def devVer() { return "3.1.3" }
+def devVer() { return "3.2.0" }
 
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} Energy Monitor - ${installType}",
 				namespace: "ramiran2",
 				author: "Dave Gutheinz, Anthony Ramirez",
 				deviceType: "${deviceType}",
-				energyMonitorMode: "Energy Monitor",
+				energyMonitor: "Energy Monitor",
 				ocfDeviceType: "oic.d.light",
 				mnmn: "SmartThings",
 				vid: "generic-rgbw-color-bulb",
@@ -50,6 +48,7 @@ metadata {
 		capability "polling"
 		capability "Sensor"
 		capability "Actuator"
+		capability "Health Check"
 		if (deviceType =~ "Tunable White Bulb" || "Color Bulb") {
 			capability "Color Temperature"
 			command "setModeNormal"
@@ -63,10 +62,9 @@ metadata {
 		command "getPower"
 		capability "Energy Meter"
 		command "getEnergyStats"
-		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "lightingTransitionTime", "string"
-		attribute "deviceRefreshRate", "string"
+		attribute "lightTransTime", "string"
+		attribute "refreshRate", "string"
 		attribute "monthTotalE", "string"
 		attribute "monthAvgE", "string"
 		attribute "weekTotalE", "string"
@@ -96,14 +94,12 @@ metadata {
 				}
 			}
 		}
-		
 		standardTile("refresh", "capability.refresh", width: 2, height: 1, decoration: "flat") {
 			state "default", label:"Refresh", action:"refresh.refresh"
 		}
-		
 		if (deviceType =~ "Tunable White Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
-			range:"(2500..6500)") {
+			range:"(2700..6500)") {
 				state "colorTemperature", action:"color temperature.setColorTemperature"
 			}
 		} else if (deviceType =~ "Color Bulb") {
@@ -112,71 +108,58 @@ metadata {
 				state "colorTemperature", action:"color temperature.setColorTemperature"
 			}
 		}
-		
 		valueTile("colorTemp", "default", inactiveLabel: false, decoration: "flat", height: 1, width: 2) {
 			state "default", label: 'Color\n\rTemperature'
 		}
-		
 		standardTile("bulbMode", "bulbMode", width: 2, height: 1, decoration: "flat") {
 			state "normal", label:'Circadian\n\rOFF', action:"setModeCircadian", nextState: "circadian"
 			state "circadian", label:'Circadian\n\rOn', action:"setModeNormal", nextState: "normal"
 		}
-
 		valueTile("currentPower", "device.power", decoration: "flat", height: 1, width: 2) {
 			state "power", label: 'Current Power \n\r ${currentValue} W'
 		}
-
 		valueTile("energyToday", "device.energy", decoration: "flat", height: 1, width: 2) {
 			state "energy", label: 'Usage Today\n\r${currentValue} WattHr'
 		}
-
 		valueTile("monthTotal", "device.monthTotalE", decoration: "flat", height: 1, width: 2) {
 			state "monthTotalE", label: '30 Day Total\n\r ${currentValue} KWH'
 		}
-
 		valueTile("monthAverage", "device.monthAvgE", decoration: "flat", height: 1, width: 2) {
 			state "monthAvgE", label: '30 Day Avg\n\r ${currentValue} KWH'
 		}
- 
 		valueTile("weekTotal", "device.weekTotalE", decoration: "flat", height: 1, width: 2) {
 			state "weekTotalE", label: '7 Day Total\n\r ${currentValue} KWH'
 		}
-
 		valueTile("weekAverage", "device.weekAvgE", decoration: "flat", height: 1, width: 2) {
 			state "weekAvgE", label: '7 Day Avg\n\r ${currentValue} KWH'
 		}
-
 		valueTile("2x1Blank", "default", decoration: "flat", height: 1, width: 2) {
 			state "default", label: ''
 		}
-		
 		valueTile("2x4Blank", "default", decoration: "flat", height: 2, width: 4) {
 			state "default", label: ''
 		}
-		
 		valueTile("4x1Blank", "default", decoration: "flat", height: 1, width: 4) {
 			state "default", label: ''
 		}
-
 		main("switch")
 		if (deviceType =~ "Soft White Bulb") {
 			details("switch", "refresh", "4x1Blank", 
 					"currentPower", "weekTotal", "monthTotal", 
 					"energyToday", "weekAverage", "monthAverage")
 		} else {
-			details("switch", "colorTemp", "bulbMode", "refresh", 
+			details("switch", "ColorTemp", "bulbMode", "refresh", 
 					"colorTempSliderControl", "4x1Blank",
 					"currentPower", "weekTotal", "monthTotal",
 					"energyToday", "weekAverage", "monthAverage")
 		}
 	}
-
 	def rates = [:]
+	rates << ["1" : "Refresh every minute (Not Recommended)"]
 	rates << ["5" : "Refresh every 5 minutes"]
 	rates << ["10" : "Refresh every 10 minutes"]
 	rates << ["15" : "Refresh every 15 minutes"]
-	rates << ["30" : "Refresh every 30 minutes"]
-
+	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
 	preferences {
 		if (installType =~ "Node Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
@@ -187,12 +170,13 @@ metadata {
 	}
 }
 
-simulator {
-	status "on": "on/off: 1" 
-	status "off": "on/off: 0"
-}
-
-//	===== Device Health Check / Driver Version =====
+//	===== Update when installed or setting changed =====
+/*	Health Check Implementation
+	1.	Each time a command is sent, the DeviceWatch-Status
+		is set to on- or off-line.
+	2.	Refresh is run every 15 minutes to provide a min
+		cueing of this.
+	3.	Is valid for either hub or cloud based device.*/
 def initialize() {
 	log.trace "Initialized..."
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
@@ -201,45 +185,7 @@ def initialize() {
 
 def ping() {
 	log.trace "Ping..."
-	keepAwakeEvent()
-}
-
-def keepAwakeEvent() {
-	def lastDt = state?.lastUpdatedDtFmt
-	if(lastDt) {
-		def ldtSec = getTimeDiffSeconds(lastDt)
-		//log.debug "ldtSec: $ldtSec"
-		if(ldtSec < 1900) {
-			poll()
-		}
-	}
-}
-
-
-def lastUpdatedEvent(sendEvt=false) {
-	def now = new Date()
-	def formatVal = state?.useMilitaryTime ? "MMM d, yyyy - HH:mm:ss" : "MMM d, yyyy - h:mm:ss a"
-	def tf = new SimpleDateFormat(formatVal)
-		tf.setTimeZone(getTimeZone())
-	def lastDt = "${tf?.format(now)}"
-	state?.lastUpdatedDt = lastDt?.toString()
-	state?.lastUpdatedDtFmt = getDtNow()
-	if(sendEvt) {
-		log.trace "Last Parent Refresh time: (${lastDt}) | Previous Time: (${lastUpd})"
-		sendEvent(name: 'lastUpdatedDt', value: getDtNow()?.toString(), displayed: false, isStateChange: true)
-	}
-}
-
-def getDtNow() {
-	def now = new Date()
-	return formatDt(now)
-}
-
-def getTimeZone() {
-	def tz = null
-	if(location?.timeZone) { tz = location?.timeZone }
-	if(!tz) { log.warn "getTimeZone: Hub TimeZone is not found ..." }
-	return tz
+	refresh()
 }
 
 //	===== Update when installed or setting changed =====
@@ -253,42 +199,35 @@ def updated() {
 	runIn(2, update)
 }
 
+/*	__________________________________________________________
+	Updated refresh rates and light trans time to call routine
+	at bottom of page
+	__________________________________________________________
+*/
 def update() {
 	log.trace "Update..."
-	unschedule()
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
-	state.emon = metadata.definition.energyMonitorMode
+	state.emon = metadata.definition.energyMonitor
 	state.emeterText = "smartlife.iot.common.emeter"
 	state.getTimeText = "smartlife.iot.common.timesetting"
-	switch(refreshRate) {
-		case "5":
-			runEvery5Minutes(refresh)
-			log.info "Refresh Scheduled for every 5 minutes"
-			break
-		case "10":
-			runEvery10Minutes(refresh)
-			log.info "Refresh Scheduled for every 10 minutes"
-			break
-		case "15":
-			runEvery15Minutes(refresh)
-			log.info "Refresh Scheduled for every 15 minutes"
-			break
-		default:
-			runEvery30Minutes(refresh)
-			log.info "Refresh Scheduled for every 30 minutes"
+	unschedule()
+	if (refreshRate) {
+		setRefreshRate(refreshRate)
+	} else {
+		setRefreshRate(30)
 	}
 	if (lightTransTime >= 0 && lightTransTime <= 60) {
-		state.transTime = 1000 * lightTransTime
+ 	def adjustedTime = lightTransTime*1000
+		setLightTransTime(adjustedTime)
 	} else {
-		state.transTime = 5000
+		setLightTransTime(5000)
 	}
 	schedule("0 05 0 * * ?", setCurrentDate)
 	schedule("0 10 0 * * ?", getEnergyStats)
 	setCurrentDate()
 	runIn(2, refresh)
 	runIn(7, getEnergyStats)
-	runIn( 5, "initialize")
 }
 
 void uninstalled() {
@@ -347,6 +286,7 @@ def poll() {
 def refresh(){
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 	runIn(2, getPower)
+	runIn(7, getConsumption)
 }
 
 def commandResponse(cmdResponse){
@@ -372,7 +312,7 @@ def commandResponse(cmdResponse){
 	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "switch", value: onOff)
  	sendEvent(name: "level", value: level)
-	if (state.deviceType =~ "Tunable White Bulb" || state.deviceType =~ "Color Bulb") {
+	if (state.deviceType =~ "Tunable White Bulb" || "Color Bulb") {
 		sendEvent(name: "bulbMode", value: mode)
 		sendEvent(name: "colorTemperature", value: color_temp)
 	}
@@ -387,13 +327,14 @@ def commandResponse(cmdResponse){
 def getPower(){
 	if (state.emon =~ "Energy Monitor") {
 		sendCmdtoServer("""{"${state.emeterText}":{"get_realtime":{}}}""", "deviceCommand", "energyMeterResponse")
-		runIn(5, getConsumption)
 	}
 }
 
 def energyMeterResponse(cmdResponse) {
-	if (cmdResponse[state.emeterText].err_code == -1) {
-		log.error "${device.name} ${device.label}: does not support Energy Monitor.  Energy Monitor disabled."
+	if (state.emon == "Standard") {
+		return
+	} else if (cmdResponse[state.emeterText].err_code == -1) {
+		log.error "${device.name} ${device.label}: does not support Energy Monitor. Energy Monitor disabled."
 		state.emon = "Standard"
 		unschedule(getEnergyStats)
 	} else {
@@ -469,7 +410,7 @@ def getPrevMonth() {
 }
 
 def getJan() {
-//	Gets January data on March 1 and 2.  Only accessed if current month = 3
+//	Gets January data on March 1 and 2. Only accessed if current month = 3
 //	and start month = 1
 	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthStart}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
 }
@@ -478,7 +419,7 @@ def engrStatsResponse(cmdResponse) {
 /*	
 	This method parses up to two energy status messages from the device,
 	adding the energy for the previous 30 days and week, ignoring the
-	current day.  It then calculates the 30 and 7 day average formatted
+	current day. It then calculates the 30 and 7 day average formatted
 	in kiloWattHours to two decimal places.
 */
 	def dayList = cmdResponse[state.emeterText]["get_daystat"].day_list
@@ -490,7 +431,7 @@ def engrStatsResponse(cmdResponse) {
 	def wkTotEnergy = state.wkTotEnergy
 	def monTotDays = state.monTotDays
 	def wkTotDays = state.wkTotDays
-    def startDay = state.dayStart
+  def startDay = state.dayStart
 	def dataMonth = dayList[0].month
 	if (dataMonth == state.monthToday) {
 		for (int i = 0; i < dayList.size(); i++) {
@@ -509,7 +450,7 @@ def engrStatsResponse(cmdResponse) {
 			}
 		}
 	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
-    	startDay = 1
+  	startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -548,10 +489,10 @@ def engrStatsResponse(cmdResponse) {
 	state.wkTotEnergy = wkTotEnergy
 	state.wkTotDays = wkTotDays
 	log.info "$device.name $device.label: Update 7 and 30 day energy consumption statistics"
-    if (monTotDays == 0) {
-    	//	Aviod divide by zero on 1st of month
-    	monTotDays = 1
-        wkTotDays = 1 
+  if (monTotDays == 0) {
+  	//	Aviod divide by zero on 1st of month
+  	monTotDays = 1
+    wkTotDays = 1 
 	}
 	def monAvgEnergy = monTotEnergy/monTotDays
 	def wkAvgEnergy = wkTotEnergy/wkTotDays
@@ -578,7 +519,7 @@ def setCurrentDate() {
 }
 
 def currentDateResponse(cmdResponse) {
-	def currDate =  cmdResponse["smartlife.iot.common.timesetting"]["get_time"]
+	def currDate = cmdResponse["smartlife.iot.common.timesetting"]["get_time"]
 	state.dayToday = currDate.mday.toInteger()
 	state.monthToday = currDate.month.toInteger()
 	state.yearToday = currDate.year.toInteger()
@@ -610,11 +551,11 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(0,5) =~ "ERROR"){
-		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
 		sendEvent(name: "switch", value: "Unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
+		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""
 	} else {
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
@@ -641,14 +582,14 @@ def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse =~ "TcpTimeout") {
-		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
-		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR - OffLine in hubResponseParse")
+		sendEvent(name: "switch", value: "offline", descriptionText: "Error - Offline in hubResponseParse")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
+		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 	} else {
+		sendEvent(name: "deviceError", value: "OK")
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		actionDirector(action, cmdResponse)
-		sendEvent(name: "deviceError", value: "OK")
 	}
 }
 
@@ -670,7 +611,7 @@ def actionDirector(action, cmdResponse) {
 			engrStatsResponse(cmdResponse)
 			break
 		default:
-			log.info "Interface Error.  See SmartApp and Device error message."
+			log.info "Interface Error. See SmartApp and Device error message."
 	}
 }
 
@@ -678,4 +619,42 @@ def actionDirector(action, cmdResponse) {
 def syncAppServerUrl(newAppServerUrl) {
 	updateDataValue("appServerUrl", newAppServerUrl)
 		log.info "Updated appServerUrl for ${device.name} ${device.label}"
+}
+
+/*	__________________________________________________________
+	Added two routines to set refresh rate and transition time.
+ These are accessibe from the parent Service Manager.
+	__________________________________________________________
+*/
+def setLightTransTime(lightTransTime) {
+	if (lightTransTime >= 0 && lightTransTime <= 60) {
+		state.transTime = 1000 * lightTransTime
+	} else {
+		state.transTime = 5000
+	}
+	log.info "Light Transition Time for ${device.name} ${device.label} set to ${state.transTime} miliseconds"
+}
+
+def setRefreshRate(refreshRate) {
+	switch(refreshRate) {
+		case "1":
+			runEvery1Minute(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every minute"
+			break
+		case "5":
+			runEvery5Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 5 minutes"
+			break
+		case "10":
+			runEvery10Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 10 minutes"
+			break
+		case "15":
+			runEvery15Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		default:
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
+	}
 }

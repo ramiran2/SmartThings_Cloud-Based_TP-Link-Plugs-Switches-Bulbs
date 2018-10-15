@@ -1,6 +1,7 @@
 /*
 TP-Link Plug and Switch Device Handler, 2018, Version 3
-Copyright 2018 Dave Gutheinz, Anthony Ramirez
+
+	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the
@@ -15,27 +16,27 @@ either express or implied. See the License for the specific
 language governing permissions and limitations under the 
 License.
 
-Discalimer:  This Service Manager and the associated Device 
-Handlers are in no way sanctioned or supported by TP-Link.  
+Discalimer: This Service Manager and the associated Device 
+Handlers are in no way sanctioned or supported by TP-Link. 
 All development is based upon open-source data on the 
-TP-Link Kasa Devices; primarily various users on GitHub.com.
+TP-Link devices; primarily various users on GitHub.com.
 
+	===== Plug/Switch Type DO NOT EDIT ====================*/
+//	def deviceType = "Plug"					//	Plug
+	def deviceType = "Energy Monitor Plug"	//	Energy Monitor Plug
 //	===== Hub or Cloud Installation =========================*/
 	def installType = "Kasa Account"
 	//def installType = "Node Applet"
 //	===========================================================
 
-import java.text.SimpleDateFormat
-import groovy.time.*
-
-def devVer() { return "3.1.3" }
+def devVer() { return "3.2.0" }
 
 metadata {
-	definition (name: "TP-Link Smart Energy Monitor Plug - ${installType}",
+	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
 				namespace: "ramiran2",
 				author: "Dave Gutheinz, Anthony Ramirez",
-				deviceType: "energyMonitorMode Plug",
-				energyMonitorMode: "Energy Monitor",
+				deviceType: "${deviceType}",
+				energyMonitor: "Energy Monitor",
 				ocfDeviceType: "oic.d.smartplug",
 				mnmn: "SmartThings",
 				vid: "generic-switch-power-energy",
@@ -45,14 +46,14 @@ metadata {
 		capability "polling"
 		capability "Sensor"
 		capability "Actuator"
+		capability "Health Check"
 		capability "Power Meter"
 		command "getPower"
 		capability "Energy Meter"
 		command "getEnergyStats"
-		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "lightingTransitionTime", "string"
-		attribute "deviceRefreshRate", "string"
+		attribute "lightTransTime", "string"
+		attribute "refreshRate", "string"
 		attribute "monthTotalE", "string"
 		attribute "monthAvgE", "string"
 		attribute "weekTotalE", "string"
@@ -74,51 +75,39 @@ metadata {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 		}
-		
 		standardTile("refresh", "capability.refresh", width: 2, height: 1, decoration: "flat") {
 			state "default", label:"Refresh", action:"refresh.refresh"
 		}
-		
 		valueTile("currentPower", "device.power", decoration: "flat", height: 1, width: 2) {
 			state "power", label: 'Current Power \n\r ${currentValue} W'
 		}
-
 		valueTile("energyToday", "device.energy", decoration: "flat", height: 1, width: 2) {
 			state "energy", label: 'Usage Today\n\r${currentValue} WattHr'
 		}
-
 		valueTile("monthTotal", "device.monthTotalE", decoration: "flat", height: 1, width: 2) {
 			state "monthTotalE", label: '30 Day Total\n\r ${currentValue} KWH'
 		}
-
 		valueTile("monthAverage", "device.monthAvgE", decoration: "flat", height: 1, width: 2) {
 			state "monthAvgE", label: '30 Day Avg\n\r ${currentValue} KWH'
 		}
- 
 		valueTile("weekTotal", "device.weekTotalE", decoration: "flat", height: 1, width: 2) {
 			state "weekTotalE", label: '7 Day Total\n\r ${currentValue} KWH'
 		}
-
 		valueTile("weekAverage", "device.weekAvgE", decoration: "flat", height: 1, width: 2) {
 			state "weekAvgE", label: '7 Day Avg\n\r ${currentValue} KWH'
 		}
-
 		valueTile("4x1Blank", "default", decoration: "flat", height: 1, width: 4) {
 			state "default", label: ''
 		}
-
 		main("switch")
-		details("switch", "refresh" ,"4x1Blank",
-				"currentPower", "weekTotal", "monthTotal",
-				"energyToday", "weekAverage", "monthAverage")
+		details("switch", "refresh", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
 	}
-
 	def rates = [:]
+	rates << ["1" : "Refresh every minute (Not Recommended)"]
 	rates << ["5" : "Refresh every 5 minutes"]
-	rates << ["10" : "Refresh every 10 minutes"]	
+	rates << ["10" : "Refresh every 10 minutes"]
 	rates << ["15" : "Refresh every 15 minutes"]
-	rates << ["30" : "Refresh every 30 minutes"]
-
+	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
 	preferences {
 		if (installType =~ "Node Applet") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
@@ -128,12 +117,13 @@ metadata {
 	}
 }
 
-simulator {
-	status "on": "on/off: 1" 
-	status "off": "on/off: 0"
-}
-
-//	===== Device Health Check / Driver Version =====
+//	===== Update when installed or setting changed =====
+/*	Health Check Implementation
+	1.	Each time a command is sent, the DeviceWatch-Status
+		is set to on- or off-line.
+	2.	Refresh is run every 15 minutes to provide a min
+		cueing of this.
+	3.	Is valid for either hub or cloud based device.*/
 def initialize() {
 	log.trace "Initialized..."
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
@@ -142,45 +132,7 @@ def initialize() {
 
 def ping() {
 	log.trace "Ping..."
-	keepAwakeEvent()
-}
-
-def keepAwakeEvent() {
-	def lastDt = state?.lastUpdatedDtFmt
-	if(lastDt) {
-		def ldtSec = getTimeDiffSeconds(lastDt)
-		//log.debug "ldtSec: $ldtSec"
-		if(ldtSec < 1900) {
-			poll()
-		}
-	}
-}
-
-
-def lastUpdatedEvent(sendEvt=false) {
-	def now = new Date()
-	def formatVal = state?.useMilitaryTime ? "MMM d, yyyy - HH:mm:ss" : "MMM d, yyyy - h:mm:ss a"
-	def tf = new SimpleDateFormat(formatVal)
-		tf.setTimeZone(getTimeZone())
-	def lastDt = "${tf?.format(now)}"
-	state?.lastUpdatedDt = lastDt?.toString()
-	state?.lastUpdatedDtFmt = getDtNow()
-	if(sendEvt) {
-		log.trace "Last Parent Refresh time: (${lastDt}) | Previous Time: (${lastUpd})"
-		sendEvent(name: 'lastUpdatedDt', value: getDtNow()?.toString(), displayed: false, isStateChange: true)
-	}
-}
-
-def getDtNow() {
-	def now = new Date()
-	return formatDt(now)
-}
-
-def getTimeZone() {
-	def tz = null
-	if(location?.timeZone) { tz = location?.timeZone }
-	if(!tz) { log.warn "getTimeZone: Hub TimeZone is not found ..." }
-	return tz
+	refresh()
 }
 
 //	===== Update when installed or setting changed =====
@@ -194,37 +146,29 @@ def updated() {
 	runIn(2, update)
 }
 
+/*	__________________________________________________________
+	Updated refresh rates time to call routine
+	at bottom of page
+	__________________________________________________________
+*/
 def update() {
 	log.trace "Update..."
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
-	state.emon = metadata.definition.energyMonitorMode
+	state.emon = metadata.definition.energyMonitor
 	state.emeterText = "emeter"
 	state.getTimeText = "time"
 	unschedule()
-	switch(refreshRate) {
-		case "5":
-			runEvery5Minutes(refresh)
-			log.info "Refresh Scheduled for every 5 minutes"
-			break
-		case "10":
-			runEvery10Minutes(refresh)
-			log.info "Refresh Scheduled for every 10 minutes"
-			break
-		case "15":
-			runEvery15Minutes(refresh)
-			log.info "Refresh Scheduled for every 15 minutes"
-			break
-		default:
-			runEvery30Minutes(refresh)
-			log.info "Refresh Scheduled for every 30 minutes"
+	if (refreshRate) {
+		setRefreshRate(refreshRate)
+	} else {
+		setRefreshRate(30)
 	}
 	schedule("0 05 0 * * ?", setCurrentDate)
 	schedule("0 10 0 * * ?", getEnergyStats)
 	setCurrentDate()
 	runIn(2, refresh)
 	runIn(7, getEnergyStats)
-	runIn( 5, "initialize")
 }
 
 void uninstalled() {
@@ -247,6 +191,11 @@ def off() {
 	runIn(2, refresh)
 }
 
+def getSystemInfo() {
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
+    runIn(2, getPower)
+}
+
 def poll() {
 	log.trace "Polling parent..."
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
@@ -255,6 +204,7 @@ def poll() {
 def refresh(){
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 	runIn(2, getPower)
+    runIn(7, getConsumption)
 }
 
 def commandResponse(cmdResponse){
@@ -275,7 +225,6 @@ def commandResponse(cmdResponse){
 //	===== Get Current Energy Data =====
 def getPower(){
 	sendCmdtoServer("""{"${state.emeterText}":{"get_realtime":{}}}""", "deviceCommand", "energyMeterResponse")
-	runIn(5, getConsumption)
 }
 
 def energyMeterResponse(cmdResponse) {
@@ -343,13 +292,10 @@ def getPrevMonth() {
 		runIn(4, getJan)
 	}
 //	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${prevMonth}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
-//	===== SIMULATOR COMMANDS ================================================
-sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${prevMonth}, "year": ${state.yearStart}}}}""", "emeterCmd", "UseJanWatts")
-//	===== SIMULATOR COMMANDS ================================================
 }
 
 def getJan() {
-//	Gets January data on March 1 and 2.  Only access if current month = 3
+//	Gets January data on March 1 and 2. Only access if current month = 3
 //	and start month = 1
 	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthStart}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
 }
@@ -358,7 +304,7 @@ def engrStatsResponse(cmdResponse) {
 /*	
 	This method parses up to two energy status messages from the device,
 	adding the energy for the previous 30 days and week, ignoring the
-	current day.  It then calculates the 30 and 7 day average formatted
+	current day. It then calculates the 30 and 7 day average formatted
 	in kiloWattHours to two decimal places.
 */
 	def dayList = cmdResponse[state.emeterText]["get_daystat"].day_list
@@ -370,7 +316,7 @@ def engrStatsResponse(cmdResponse) {
 	def wkTotEnergy = state.wkTotEnergy
 	def monTotDays = state.monTotDays
 	def wkTotDays = state.wkTotDays
-    def startDay = state.dayStart
+  def startDay = state.dayStart
 	def dataMonth = dayList[0].month
 	if (dataMonth == state.monthToday) {
 		for (int i = 0; i < dayList.size(); i++) {
@@ -389,7 +335,7 @@ def engrStatsResponse(cmdResponse) {
 			}
 		}
 	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
-    	startDay = 1
+  	startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -428,10 +374,10 @@ def engrStatsResponse(cmdResponse) {
 	state.wkTotEnergy = wkTotEnergy
 	state.wkTotDays = wkTotDays
 	log.info "$device.name $device.label: Update 7 and 30 day energy consumption statistics"
-    if (monTotDays == 0) {
-    	//	Aviod divide by zero on 1st of month
-    	monTotDays = 1
-        wkTotDays = 1 
+  if (monTotDays == 0) {
+  	//	Aviod divide by zero on 1st of month
+  	monTotDays = 1
+    wkTotDays = 1 
 	}
 	def monAvgEnergy = monTotEnergy/monTotDays
 	def wkAvgEnergy = wkTotEnergy/wkTotDays
@@ -458,7 +404,7 @@ def setCurrentDate() {
 }
 
 def currentDateResponse(cmdResponse) {
-	def currDate =  cmdResponse["time"]["get_time"]
+	def currDate = cmdResponse["time"]["get_time"]
 	state.dayToday = currDate.mday.toInteger()
 	state.monthToday = currDate.month.toInteger()
 	state.yearToday = currDate.year.toInteger()
@@ -490,11 +436,11 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
 	if (cmdResp.substring(0,5) =~ "ERROR"){
-		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
 		sendEvent(name: "switch", value: "Unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
+		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""
 	} else {
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
@@ -521,14 +467,14 @@ def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
 	if (cmdResponse =~ "TcpTimeout") {
-		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		log.error "$device.name $device.label: Communications Error"
 		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR at hubResponseParse TCP Timeout")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
+		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 	} else {
+		sendEvent(name: "deviceError", value: "OK")
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false, isStateChange: true)
 		actionDirector(action, cmdResponse)
-		sendEvent(name: "deviceError", value: "OK")
 	}
 }
 
@@ -563,4 +509,38 @@ def actionDirector(action, cmdResponse) {
 def syncAppServerUrl(newAppServerUrl) {
 	updateDataValue("appServerUrl", newAppServerUrl)
 		log.info "Updated appServerUrl for ${device.name} ${device.label}"
+}
+
+/*	__________________________________________________________
+	Added two routines to set refresh rate and transition time.
+ These are accessibe from the parent Service Manager.
+	__________________________________________________________
+*/
+def setLightTransTime(lightTransTime) {
+	log.info "${device.name} ${device.label} setLightTransTime receive. No action."
+	return
+}
+
+def setRefreshRate(refreshRate) {
+	switch(refreshRate) {
+		case "1":
+			runEvery1Minute(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every minute"
+			break
+		case "5":
+			runEvery5Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 5 minutes"
+			break
+		case "10":
+			runEvery10Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 10 minutes"
+			break
+		case "15":
+			runEvery15Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		default:
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
+	}
 }
