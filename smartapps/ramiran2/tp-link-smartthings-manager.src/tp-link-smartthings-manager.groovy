@@ -1230,7 +1230,7 @@ def getWikiPageUrl() { return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl() { return "https://github.com/${gitRepo()}/issues" }
 def appLabel() { return "TP-Link SmartThings Manager" }
 def appNamespace() { return "ramiran2" }
-def driverNamespace() { return (!userSelectedDriver) ? "ramiran2" : "ramiran2" (userSelectedDriver) ? "DaveGut" : "DaveGut" }
+def driverNamespace() { return (userSelectedDriver) ? "DaveGut" : "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
