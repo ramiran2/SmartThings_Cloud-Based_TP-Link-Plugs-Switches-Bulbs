@@ -1,4 +1,4 @@
-##### TP-Link Device Manager #####
+##### TP-Link SmartThings Manager #####
 2018-10-13 - Update to Version 3.5.0
 a. Added a new page/icons
 b. Added icons to paragraph

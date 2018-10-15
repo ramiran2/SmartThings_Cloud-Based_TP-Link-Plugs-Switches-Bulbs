@@ -144,14 +144,9 @@ metadata {
 		}
 		main("switch")
 		if (deviceType =~ "Soft White Bulb") {
-			details("switch", "refresh", "4x1Blank", 
-					"currentPower", "weekTotal", "monthTotal", 
-					"energyToday", "weekAverage", "monthAverage")
+			details("switch", "refresh", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
 		} else {
-			details("switch", "ColorTemp", "bulbMode", "refresh", 
-					"colorTempSliderControl", "4x1Blank",
-					"currentPower", "weekTotal", "monthTotal",
-					"energyToday", "weekAverage", "monthAverage")
+			details("switch", "ColorTemp", "bulbMode", "refresh", "colorTempSliderControl", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
 		}
 	}
 

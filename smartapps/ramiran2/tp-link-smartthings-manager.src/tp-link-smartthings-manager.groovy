@@ -1,7 +1,7 @@
 /*
-TP-Link Connect Service Manager, 2018 Version 2, TP-Link Device Manager, 2018 Version 3
+TP-Link SmartThings Manager, 2018 Version 3
 
-Copyright 2018 Dave Gutheinz, Anthony Ramirez
+	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
 may not use this file except in compliance with the License. You may
@@ -15,17 +15,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied. See the License for the specific language governing
 permissions and limitations under the License.
 
-##### Discalimer: This Service Manager and the associated Device
+Discalimer: This Service Manager and the associated Device
 Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Kasa Devices;
-primarily various users on GitHub.com.
-
-##### Notes #####
-1.	This Service Manager is designed to install and manage TP-Link
-	bulbs, plugs, and switches using their respective device handlers.
-2.	Please direct comments to the SmartThings community thread
-	'TP-Link Device Manager SmartThings Integration'.
-*/
+primarily various users on GitHub.com.*/
 
 definition(
 	name: "${appLabel()}",
@@ -39,18 +32,21 @@ definition(
 	singleInstance: true
 )
 
-def appVersion() { return "3.5.0" }
-def appVerDate() { return "10-13-2018" }
-def driverVersionsMin() { return "3.2.0" }
+def appVersion() { return "3.6.0" }
+def appVerDate() { return "10-15-2018" }
+def currentDriverVersion() { return "3.2.0" }
+def legacyDriverVersion() { return "3.0.0" }
 
 preferences {
-	page(name: "startPage")
-	page(name: "authPage")
-	page(name: "mainPage")
-	page(name: "selectDevices")
+	page(name: "welcomePage")
+	page(name: "authenticationPage")
+	page(name: "userSelectionPage")
+	page(name: "addDevicesPage")
+	page(name: "removeDevicesPage")
+	page(name: "userPreferencesPage")
 	page(name: "tokenPage")
-	page(name: "devMode")
-	page(name: "devModeTestingPage")
+	page(name: "developerPage")
+	page(name: "developerTestingPage")
 	page(name: "hiddenPage")
 	page(name: "aboutPage")
 	page(name: "changeLogPage")
@@ -63,8 +59,6 @@ def setInitialStates() {
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
 	settingUpdate("userSelectedReload", "false", "bool")
-	settingUpdate("userSelectedRemoveMode", "false", "bool")
-	settingUpdate("mainPageSync", "false", "bool")
 	settingUpdate("userSelectedDevicesRemove", "", "enum")
 	settingUpdate("userSelectedDevicesAdd", "", "enum")
 }
@@ -90,19 +84,17 @@ def setRecommendedOptions() {
 			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
 		}
 		if (state.TpLinkToken != null){
-			settingUpdate("userSelectedOptionOne", "Add/Remove Devices", "enum")
+			if (newDevices =~ [:]){
+				settingUpdate("userSelectedOptionOne", "Add Devices", "enum")
+			}
+			if (oldDevices =~ [:]){
+				settingUpdate("userSelectedOptionOne", "Remove Devices", "enum")
+			}
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null){
-				settingUpdate("userSelectedOptionOne", "Initial Install", "enum")
+				settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
-			}
-		}
-		if (newDevices != [:]){
-			settingUpdate("userSelectedRemoveMode", "false", "bool")
-		} else {
-			if (oldDevices != [:]){
-				settingUpdate("userSelectedRemoveMode", "true", "bool")
 			}
 		}
 		if (state.currentError != null){
@@ -121,41 +113,80 @@ def setRecommendedOptions() {
 	}
 }
 
-//	----- START PAGE -----
-def startPage() {
+//	----- WELCOME PAGE -----
+def welcomePage() {
 	setInitialStates()
-	if ("${userName}" =~ null || "${userPassword}" =~ null){
-		return authPage()
-	} else {
-		setRecommendedOptions()
-		return mainPage()
+	setRecommendedOptions()
+		def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
+		def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${currentDriverVersion()}" + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
+	return dynamicPage(
+		name: "welcomePage",
+		title: "Welcome Page",
+		install: false,
+		uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
+			paragraph title: "Information:", welcomePageText, image: getAppImg("information.png")
+			paragraph title: "Driver Version:", driverVersionText, image: getAppImg("devices.png")
+		}
+		section("Page Selector:") {
+			if (state.currentError != null){
+				paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+			} else {
+				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+			}
+			if ("${userName}" =~ null || "${userPassword}" =~ null){
+				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+			} else {
+				href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+			}
+		}
+		section("Settings:") {
+			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
+		}
+		section("Help and Feedback:") {
+			if (userSelectedDeveloper){
+				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+			}
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+		}
+		section("About and Changelog:") {
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
+		}
 	}
 }
 
-//	----- AUTH PAGE -----
-def authPage() {
-	def authPageText = "If possible, open the IDE and select Live Logging. Then, " +
+//	----- AUTHENTICATION PAGE -----
+def authenticationPage() {
+	def authenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. " + "\n\rAvailable actions:\n\r" +
-		"Activate Account: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Update Account: Updates or removes the token and credentials."
-	def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "${driverVersionsMin()}" + "\n" + "Note: Drivers from the old the original repository will not work with this version of the application."
+		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
+		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Hub. \n\r" +
+		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
 	return dynamicPage(
-		name: "authPage",
+		name: "authenticationPage",
 		title: "Login Page",
 		install: false,
 		uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Driver Version:", hideable: true, hidden: true) {
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null){
-				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", authPageText, image: getAppImg("information.png")
-			paragraph title: "Driver Version:", driverVersionText, image: getAppImg("devices.png")
+			paragraph title: "Information:", authenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
 			input(
@@ -198,7 +229,7 @@ def authPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
-				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevices.png")
 			}
 			if (userSelectedOptionTwo =~ "Update Account") {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
@@ -207,32 +238,24 @@ def authPage() {
 				href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			}
 		}
-		section("Extra Configuration:") {
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input(
-				"userSelectedDevMode", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
-			)
-		}
 	}
 }
 
-//	----- MAIN PAGE -----
-def mainPage() {
-	def mainPageText = "Available actions:\n\r" +
-		"Initial Install: Login into TP-Link Account and obtains token and adds devices.\n\r" +
-		"Add/Remove Devices: Only Add/Remove Devices.\n\r" +
-		"Update Token: Updates the token or you can remove the token."
+//	----- USER SELECTION PAGE -----
+def userSelectionPage() {
+	def userSelectionPageText = "Available actions:\n\r" +
+		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n\r" +
+		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n\r" +
+		"Update Token: You will be able to request for a new token or delete your current token from the application. \n\r" +
+		"Initial Installation: You will be asked to login into TP-Link Account and you may be asked to adds devices if you have not done so already."
 	def errorMsgCom = "None"
 	if (state.currentError != null){
 		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
 	}
 	return dynamicPage(
-		name: "mainPage",
-		title: "Settings Page",
+		name: "userSelectionPage",
+		title: "Launcher Page",
 		install: false,
 		uninstall: false) {
 		section("") {
@@ -240,11 +263,11 @@ def mainPage() {
 		}
         section("Information and Diagnostics:", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null){
-				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", mainPageText, image: getAppImg("information.png")
+			paragraph title: "Information:", userSelectionPageText, image: getAppImg("information.png")
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
@@ -254,7 +277,7 @@ def mainPage() {
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Initial Install", "Add/Remove Devices", "Update Token"]],
+				metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]],
 				image: getAppImg("settings.png")
 			)
 		}
@@ -268,56 +291,30 @@ def mainPage() {
 			} else {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
-			if (userSelectedOptionOne =~ "Initial Install") {
-				href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
+			if (userSelectedOptionOne =~ "Initial Installation") {
+				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
 			}
-			if (userSelectedOptionOne =~ "Add/Remove Devices") {
-				href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			if (userSelectedOptionOne =~ "Add Devices") {
+				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			}
+			if (userSelectedOptionOne =~ "Remove Devices") {
+				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Update Token") {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			}
 		}
-		section("Extra Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			if (userSelectedAssistant){
-				input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
-			} else {
-				input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			}
-			if (mainPageSync){
-				settingUpdate("mainPageSync", "false", "bool")
-			}
-		}
-		section("Help and Feedback:") {
-			if (userSelectedDevMode){
-				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
-			}
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("help.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
-		}
-		section("About and Changelog:") {
-			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
-			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
-		}
-		section("Uninstall:") {
-			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstall.png")
-		}
 	}
 }
 
-//	----- SELECT DEVICES PAGE -----
-def selectDevices() {
+//	----- ADD DEVICES PAGE -----
+def addDevicesPage() {
 	getDevices()
 	def devices = state.devices
 	def errorMsgDev = "None"
 	def newDevices = [:]
-	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
 		if (!isChild) {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
@@ -329,7 +326,60 @@ def selectDevices() {
 	if (newDevices == [:]) {
 		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
-	if (oldDevices == [:] && userSelectedRemoveMode) {
+	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
+		"WiFi control only' will appear below. Tap below to see the list of " +
+		"TP-Link Kasa Devices available select the ones you want to connect to " +
+		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
+		"wish to add, then press Done again to install the devices. Press < " +
+		"to return to the previous page."
+	return dynamicPage(
+		name: "addDevicesPage",
+		title: "Device Installer Page",
+		install: true,
+		uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
+			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
+		}
+		section("Device Controller:") {
+			input(
+				"userSelectedDevicesAdd", "enum",
+				required: true,
+				multiple: true,
+				submitOnChange: true,
+				title: "Select Devices (${newDevices.size() ?: 0} found)",
+				metadata: [values:newDevices],
+				image: getAppImg("adddevices.png")
+			)
+		}
+	}
+}
+
+//	----- REMOVE DEVICES PAGE -----
+def removeDevicesPage() {
+	getDevices()
+	def devices = state.devices
+	def errorMsgDev = "None"
+	def oldDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	if (devices == [:]) {
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
+	}
+	if (oldDevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the smart things app at this time."
 	}
 	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
@@ -339,8 +389,8 @@ def selectDevices() {
 		"wish to add, then press Done again to install the devices. Press < " +
 		"to return to the previous page."
 	return dynamicPage(
-		name: "selectDevices",
-		title: "Device Manager Page",
+		name: "removeDevicesPage",
+		title: "Device Uninstaller Page",
 		install: true,
 		uninstall: false) {
 		section("") {
@@ -348,7 +398,7 @@ def selectDevices() {
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null){
-				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
@@ -357,47 +407,59 @@ def selectDevices() {
 		}
 		section("Device Controller:") {
 			input(
-				"userSelectedRemoveMode", "bool",
-				title: "Do you want to enable device removal mode?",
-				defaultValue: false,
+				"userSelectedDevicesRemove", "enum",
+				required: true,
+				multiple: true,
 				submitOnChange: true,
-				image: getAppImg("deviceremover.png")
+				title: "Select Devices (${oldDevices.size() ?: 0} found)",
+				metadata: [values:oldDevices],
+				image: getAppImg("removedevices.png")
 			)
-			if (userSelectedRemoveMode) {
-				input(
-					"userSelectedDevicesRemove", "enum",
-					required: true,
-					multiple: true,
-					submitOnChange: true,
-					title: "Select Devices (${oldDevices.size() ?: 0} found)",
-					metadata: [values:oldDevices],
-					image: getAppImg("removedevices.png")
-				)
-			} else {
-				input(
-					"userSelectedDevicesAdd", "enum",
-					required: true,
-					multiple: true,
-					submitOnChange: true,
-					title: "Select Devices (${newDevices.size() ?: 0} found)",
-					metadata: [values:newDevices],
-					image: getAppImg("adddevices.png")
-				)
-			}
 		}
-		section("Saving Settings:") {
+	}
+}
+
+//	----- USER PREFERENCES PAGE -----
+def userPreferencesPage() {
+	def TPLinkDevicesMsg = ""
+	return dynamicPage(
+		name: "userPreferencesPage",
+		title: "Settings Page",
+		install: true,
+		uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null){
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
+			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+		}
+		section("Application Configuration:") {
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input (name: "userSelectedDriver", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input(
+				"userSelectedDeveloper", "bool",
+				title: "Do you want to enable developer mode?",
+				submitOnChange: true,
+				image: getAppImg("developer.png")
+			)
+		}
+		section("Device Configuration:") {
 			if (userLightTransTime != null && userRefreshRate != null){
-				sendEvent(name: "lightingTransitionTime", value: userLightTransTime)
-				sendEvent(name: "deviceRefreshRate", value: userRefreshRate)
+				sendEvent(name: "lightTransTime", value: userLightTransTime)
+				sendEvent(name: "refreshRate", value: userRefreshRate)
 				paragraph sendingDataSuccess(), image: getAppImg("send.png")
 			} else {
 				paragraph sendingDataFailed(), image: getAppImg("issue.png")
 			}
-		}
-		section("Device Configuration:") {
 			input(
 				"userLightTransTime", "number",
-				required: true,
+				required: false,
 				multiple: false,
 				submitOnChange: true,
 				title: "Lighting Transition Time",
@@ -406,13 +468,16 @@ def selectDevices() {
 			)
 			input(
 				"userRefreshRate", "enum",
-				required: true,
+				required: false,
 				multiple: false,
 				submitOnChange: true,
 				title: "Device Refresh Rate",
-				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
+				metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]],
 				image: getAppImg("refresh.png")
 			)
+		}
+		section("Uninstall:") {
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstall.png")
 		}
 	}
 }
@@ -441,7 +506,7 @@ def tokenPage () {
 		}
 		section("Account Status:") {
 			if (state.TpLinkToken != null){
-				paragraph tokenInfoOnline(), image: getAppImg("success.png")
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
@@ -509,9 +574,9 @@ def devMode() {
 		}
 		section("Page Selector:") {
 			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
-			href "authPage", title: "Login Page", description: "Tap to view", image: getAppImg("authpage.png")
-			href "mainPage", title: "Settings Page", description: "Tap to view", image: getAppImg("mainpage.png")
-			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("selectdevices.png")
+			href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+			href "userSelectionPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("devicemanager.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089"){
 				href "hiddenPage", title: "xKiller Clan Page", description: "Tap to view", image: getAppImg("xkillerclan.png")
@@ -523,7 +588,7 @@ def devMode() {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
-		section("Extra Configuration:") {
+		section("Application Configuration:") {
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload){
 				setInitialStates()
@@ -616,7 +681,7 @@ def devModeTestingPage() {
 				required: false,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Initial Install", "Add/Remove Devices", "Update Token"]],
+				metadata: [values:["Initial Installation", "Add/Remove Devices", "Update Token"]],
 				image: getAppImg("settings.png")
 			)
 			input(
@@ -631,11 +696,11 @@ def devModeTestingPage() {
 		}
 		section("Extra Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("mainPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
+			input ("userSelectionPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
 			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input(
-				"userSelectedDevMode", "bool",
+				"userSelectedDeveloper", "bool",
 				title: "Do you want to enable developer mode?",
 				submitOnChange: true,
 				image: getAppImg("developer.png")
@@ -709,7 +774,7 @@ def devModeTestingPage() {
 			paragraph sendingDataFailed(), image: getAppImg("issue.png")
 		}
 		section("Account Status:") {
-			paragraph tokenInfoOnline(), image: getAppImg("success.png")
+			paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			paragraph tokenInfoOffline(), image: getAppImg("error.png")
 		}
 	}
@@ -894,32 +959,61 @@ def getWebData(params, desc, text=true) {
 
 def addDevices() {
 	def tpLinkModel = [:]
-	//	Plug-Switch Devices (no energy monitor capability)
-	tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
-	tpLinkModel << ["HS103" : "TP-Link Smart Plug - Kasa Account"]						//	HS103
-	tpLinkModel << ["HS105" : "TP-Link Smart Plug - Kasa Account"]						//	HS105
-	tpLinkModel << ["HS200" : "TP-Link Smart Switch - Kasa Account"]					//	HS200
-	tpLinkModel << ["HS210" : "TP-Link Smart Switch - Kasa Account"]					//	HS210
-	tpLinkModel << ["KP100" : "TP-Link Smart Plug - Kasa Account"]						//	KP100
-	//	Dimming Switch Devices
-	tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Kasa Account"]			//	HS220
-	//	Energy Monitor Plugs
-	tpLinkModel << ["HS110" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
-	tpLinkModel << ["HS115" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
-	//	Soft White Bulbs
-	tpLinkModel << ["KB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	KB100
-	tpLinkModel << ["LB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB100
-	tpLinkModel << ["LB110" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB110
-	tpLinkModel << ["KL110" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	KL110
-	tpLinkModel << ["LB200" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB200
-	//	Tunable White Bulbs
-	tpLinkModel << ["LB120" : "TP-Link Smart Tunable White Bulb - Kasa Account"]		//	LB120
-	tpLinkModel << ["KL120" : "TP-Link Smart Tunable White Bulb - Kasa Account"]		//	KL120
-	//	Color Bulbs
-	tpLinkModel << ["KB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KB130
-	tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB130
-	tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KL130
-	tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB230
+	if (userSelectedDriver){
+		//	Plug-Switch Devices (no energy monitor capability)
+		tpLinkModel << ["HS100" : "(Cloud) TP-Link Plug"]								//	HS100
+		tpLinkModel << ["HS103" : "(Cloud) TP-Link Plug"]								//	HS103
+		tpLinkModel << ["HS105" : "(Cloud) TP-Link Plug"]								//	HS105
+		tpLinkModel << ["HS200" : "(Cloud) TP-Link Switch"]								//	HS200
+		tpLinkModel << ["HS210" : "(Cloud) TP-Link Switch"]								//	HS210
+		tpLinkModel << ["KP100" : "(Cloud) TP-Link Plug"]								//	KP100
+		//	Dimming Plug Devices
+		tpLinkModel << ["HS220" : "(Cloud) TP-Link Dimming Switch"]						//	HS220
+		//	Energy Monitor Plugs
+		tpLinkModel << ["HS110" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
+		tpLinkModel << ["HS115" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
+		//	Soft White Bulbs
+		tpLinkModel << ["KB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	KB100
+		tpLinkModel << ["LB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB100
+		tpLinkModel << ["LB110" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB110
+		tpLinkModel << ["KL110" : "(Cloud) TP-Link SoftWhite Bulb"]						//	KL110
+		tpLinkModel << ["LB200" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB200
+		//	Tunable White Bulbs
+		tpLinkModel << ["LB120" : "(Cloud) TP-Link TunableWhite Bulb"]					//	LB120
+		tpLinkModel << ["KL120" : "(Cloud) TP-Link TunableWhite Bulb"]					//	KL120
+		//	Color Bulbs
+		tpLinkModel << ["KB130" : "(Cloud) TP-Link Color Bulb"]							//	KB130
+		tpLinkModel << ["LB130" : "(Cloud) TP-Link Color Bulb"]							//	LB130
+		tpLinkModel << ["KL130" : "(Cloud) TP-Link Color Bulb"]							//	KL130
+		tpLinkModel << ["LB230" : "(Cloud) TP-Link Color Bulb"]							//	LB230
+	} else {
+		//	Plug-Switch Devices (no energy monitor capability)
+		tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
+		tpLinkModel << ["HS103" : "TP-Link Smart Plug - Kasa Account"]						//	HS103
+		tpLinkModel << ["HS105" : "TP-Link Smart Plug - Kasa Account"]						//	HS105
+		tpLinkModel << ["HS200" : "TP-Link Smart Switch - Kasa Account"]					//	HS200
+		tpLinkModel << ["HS210" : "TP-Link Smart Switch - Kasa Account"]					//	HS210
+		tpLinkModel << ["KP100" : "TP-Link Smart Plug - Kasa Account"]						//	KP100
+		//	Dimming Switch Devices
+		tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Kasa Account"]			//	HS220
+		//	Energy Monitor Plugs
+		tpLinkModel << ["HS110" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
+		tpLinkModel << ["HS115" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
+		//	Soft White Bulbs
+		tpLinkModel << ["KB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	KB100
+		tpLinkModel << ["LB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB100
+		tpLinkModel << ["LB110" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB110
+		tpLinkModel << ["KL110" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	KL110
+		tpLinkModel << ["LB200" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB200
+		//	Tunable White Bulbs
+		tpLinkModel << ["LB120" : "TP-Link Smart Tunable White Bulb - Kasa Account"]		//	LB120
+		tpLinkModel << ["KL120" : "TP-Link Smart Tunable White Bulb - Kasa Account"]		//	KL120
+		//	Color Bulbs
+		tpLinkModel << ["KB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KB130
+		tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB130
+		tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KL130
+		tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB230
+	}
 
 	def hub = location.hubs[0]
 	def hubId = hub.id
@@ -930,7 +1024,7 @@ def addDevices() {
 				def device = state.devices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
 				addChildDevice(
-					"ramiran2",
+					"${appNamespace()}",
 					tpLinkModel["${deviceModel}"],
 					device.value.deviceMac,
 					hubId, [
@@ -1152,7 +1246,7 @@ def gitBranch() { return betaMarker() ? "beta" : "master"  }
 def getAppImg(imgName, on = null)	{ return (!appIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 def getWikiPageUrl() { return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl() { return "https://github.com/${gitRepo()}/issues" }
-def appLabel() { return "TP-Link Device Manager" }
+def appLabel() { return "TP-Link SmartThings Manager" }
 def appNamespace() { return "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
