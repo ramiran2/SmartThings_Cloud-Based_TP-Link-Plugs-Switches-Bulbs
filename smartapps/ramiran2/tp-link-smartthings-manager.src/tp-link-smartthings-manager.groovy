@@ -1005,11 +1005,7 @@ def addDevices() {
 				def device = state.devices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
 				addChildDevice(
-					if (userSelectedDriver){
-						"${driverNamespace(DaveGut)}",
-					} else {
-						"${driverNamespace(ramiran2)}",
-					}
+					"${driverNamespace()}",
 					tpLinkModel["${deviceModel}"],
 					device.value.deviceMac,
 					hubId, [
@@ -1233,7 +1229,7 @@ def getWikiPageUrl() { return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl() { return "https://github.com/${gitRepo()}/issues" }
 def appLabel() { return "TP-Link SmartThings Manager" }
 def appNamespace() { return "ramiran2" }
-def driverNamespace(nameSpace) { return "$nameSpace" }
+def driverNamespace() { return if (!userSelectedDriver) { "ramiran2" } else { "DaveGut" }}
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
