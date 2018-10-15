@@ -65,19 +65,6 @@ def setInitialStates() {
 
 def setRecommendedOptions() {
 	if (userSelectedAssistant){
-		getDevices()
-		def devices = state.devices
-		def newDevices = [:]
-		def oldDevices = [:]
-		devices.each {
-			def isChild = getChildDevice(it.value.deviceMac)
-			if (isChild) {
-				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
-			if (!isChild) {
-				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
-		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null){
 			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
 		} else {
@@ -162,6 +149,9 @@ def welcomePage() {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
+		section("Uninstall:") {
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
+		}
 	}
 }
 
@@ -211,7 +201,7 @@ def authenticationPage() {
 				required: true,
 				multiple: false,
 				submitOnChange: true,
-				metadata: [values:["Activate Account", "Update Account", "About Application"]],
+				metadata: [values:["Update Account", "Activate Account", "About Application"]],
 				image: getAppImg("userinput.png")
 			)
 			if (userSelectedOptionTwo =~ "Activate Account") {
@@ -243,7 +233,7 @@ def authenticationPage() {
 
 //	----- USER SELECTION PAGE -----
 def userSelectionPage() {
-	def userSelectionPageText = "Available actions:\n\r" +
+	def userSelectionPageText = "Available actions: \n\r" +
 		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n\r" +
 		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n\r" +
 		"Update Token: You will be able to request for a new token or delete your current token from the application. \n\r" +
@@ -326,7 +316,7 @@ def addDevicesPage() {
 	if (newDevices == [:]) {
 		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
-	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
+	def addDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
@@ -345,7 +335,7 @@ def addDevicesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+			paragraph title: "Information:", addDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
@@ -381,7 +371,7 @@ def removeDevicesPage() {
 	if (oldDevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the smart things app at this time."
 	}
-	def TPLinkDevicesMsg = "Devices that have been installed " +
+	def removeDevicesPageText = "Devices that have been installed " +
 		"will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
@@ -400,7 +390,7 @@ def removeDevicesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+			paragraph title: "Information:", removeDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
@@ -419,7 +409,9 @@ def removeDevicesPage() {
 
 //	----- USER PREFERENCES PAGE -----
 def userPreferencesPage() {
-	def TPLinkDevicesMsg = ""
+	def userPreferencesPageText = "Welcome to the application settings page. \n\r" +
+		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
+		"Switch the device handlers: You will be able to switch to the legacy device handlers provided you have them installed. \n\r" +
 	return dynamicPage(
 		name: "userPreferencesPage",
 		title: "Settings Page",
@@ -434,12 +426,12 @@ def userPreferencesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", TPLinkDevicesMsg, image: getAppImg("information.png")
+			paragraph title: "Information:", userPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch to the legacy device handlers?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 			input(
 				"userSelectedDeveloper", "bool",
 				title: "Do you want to enable developer mode?",
@@ -474,9 +466,6 @@ def userPreferencesPage() {
 				image: getAppImg("refresh.png")
 			)
 		}
-		section("Uninstall:") {
-			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
-		}
 	}
 }
 
@@ -484,8 +473,8 @@ def userPreferencesPage() {
 def tokenPage () {
 	def tokenPageText = "Your current token:\n\r\n\r${state.TpLinkToken}" + 
 		"\n\rAvailable actions:\n\r" +
-		"Update Token: Updates the token.\n\r" +
-		"Remove Token: Removes the token.\n\r" +
+		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
+		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
 		"Update Credentials: Updates your out of date credentials so you can get a new token."
 		def errorMsgTok = "None"
 		if (state.TpLinkToken == null){
@@ -524,12 +513,6 @@ def tokenPage () {
 			}
 			if (userSelectedOptionThree =~ "Delete Token") {
 				state.TpLinkToken = null
-			}
-		}
-		section("Extra Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
-			if (userSelectedReload){
-				setInitialStates()
 			}
 		}
 	}
@@ -1022,7 +1005,11 @@ def addDevices() {
 				def device = state.devices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
 				addChildDevice(
-					"${appNamespace()}",
+					if (userSelectedDriver){
+						"${driverNamespace(DaveGut)}",
+					} else {
+						"${driverNamespace(ramiran2)}",
+					}
 					tpLinkModel["${deviceModel}"],
 					device.value.deviceMac,
 					hubId, [
@@ -1246,6 +1233,7 @@ def getWikiPageUrl() { return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl() { return "https://github.com/${gitRepo()}/issues" }
 def appLabel() { return "TP-Link SmartThings Manager" }
 def appNamespace() { return "ramiran2" }
+def driverNamespace(nameSpace) { return "$nameSpace" }
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
