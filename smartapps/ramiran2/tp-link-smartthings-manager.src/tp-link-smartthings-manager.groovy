@@ -548,6 +548,7 @@ def devMode() {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
 			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
 			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
+			paragraph title: "GitHub Namespace:", "${driverNamespace()}", image: getAppImg("github.png")
 			paragraph title: "Username:", "${userName}", image: getAppImg("email.png")
 			paragraph title: "Password:", "${userPassword}", image: getAppImg("password.png")
 			paragraph title: "Managed Devices:", "${oldDevices}", image: getAppImg("devices.png")
