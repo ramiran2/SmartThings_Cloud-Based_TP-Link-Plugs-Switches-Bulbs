@@ -179,11 +179,11 @@ def authenticationPage() {
 			paragraph title: "Information:", authenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
-			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
-			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				getToken()
 			}
@@ -241,15 +241,7 @@ def userSelectionPage() {
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input (
-				"userSelectedOptionOne", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]],
-				image: getAppImg("userinput.png")
-			)
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne != null) {
@@ -442,7 +434,7 @@ def tokenPage() {
 			}
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionThree != null) {
@@ -601,11 +593,12 @@ def devModeTestingPage() {
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
 		section("Account Configuration:") {
-			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
-			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
 		section("Device Controller:") {
 			input (name: "userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
