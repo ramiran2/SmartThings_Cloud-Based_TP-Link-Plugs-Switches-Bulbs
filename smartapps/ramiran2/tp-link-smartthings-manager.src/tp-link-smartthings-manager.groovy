@@ -140,7 +140,7 @@ def welcomePage() {
 		}
 		section("Help and Feedback:") {
 			if (userSelectedDeveloper){
-				href "devMode", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
 			}
 			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
