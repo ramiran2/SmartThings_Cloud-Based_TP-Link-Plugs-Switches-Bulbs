@@ -190,7 +190,6 @@ def ping() {
 	refresh()
 }
 
-//	===== Update when installed or setting changed =====
 def installed() {
 	log.trace "Installed..."
 	update()
@@ -205,6 +204,7 @@ def updated() {
 	Updated refresh rates and light trans time to call routine
 	at bottom of page
 	__________________________________________________________
+*/
 def update() {
 	log.trace "Update..."
 	state.deviceType = metadata.definition.deviceType

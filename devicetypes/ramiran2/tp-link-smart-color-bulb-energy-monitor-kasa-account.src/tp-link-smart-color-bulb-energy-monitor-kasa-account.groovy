@@ -188,7 +188,6 @@ def ping() {
 	refresh()
 }
 
-//	===== Update when installed or setting changed =====
 def installed() {
 	log.trace "Installed..."
 	update()
