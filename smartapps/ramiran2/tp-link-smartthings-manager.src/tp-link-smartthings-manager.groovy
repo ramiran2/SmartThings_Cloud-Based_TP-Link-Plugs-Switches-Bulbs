@@ -441,21 +441,20 @@ def tokenPage() {
 				if (state.currentError != null){
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
-					if (userSelectedOptionThree =~ "Update Credentials") {
-						paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+					if (userSelectedOptionThree != "Update Credentials") {
+						paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 					}
 				}
 			} else {
-				paragraph sendingCommandFailed(), image: getAppImg("issue.png")
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
+				paragraph sendingCommandFailed(), image: getAppImg("issue.png")
 			}
 			if (userSelectedOptionThree =~ "Update Token") {
 				getToken()
-				paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 			}
 			if (userSelectedOptionThree =~ "Delete Token") {
 				state.TpLinkToken = null
-				paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 			}
 			if (userSelectedOptionThree =~ "Update Credentials") {
 				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
@@ -599,6 +598,7 @@ def devModeTestingPage() {
 		section("User Configuration:") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller:") {
 			input (name: "userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
@@ -611,8 +611,6 @@ def devModeTestingPage() {
 			input (name: "userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 		}
 		section("Device Configuration:") {
-			paragraph sendingDataSuccess(), image: getAppImg("send.png")
-			paragraph sendingDataFailed(), image: getAppImg("issue.png")
 			input (name: "userLightTransTime", "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
 			input (name: "userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
@@ -1002,8 +1000,6 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 
 def uninstManagerApp() {
 	try {
-		//Revokes Smartthings endpoint token
-		revokeAccessToken()
 		//Revokes TP-Link Auth Token
 		state.TpLinkToken = null
 	} catch (ex) {
@@ -1026,12 +1022,11 @@ def initialize() {
 	unschedule()
 	runEvery5Minutes(checkError)
 	schedule("0 30 2 ? * WED", getToken)
-	if (userSelectedDevicesAdd || userSelectedDevicesRemove) {
-		if (userSelectedRemoveMode){
-			removeDevices()
-		} else {
-			addDevices()
-		}
+	if (userSelectedDevicesAdd) {
+		addDevices()
+	}
+	if (userSelectedDevicesRemove) {
+		removeDevices()
 	}
 }
 
