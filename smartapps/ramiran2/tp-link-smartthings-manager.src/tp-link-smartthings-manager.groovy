@@ -118,7 +118,7 @@ def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
 		def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
-		def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${currentDriverVersion()}" + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
+		def driverVersionText = "TP-Link Kasa Drivers for SmartThings:" + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${legacyDriverVersion()}" + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
 	return dynamicPage(
 		name: "welcomePage",
 		title: "Welcome Page",
@@ -212,7 +212,7 @@ def authenticationPage() {
 				multiple: false,
 				submitOnChange: true,
 				metadata: [values:["Activate Account", "Update Account", "About Application"]],
-				image: getAppImg("settings.png")
+				image: getAppImg("userinput.png")
 			)
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				getToken()
@@ -278,7 +278,7 @@ def userSelectionPage() {
 				multiple: false,
 				submitOnChange: true,
 				metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]],
-				image: getAppImg("settings.png")
+				image: getAppImg("userinput.png")
 			)
 		}
 		section("Page Selector:") {
@@ -330,8 +330,7 @@ def addDevicesPage() {
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
-		"wish to add, then press Done again to install the devices. Press < " +
-		"to return to the previous page."
+		"wish to add, then press Save to add the devices to your SmartThings account."
 	return dynamicPage(
 		name: "addDevicesPage",
 		title: "Device Installer Page",
@@ -382,12 +381,11 @@ def removeDevicesPage() {
 	if (oldDevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the smart things app at this time."
 	}
-	def TPLinkDevicesMsg = "Devices that have not been previously installed and are not in 'Local " +
-		"WiFi control only' will appear below. Tap below to see the list of " +
+	def TPLinkDevicesMsg = "Devices that have been installed " +
+		"will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
-		"wish to add, then press Done again to install the devices. Press < " +
-		"to return to the previous page."
+		"wish to remove, then Press Save to remove the devices to your SmartThings account."
 	return dynamicPage(
 		name: "removeDevicesPage",
 		title: "Device Uninstaller Page",
@@ -441,7 +439,7 @@ def userPreferencesPage() {
 		section("Application Configuration:") {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input (name: "userSelectedDriver", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch to the legacy device handlers?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 			input(
 				"userSelectedDeveloper", "bool",
 				title: "Do you want to enable developer mode?",
@@ -477,7 +475,7 @@ def userPreferencesPage() {
 			)
 		}
 		section("Uninstall:") {
-			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstall.png")
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 	}
 }
@@ -673,7 +671,7 @@ def devModeTestingPage() {
 				multiple: false,
 				submitOnChange: true,
 				metadata: [values:["Activate Account", "Update Account"]],
-				image: getAppImg("settings.png")
+				image: getAppImg("userinput.png")
 			)
 			input(
 				"userSelectedOptionOne", "enum",
@@ -682,7 +680,7 @@ def devModeTestingPage() {
 				multiple: false,
 				submitOnChange: true,
 				metadata: [values:["Initial Installation", "Add/Remove Devices", "Update Token"]],
-				image: getAppImg("settings.png")
+				image: getAppImg("userinput.png")
 			)
 			input(
 				"userSelectedOptionThree", "enum",
