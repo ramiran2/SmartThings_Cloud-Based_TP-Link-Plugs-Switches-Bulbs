@@ -411,7 +411,7 @@ def removeDevicesPage() {
 def userPreferencesPage() {
 	def userPreferencesPageText = "Welcome to the application settings page. \n\r" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
-		"Switch the device handlers: You will be able to switch to the legacy device handlers provided you have them installed. \n\r" +
+		"Switch the device handlers: You will be able to switch to the legacy device handlers provided you have them installed. \n\r"
 	return dynamicPage(
 		name: "userPreferencesPage",
 		title: "Settings Page",
