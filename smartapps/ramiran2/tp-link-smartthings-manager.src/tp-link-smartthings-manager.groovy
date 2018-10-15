@@ -179,31 +179,11 @@ def authenticationPage() {
 			paragraph title: "Information:", authenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
-			input(
-				"userName", "email",
-				title: "TP-Link Kasa Email Address",
-				required: true,
-				submitOnChange: true,
-				image: getAppImg("email.png")
-			)
-			input(
-				"userPassword", "password",
-				title: "TP-Link Kasa Account Password",
-				required: true,
-				submitOnChange: true,
-				image: getAppImg("password.png")
-			)
+			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input(
-				"userSelectedOptionTwo", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Update Account", "Activate Account", "About Application"]],
-				image: getAppImg("userinput.png")
-			)
+			input (name: "userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				getToken()
 			}
@@ -261,7 +241,7 @@ def userSelectionPage() {
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input(
+			input (
 				"userSelectedOptionOne", "enum",
 				title: "What do you want to do?",
 				required: true,
@@ -339,15 +319,7 @@ def addDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input(
-				"userSelectedDevicesAdd", "enum",
-				required: true,
-				multiple: true,
-				submitOnChange: true,
-				title: "Select Devices (${newDevices.size() ?: 0} found)",
-				metadata: [values:newDevices],
-				image: getAppImg("adddevices.png")
-			)
+			input (name: "userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
 	}
 }
@@ -394,15 +366,7 @@ def removeDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input(
-				"userSelectedDevicesRemove", "enum",
-				required: true,
-				multiple: true,
-				submitOnChange: true,
-				title: "Select Devices (${oldDevices.size() ?: 0} found)",
-				metadata: [values:oldDevices],
-				image: getAppImg("removedevices.png")
-			)
+			input (name: "userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 	}
 }
@@ -411,7 +375,7 @@ def removeDevicesPage() {
 def userPreferencesPage() {
 	def userPreferencesPageText = "Welcome to the application settings page. \n\r" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
-		"Switch the device handlers: You will be able to switch to the legacy device handlers provided you have them installed. \n\r"
+		"Switch device handlers: You will be able to switch to the legacy device handlers provided you have them installed."
 	return dynamicPage(
 		name: "userPreferencesPage",
 		title: "Settings Page",
@@ -429,48 +393,27 @@ def userPreferencesPage() {
 			paragraph title: "Information:", userPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
-			input(
-				"userSelectedDeveloper", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
-			)
+			input (name: "userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 		}
 		section("Device Configuration:") {
 			if (userLightTransTime != null && userRefreshRate != null){
 				sendEvent(name: "lightTransTime", value: userLightTransTime)
 				sendEvent(name: "refreshRate", value: userRefreshRate)
-				paragraph sendingDataSuccess(), image: getAppImg("send.png")
+				paragraph sendingDataSuccess(), image: getAppImg("sent.png")
 			} else {
 				paragraph sendingDataFailed(), image: getAppImg("issue.png")
 			}
-			input(
-				"userLightTransTime", "number",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				title: "Lighting Transition Time",
-				description: "0 to 60 seconds",
-				image: getAppImg("transition.png")
-			)
-			input(
-				"userRefreshRate", "enum",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				title: "Device Refresh Rate",
-				metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]],
-				image: getAppImg("refresh.png")
-			)
+			input (name: "userLightTransTime", "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
+			input (name: "userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
 }
 
 //	----- TOKEN MANAGER PAGE -----
-def tokenPage () {
+def tokenPage() {
 	def tokenPageText = "Your current token:\n\r\n\r${state.TpLinkToken}" + 
 		"\n\rAvailable actions:\n\r" +
 		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
@@ -499,20 +442,31 @@ def tokenPage () {
 			}
 		}
 		section("User Configuration:") {
-			input(
-				"userSelectedOptionThree", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Update Token", "Delete Token", "Update Credentials"]],
-				image: getAppImg("token.png")
-			)
+			input (name: "userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
+		}
+		section("Page Selector:") {
+			if (userSelectedOptionThree != null) {
+				if (state.currentError != null){
+					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+				} else {
+					if (userSelectedOptionThree =~ "Update Credentials") {
+						paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+					}
+				}
+			} else {
+				paragraph sendingCommandFailed(), image: getAppImg("issue.png")
+				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
+			}
 			if (userSelectedOptionThree =~ "Update Token") {
 				getToken()
+				paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 			}
 			if (userSelectedOptionThree =~ "Delete Token") {
 				state.TpLinkToken = null
+				paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
+			}
+			if (userSelectedOptionThree =~ "Update Credentials") {
+				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
 			}
 		}
 	}
@@ -563,7 +517,7 @@ def developerPage() {
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089"){
 				href "hiddenPage", title: "xKiller Clan Page", description: "Tap to view", image: getAppImg("xkillerclan.png")
 			}
-			if (devModeLoaded){
+			if (devTestingLoaded){
 				href "devModeTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -575,14 +529,8 @@ def developerPage() {
 			if (userSelectedReload){
 				setInitialStates()
 			}
-			input(
-				"devModeLoaded", "bool",
-				title: "Do you want to enable developer testing page?",
-				submitOnChange: true,
-				required: false,
-				image: getAppImg("developer.png")
-			)
-			if (devModeLoaded && userSelectedReload || hiddenInput == 1){
+			input (name: "devTestingLoaded", "bool", title: "Do you want to enable developer testing page?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
+			if (devTestingLoaded && userSelectedReload || hiddenInput == 1){
 				hiddenInput = 1
 				input (name: "restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: Maverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
@@ -647,123 +595,39 @@ def devModeTestingPage() {
 			paragraph title: "Current Error:", "${state.currentError}", image: getAppImg("error.png")
 			paragraph title: "Error Messages:", "${errMsg}", image: getAppImg("error.png")
 		}
-		section("User Configuration:") {
-			input(
-				"userSelectedOptionTwo", "enum",
-				title: "What do you want to do?",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Activate Account", "Update Account"]],
-				image: getAppImg("userinput.png")
-			)
-			input(
-				"userSelectedOptionOne", "enum",
-				title: "What do you want to do?",
-				required: false,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Initial Installation", "Add/Remove Devices", "Update Token"]],
-				image: getAppImg("userinput.png")
-			)
-			input(
-				"userSelectedOptionThree", "enum",
-				title: "What do you want to do?",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				metadata: [values:["Update Token", "Delete Token", "Update Credentials"]],
-				image: getAppImg("token.png")
-			)
-		}
-		section("Extra Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("userSelectionPageSync", "bool", title: "Do you want to reload the settings page?", required: false, submitOnChange: true, image: getAppImg("reload.png"))
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input(
-				"userSelectedDeveloper", "bool",
-				title: "Do you want to enable developer mode?",
-				submitOnChange: true,
-				image: getAppImg("developer.png")
-			)
-		}
 		section("Page Selector:") {
 			paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 			paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
 		section("Account Configuration:") {
-			input(
-				"userName", "email",
-				title: "TP-Link Kasa Email Address",
-				required: false,
-				image: getAppImg("email.png")
-			)
-			input(
-				"userPassword", "password",
-				title: "TP-Link Kasa Account Password",
-				required: false,
-				image: getAppImg("password.png")
-			)
+			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+		}
+		section("User Configuration:") {
+			input (name: "userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "About Application"]], image: getAppImg("userinput.png"))
+		}
+		section("Device Controller:") {
+			input (name: "userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input (name: "userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+		}
+		section("Application Configuration:") {
+			input (name: "appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input (name: "userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 		}
 		section("Device Configuration:") {
-			input(
-				"userSelectedRemoveMode", "bool",
-				title: "Do you want to enable device removal mode?",
-				submitOnChange: true,
-				image: getAppImg("deviceremover.png")
-			)
-			input(
-				"userSelectedDevicesRemove", "enum",
-				required: false,
-				multiple: true,
-				submitOnChange: true,
-				title: "Select Devices (${oldDevices.size() ?: 0} found)",
-				metadata: [values:oldDevices],
-				image: getAppImg("devices.png")
-			)
-			input(
-				"userSelectedDevicesAdd", "enum",
-				required: false,
-				multiple: true,
-				submitOnChange: true,
-				title: "Select Devices (${newDevices.size() ?: 0} found)",
-				metadata: [values:newDevices],
-				image: getAppImg("devices.png")
-			)
-			input(
-				"userLightTransTime", "number",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				title: "Lighting Transition Time",
-				description: "0 to 60 seconds",
-				image: getAppImg("transition.png")
-			)
-			input(
-				"userRefreshRate", "enum",
-				required: true,
-				multiple: false,
-				submitOnChange: true,
-				title: "Device Refresh Rate",
-				metadata: [values:["5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]],
-				image: getAppImg("refresh.png")
-			)
-		}
-		section("Saving Settings:") {
 			paragraph sendingDataSuccess(), image: getAppImg("send.png")
 			paragraph sendingDataFailed(), image: getAppImg("issue.png")
-		}
-		section("Account Status:") {
-			paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
-			paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			input (name: "userLightTransTime", "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
+			input (name: "userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
 }
 
 //	----- HIDDEN PAGE -----
-def hiddenPage () {
+def hiddenPage() {
 	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had" 
 	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah,xKillerSierra, Weirdowack"
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
@@ -839,7 +703,7 @@ def aboutPage() {
 }
 
 //	----- CHANGELOG PAGE -----
-def changeLogPage () {
+def changeLogPage() {
 	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -853,7 +717,7 @@ def changeLogPage () {
 
 //	----- UNINSTALL PAGE -----
 def uninstallPage() {
-	def uninstallPageText = "This will uninstall the App, All Child Devices.\nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+	def uninstallPageText = "This will uninstall the App, All Child Devices. \nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 	dynamicPage(name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -861,7 +725,7 @@ def uninstallPage() {
 		section("Information:") {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
-		remove("Remove ${appLabel()} and Devices!", "WARNING!!!", "Last Chance to Stop!\nThis action is not reversible\n\nThis App, All Devices, and Automations will be removed")
+		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
 	}
 }
 
@@ -1236,6 +1100,8 @@ def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker() { return false }
 def sendingDataSuccess()	{ return "Data Sent to All Devices" }
 def sendingDataFailed()	{ return "Ready to Send Data to All Devices" }
+def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
+def sendingCommandFailed()	{ return "Ready to Send Command to SmartThings Application" }
 def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
 def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
 def pageSelectorText()	{ return "Please tap below to continue" }
