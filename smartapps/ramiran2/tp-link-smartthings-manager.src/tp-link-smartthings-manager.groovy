@@ -58,9 +58,9 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settingUpdate(name: "userSelectedReload", "false", type: "bool")
-	settingRemove(name: "userSelectedDevicesRemove")
-	settingRemove(name: "userSelectedDevicesAdd")
+	settingUpdate("userSelectedReload", "false", "bool")
+	settingRemove("userSelectedDevicesRemove")
+	settingRemove("userSelectedDevicesAdd")
 }
 
 def setRecommendedOptions() {
@@ -79,35 +79,35 @@ def setRecommendedOptions() {
 			}
 		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
-			settingUpdate(name: "userSelectedOptionTwo", "Activate Account", type: "enum")
+			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
 		} else {
-			settingUpdate(name: "userSelectedOptionTwo", "Update Account", type: "enum")
+			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
 		}
 		if (state.TpLinkToken != null) {
 			if (newDevices != [:]) {
-				settingUpdate(name: "userSelectedOptionOne", "Add Devices", type: "enum")
+				settingUpdate("userSelectedOptionOne", "Add Devices", "enum")
 			}
 			if (oldDevices != [:] && newDevices =~ [:]) {
-				settingUpdate(name: "userSelectedOptionOne", "Remove Devices", type: "enum")
+				settingUpdate("userSelectedOptionOne", "Remove Devices", "enum")
 			}
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				settingUpdate(name: "userSelectedOptionOne", "Initial Installation", type: "enum")
+				settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
 			} else {
-				settingUpdate(name: "userSelectedOptionOne", "Update Token", type: "enum")
+				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
 			}
 		}
 		if (state.currentError != null) {
-			settingUpdate(name: "userSelectedOptionThree", "Update Credentials", type: "enum")
+			settingUpdate("userSelectedOptionThree", "Update Credentials", "enum")
 		} else {
 			if (state.TpLinkToken != null) {
 				if (userSelectedOptionTwo =~ "Update Account") {
-					settingUpdate(name: "userSelectedOptionThree", "Update Token", type: "enum")
+					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 				} else {
-					settingUpdate(name: "userSelectedOptionThree", "Delete Token", type: "enum")
+					settingUpdate("userSelectedOptionThree", "Delete Token", "enum")
 				}
 			} else {
-				settingUpdate(name: "userSelectedOptionThree", "Update Token", type: "enum")
+				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 			}
 		}
 	}
@@ -192,11 +192,11 @@ def authenticationPage() {
 			paragraph title: "Information:", authenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
-			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
-			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionTwo", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Remove Devices"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Remove Devices"]], image: getAppImg("userinput.png"))
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				getToken()
 			}
@@ -254,7 +254,7 @@ def userSelectionPage() {
 			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionOne", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne != null) {
@@ -324,7 +324,7 @@ def addDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input (name: "userSelectedDevicesAdd", type: "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
 	}
 }
@@ -371,7 +371,7 @@ def removeDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input (name: "userSelectedDevicesRemove", type: "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 	}
 }
@@ -398,10 +398,10 @@ def userPreferencesPage() {
 			paragraph title: "Information:", userPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input (name: "appIcons", type: "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
-			input (name: "userSelectedDeveloper", type: "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 		}
 		section("Device Configuration:") {
 			if (userLightTransTime != null && userRefreshRate != null) {
@@ -411,8 +411,8 @@ def userPreferencesPage() {
 			} else {
 				paragraph sendingDataFailed(), image: getAppImg("issue.png")
 			}
-			input (name: "userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
-			input (name: "userRefreshRate", type: "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			input ("userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
 }
@@ -447,7 +447,7 @@ def tokenPage() {
 			}
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionThree", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionThree != null) {
@@ -529,14 +529,14 @@ def developerPage() {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		section("Application Configuration:") {
-			input (name: "userSelectedReload", type: "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload) {
 				setInitialStates()
 			}
-			input (name: "devTestingLoaded", "bool", title: "Do you want to enable developer testing page?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
+			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing page?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
-				input (name: "restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: Maverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
+				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: Maverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
 		}
 	}
@@ -605,27 +605,27 @@ def devModeTestingPage() {
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
 		section("Account Configuration:") {
-			input (name: "userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
-			input (name: "userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input (name: "userSelectedOptionTwo", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Remove Devices"]], image: getAppImg("userinput.png"))
-			input (name: "userSelectedOptionOne", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
-			input (name: "userSelectedOptionThree", type: "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Remove Devices"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller:") {
-			input (name: "userSelectedDevicesAdd", type: "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
-			input (name: "userSelectedDevicesRemove", type: "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration:") {
-			input (name: "appIcons", type: "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input (name: "userSelectedAssistant", type: "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input (name: "userSelectedDriver", type: "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
-			input (name: "userSelectedDeveloper", type: "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 		}
 		section("Device Configuration:") {
-			input (name: "userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
-			input (name: "userRefreshRate", type: "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			input ("userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
 }
