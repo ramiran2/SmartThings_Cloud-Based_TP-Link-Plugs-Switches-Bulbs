@@ -154,8 +154,8 @@ def welcomePage() {
 			}
 		}
 		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+			href url: getWikiPageUrl(), style: "embedded", required:false, title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style: "embedded", required:false, title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -637,16 +637,17 @@ def hiddenPage() {
 			paragraph "Minecraft Bedrock Edition", image: getAppImg("minecraft.png")
 		}
 		section("Easter Eggs:") {
-			href url: linkYoutubeEE1(), style:"external", required: false, title:"Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE2(), style:"external", required: false, title:"Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE3(), style:"external", required: false, title:"Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE1(), style: "external", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE2(), style: "external", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE3(), style: "external", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkMinecraft(), style: "external", required: false, title: "Minecraft Bedrock Edition Realm - Rosalia V.4", description: "Tap to open in browser", state: "complete", image: getAppImg("minecraft.png")
 		}
 		section("Contact:") {
-			href url: linkDiscord(), style:"external", required: false, title:"Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
-			href url: linkWaypoint(), style:"external", required: false, title:"Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
-			href url: linkXbox(), style:"external", required: false, title:"Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
-			href url: linkSteam(), style:"external", required: false, title:"Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
-			href url: linkFacebook(), style:"external", required: false, title:"Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
+			href url: linkDiscord(), style: "external", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
+			href url: linkWaypoint(), style: "external", required: false, title: "Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
+			href url: linkXbox(), style: "external", required: false, title: "Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
+			href url: linkSteam(), style: "external", required: false, title: "Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
+			href url: linkFacebook(), style: "external", required: false, title: "Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
 		}
 	}
 }
@@ -658,7 +659,7 @@ def aboutPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
-			href url: textDonateLinkAntR(), style:"external", required: false, title:"Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
+			href url: textDonateLinkAntR(), style: "external", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
@@ -672,9 +673,9 @@ def aboutPage() {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("GitHub:") {
-			href url: linkGitHubDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubDavG(), style: "external", required: false, title: "Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntR(), style: "external", required: false, title: "Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntS(), style: "external", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
@@ -1106,6 +1107,7 @@ def linkYoutubeEE2()	{ return "https://www.youtube.com/watch?v=0eYTZrucx_o" }
 def linkYoutubeEE3()	{ return "https://www.youtube.com/watch?v=4_5kpOeiZyg&index=3&list=PL0S-Da7zGmE-i5MQdHORm6a" }
 def linkDiscord()	{ return "https://discord.gg/JDXeV23" }
 def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=3379843591790358" }
+def linkMinecraft()	{ return "https://realms.gg/0EOy4uYzhxQ" }
 def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
 def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
 def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
