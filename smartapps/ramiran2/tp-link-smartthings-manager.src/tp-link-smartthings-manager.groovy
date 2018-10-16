@@ -496,7 +496,6 @@ def developerPage() {
 			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
-			href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			if (devTestingLoaded) {
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
@@ -634,13 +633,12 @@ def hiddenPage() {
 			paragraph "Call of Duty Black Ops 2", image: getAppImg("callofdutyblackops2.png")
 			paragraph "Halo 5 Guardians", image: getAppImg("halo5.png")
 			paragraph "Vainglory - Guild: XKILLER, Team: xKiller Clan", image: getAppImg("vainglory.png")
-			paragraph "Minecraft Bedrock Edition", image: getAppImg("minecraft.png")
+			paragraph "Minecraft Bedrock Edition - Realm: 0EOy4uYzhxQ", image: getAppImg("minecraft.png")
 		}
 		section("Easter Eggs:") {
 			href url: linkYoutubeEE1(), style: "external", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE2(), style: "external", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE3(), style: "external", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkMinecraft(), style: "external", required: false, title: "Minecraft Bedrock Edition Realm - Rosalia V.4", description: "Tap to open in browser", state: "complete", image: getAppImg("minecraft.png")
 		}
 		section("Contact:") {
 			href url: linkDiscord(), style: "external", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
@@ -1107,7 +1105,6 @@ def linkYoutubeEE2()	{ return "https://www.youtube.com/watch?v=0eYTZrucx_o" }
 def linkYoutubeEE3()	{ return "https://www.youtube.com/watch?v=4_5kpOeiZyg&index=3&list=PL0S-Da7zGmE-i5MQdHORm6a" }
 def linkDiscord()	{ return "https://discord.gg/JDXeV23" }
 def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=3379843591790358" }
-def linkMinecraft()	{ return "https://realms.gg/0EOy4uYzhxQ" }
 def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
 def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
 def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
