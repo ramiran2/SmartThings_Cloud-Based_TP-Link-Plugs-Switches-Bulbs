@@ -177,7 +177,7 @@ def authenticationPage() {
 	def authenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
-		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Hub. \n\r" +
+		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n\r" +
 		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
 	return dynamicPage (name: "authenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
@@ -378,7 +378,7 @@ def removeDevicesPage() {
 		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
 	if (oldDevices == [:]) {
-		errorMsgDev = "There are no devices to remove from the smart things app at this time."
+		errorMsgDev = "There are no devices to remove from the SmartThings app at this time."
 	}
 	def removeDevicesPageText = "Devices that have been installed " +
 		"will appear below. Tap below to see the list of " +
@@ -563,13 +563,20 @@ def developerPage() {
 		section("Page Selector:") {
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+			if (devTestingLoaded) {
+				href "userSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+			}
 			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+			if (devTestingLoaded) {
+				href "computerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+			}
 			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			if (devTestingLoaded) {
+				href "developerPage", title: "Developer Page", description: "Tap to continue", image: getAppImg("developerpage.png")
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
@@ -584,7 +591,7 @@ def developerPage() {
 			if (userSelectedReload) {
 				setInitialStates()
 			}
-			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing page?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
+			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
@@ -631,7 +638,7 @@ def developerTestingPage() {
 		"Control Mode?"
 	}
 	if (oldDevices == [:]) {
-		errorMsgOld = "No current devices to remove from smart things."
+		errorMsgOld = "No current devices to remove from SmartThings."
 	}
 	return dynamicPage (name: "developerTestingPage", title: "Developer Testing Page", install: false, uninstall: false) {
 		section("") {
