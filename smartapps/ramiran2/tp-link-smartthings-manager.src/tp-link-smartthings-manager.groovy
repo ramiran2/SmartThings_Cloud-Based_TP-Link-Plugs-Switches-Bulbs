@@ -59,6 +59,7 @@ def setInitialStates() {
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
 	settingUpdate("userSelectedReload", "false", "bool")
+	settingUpdate("userSelectedDevicePreferences", "false", "bool")
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
 }
@@ -119,11 +120,7 @@ def welcomePage() {
 	setRecommendedOptions()
 		def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
 		def driverVersionText = "TP-Link Kasa Drivers for SmartThings: " + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${legacyDriverVersion()} " + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
-	return dynamicPage(
-		name: "welcomePage",
-		title: "Welcome Page",
-		install: false,
-		uninstall: false) {
+	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -151,12 +148,14 @@ def welcomePage() {
 		section("Settings:") {
 			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
 		}
-		section("Help and Feedback:") {
-			if (userSelectedDeveloper) {
-				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developer.png")
+		if (userSelectedDeveloper) {
+			section("Developer:") {
+				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			}
-			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description:"Tap to open in browser", state: "complete", image: getAppImg("help.png")
-			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description:"Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+		}
+		section("Help and Feedback:") {
+			href url: getWikiPageUrl(), style:"embedded", required:false, title:"View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style:"embedded", required:false, title:"Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -175,11 +174,7 @@ def authenticationPage() {
 		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
 		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Hub. \n\r" +
 		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
-	return dynamicPage(
-		name: "authenticationPage",
-		title: "Login Page",
-		install: false,
-		uninstall: false) {
+	return dynamicPage (name: "authenticationPage", title: "Login Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -236,11 +231,7 @@ def userSelectionPage() {
 		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
 	}
-	return dynamicPage(
-		name: "userSelectionPage",
-		title: "Launcher Page",
-		install: false,
-		uninstall: false) {
+	return dynamicPage (name: "userSelectionPage", title: "Launcher Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -306,11 +297,7 @@ def addDevicesPage() {
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Save to add the devices to your SmartThings account."
-	return dynamicPage(
-		name: "addDevicesPage",
-		title: "Device Installer Page",
-		install: true,
-		uninstall: false) {
+	return dynamicPage (name: "addDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -353,11 +340,7 @@ def removeDevicesPage() {
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
 		"wish to remove, then Press Save to remove the devices to your SmartThings account."
-	return dynamicPage(
-		name: "removeDevicesPage",
-		title: "Device Uninstaller Page",
-		install: true,
-		uninstall: false) {
+	return dynamicPage (name: "removeDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -381,11 +364,7 @@ def userPreferencesPage() {
 	def userPreferencesPageText = "Welcome to the application settings page. \n\r" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
 		"Switch device handlers: You will be able to switch to the legacy device handlers provided you have them installed."
-	return dynamicPage(
-		name: "userPreferencesPage",
-		title: "Settings Page",
-		install: true,
-		uninstall: false) {
+	return dynamicPage (name: "userPreferencesPage", title: "Settings Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -398,13 +377,14 @@ def userPreferencesPage() {
 			paragraph title: "Information:", userPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedDevicePreferences", "bool", title: "Do you want to save your device preferences?", required: false, submitOnChange: true, image: getAppImg("devicesettings.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("Device Configuration:") {
-			if (userLightTransTime != null && userRefreshRate != null) {
+			if (userLightTransTime != null && userRefreshRate != null && userSelectedDevicePreferences) {
 				sendEvent(name: "lightTransTime", value: userLightTransTime)
 				sendEvent(name: "refreshRate", value: userRefreshRate)
 				paragraph sendingDataSuccess(), image: getAppImg("sent.png")
@@ -431,7 +411,7 @@ def tokenPage() {
 		if (state.currentError != null) {
 			errorMsgTok = "You may not be able to control your devices until you update your credentials."
 		}
-	dynamicPage(name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
+	dynamicPage (name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -494,11 +474,7 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	return dynamicPage(
-		name: "developerPage",
-		title: "Developer Page",
-		install: false,
-		uninstall: false) {
+	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -513,16 +489,19 @@ def developerPage() {
 			paragraph title: "New Devices:", "${newDevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector:") {
-			href "startPage", title: "Start Page", description: "Tap to view", image: getAppImg("startpage.png")
+			href "welcomePagePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
-			href "userSelectionPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
-			href "selectDevices", title: "Device Manager Page", description: "Tap to view", image: getAppImg("devicemanager.png")
+			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+			href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
+			if (devTestingLoaded) {
+				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
+			}
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
 				href "hiddenPage", title: "xKiller Clan Page", description: "Tap to view", image: getAppImg("xkillerclan.png")
-			}
-			if (devTestingLoaded) {
-				href "devModeTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
@@ -543,7 +522,7 @@ def developerPage() {
 }
 
 //	----- DEVELOPER TESTING PAGE -----
-def devModeTestingPage() {
+def developerTestingPage() {
 	getDevices()
 	def devices = state.devices
 	def newDevices = [:]
@@ -581,11 +560,7 @@ def devModeTestingPage() {
 	if (oldDevices == [:]) {
 		errorMsgOld = "No current devices to remove from smart things."
 	}
-	return dynamicPage(
-		name: "devModeTestingPage",
-		title: "Developer Testing Page",
-		install: false,
-		uninstall: false) {
+	return dynamicPage (name: "developerTestingPage", title: "Developer Testing Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -618,10 +593,11 @@ def devModeTestingPage() {
 			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration:") {
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedDevicePreferences", "bool", title: "Do you want to save your device preferences?", required: false, submitOnChange: true, image: getAppImg("devicesettings.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
-			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("Device Configuration:") {
 			input ("userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
@@ -635,7 +611,7 @@ def hiddenPage() {
 	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had" 
 	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah,xKillerSierra, Weirdowack"
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
-	dynamicPage(name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
+	dynamicPage (name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("xkillerclan.png")
 		}
@@ -661,28 +637,28 @@ def hiddenPage() {
 			paragraph "Minecraft Bedrock Edition", image: getAppImg("minecraft.png")
 		}
 		section("Easter Eggs:") {
-			href url: linkYoutubeEE1(), style:"external", required: false, title:"Youtube Link #1", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE2(), style:"external", required: false, title:"Youtube Link #2", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE3(), style:"external", required: false, title:"Youtube Link #3", description:"Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE1(), style:"external", required: false, title:"Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE2(), style:"external", required: false, title:"Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE3(), style:"external", required: false, title:"Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 		}
 		section("Contact:") {
-			href url: linkDiscord(), style:"external", required: false, title:"Discord", description:"Tap to open in browser", state: "complete", image: getAppImg("discord.png")
-			href url: linkWaypoint(), style:"external", required: false, title:"Halo Waypoint", description:"Tap to open in browser", state: "complete", image: getAppImg("waypoint.ico")
-			href url: linkXbox(), style:"external", required: false, title:"Xbox", description:"Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
-			href url: linkSteam(), style:"external", required: false, title:"Steam", description:"Tap to open in browser", state: "complete", image: getAppImg("steam.png")
-			href url: linkFacebook(), style:"external", required: false, title:"Facebook", description:"Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
+			href url: linkDiscord(), style:"external", required: false, title:"Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
+			href url: linkWaypoint(), style:"external", required: false, title:"Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
+			href url: linkXbox(), style:"external", required: false, title:"Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
+			href url: linkSteam(), style:"external", required: false, title:"Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
+			href url: linkFacebook(), style:"external", required: false, title:"Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
 		}
 	}
 }
 
 //	----- ABOUT PAGE -----
 def aboutPage() {
-	dynamicPage(name: "aboutPage", title: "About Page", install: false, uninstall: false) {
+	dynamicPage (name: "aboutPage", title: "About Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
-			href url: textDonateLinkAntR(), style:"external", required: false, title:"Donations (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
+			href url: textDonateLinkAntR(), style:"external", required: false, title:"Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
@@ -696,9 +672,9 @@ def aboutPage() {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("GitHub:") {
-			href url: linkGitHubDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description:"Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubDavG(), style:"external", required: false, title:"Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntR(), style:"external", required: false, title:"Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntS(), style:"external", required: false, title:"Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
@@ -708,7 +684,7 @@ def aboutPage() {
 
 //	----- CHANGELOG PAGE -----
 def changeLogPage() {
-	dynamicPage(name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
+	dynamicPage (name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -722,7 +698,7 @@ def changeLogPage() {
 //	----- UNINSTALL PAGE -----
 def uninstallPage() {
 	def uninstallPageText = "This will uninstall the App, All Child Devices. \nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
-	dynamicPage(name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
+	dynamicPage (name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
