@@ -419,7 +419,7 @@ def userPreferencesPage() {
 
 //	----- TOKEN MANAGER PAGE -----
 def tokenPage() {
-	def tokenPageText = "Your current token:\n\r\n\r${state.TpLinkToken}" + 
+	def tokenPageText = "Your current token: ${state.TpLinkToken}" + 
 		"\n\rAvailable actions:\n\r" +
 		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
 		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
