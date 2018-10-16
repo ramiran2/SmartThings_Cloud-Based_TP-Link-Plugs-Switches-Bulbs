@@ -63,7 +63,7 @@ metadata {
 				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"st.Appliances.appliances17", backgroundColor:"#e86d13",
 				nextState:"waiting"
 			}
- 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
+			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 		}
@@ -257,7 +257,7 @@ def actionDirector(action, cmdResponse) {
 			break
 
 		default:
-			log.debug "Interface Error.  See SmartApp and Device error message."
+			log.debug "Interface Error. See SmartApp and Device error message."
 	}
 }
 
@@ -294,6 +294,10 @@ def setRefreshRate(refreshRate) {
 		case "15":
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		case "30":
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
 		default:
 			runEvery30Minutes(refresh)

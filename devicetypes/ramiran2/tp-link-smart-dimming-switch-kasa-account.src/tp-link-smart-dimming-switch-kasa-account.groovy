@@ -71,7 +71,7 @@ metadata {
 					attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel", range: "(1..100)"
 				}
 			}
- 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
+			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 		}
@@ -192,7 +192,7 @@ def refreshResponse(cmdResponse){
 	def level = "0"
 	if (state.deviceType =~ "Dimming Switch") {
 		level = cmdResponse.system.get_sysinfo.brightness
-	 	sendEvent(name: "level", value: level)
+		sendEvent(name: "level", value: level)
 	}
 	log.info "${device.name} ${device.label}: Power: ${onOff} / Dimmer Level: ${level}%"
 }
@@ -269,7 +269,7 @@ def actionDirector(action, cmdResponse) {
 			break
 
 		default:
-			log.debug "Interface Error.  See SmartApp and Device error message."
+			log.debug "Interface Error. See SmartApp and Device error message."
 	}
 }
 
@@ -306,6 +306,10 @@ def setRefreshRate(refreshRate) {
 		case "15":
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		case "30":
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
 		default:
 			runEvery30Minutes(refresh)

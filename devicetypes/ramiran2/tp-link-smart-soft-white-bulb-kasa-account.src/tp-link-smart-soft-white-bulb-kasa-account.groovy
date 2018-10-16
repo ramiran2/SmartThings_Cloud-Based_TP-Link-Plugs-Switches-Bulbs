@@ -22,7 +22,7 @@ All development is based upon open-source data on the
 TP-Link devices; primarily various users on GitHub.com.
 
 	===== Bulb Identifier. DO NOT EDIT ====================*/
-	def deviceType = "Soft White Bulb"	//	Soft White
+	def deviceType = "Soft White Bulb"		//	Soft White
 	//def deviceType = "Tunable White Bulb"	//	Color Temp
 	//def deviceType = "Color Bulb"			//	Color
 //	===== Hub or Cloud Installation ==========================
@@ -174,7 +174,7 @@ def update() {
 		setRefreshRate(30)
 	}
 	if (lightTransTime >= 0 && lightTransTime <= 60) {
- 	def adjustedTime = lightTransTime*1000
+		def adjustedTime = lightTransTime*1000
 		setLightTransTime(adjustedTime)
 	} else {
 		setLightTransTime(5000)
@@ -255,7 +255,7 @@ def commandResponse(cmdResponse){
 	def saturation = status.saturation
 	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "switch", value: onOff)
- 	sendEvent(name: "level", value: level)
+	sendEvent(name: "level", value: level)
 	if (state.deviceType =~ "Tunable White Bulb" || "Color Bulb") {
 		sendEvent(name: "bulbMode", value: mode)
 		sendEvent(name: "colorTemperature", value: color_temp)
@@ -375,6 +375,10 @@ def setRefreshRate(refreshRate) {
 		case "15":
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		case "30":
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
 		default:
 			runEvery30Minutes(refresh)

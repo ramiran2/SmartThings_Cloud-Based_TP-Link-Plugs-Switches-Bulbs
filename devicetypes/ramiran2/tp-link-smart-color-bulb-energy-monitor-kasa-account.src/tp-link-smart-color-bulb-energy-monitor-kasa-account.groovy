@@ -212,7 +212,7 @@ def update() {
 		setRefreshRate(30)
 	}
 	if (lightTransTime >= 0 && lightTransTime <= 60) {
- 	def adjustedTime = lightTransTime*1000
+		def adjustedTime = lightTransTime*1000
 		setLightTransTime(adjustedTime)
 	} else {
 		setLightTransTime(5000)
@@ -305,7 +305,7 @@ def commandResponse(cmdResponse){
 	def saturation = status.saturation
 	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
 	sendEvent(name: "switch", value: onOff)
- 	sendEvent(name: "level", value: level)
+	sendEvent(name: "level", value: level)
 	if (state.deviceType =~ "Tunable White Bulb" || "Color Bulb") {
 		sendEvent(name: "bulbMode", value: mode)
 		sendEvent(name: "colorTemperature", value: color_temp)
@@ -364,7 +364,7 @@ def useTodayResponse(cmdResponse) {
 		wattHrData = dayList[i]
 		if(wattHrData.day == state.dayToday) {
 			wattHrToday = wattHrData."${state.energyScale}"
- 		}
+		}
 	}
 	if (state.powerScale =~ "power") {
 		wattHrToday = Math.round(1000*wattHrToday)
@@ -425,7 +425,7 @@ def engrStatsResponse(cmdResponse) {
 	def wkTotEnergy = state.wkTotEnergy
 	def monTotDays = state.monTotDays
 	def wkTotDays = state.wkTotDays
- def startDay = state.dayStart
+	def startDay = state.dayStart
 	def dataMonth = dayList[0].month
 	if (dataMonth == state.monthToday) {
 		for (int i = 0; i < dayList.size(); i++) {
@@ -444,7 +444,7 @@ def engrStatsResponse(cmdResponse) {
 			}
 		}
 	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
- 	startDay = 1
+		startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -483,9 +483,9 @@ def engrStatsResponse(cmdResponse) {
 	state.wkTotEnergy = wkTotEnergy
 	state.wkTotDays = wkTotDays
 	log.info "$device.name $device.label: Update 7 and 30 day energy consumption statistics"
- if (monTotDays == 0) {
- 	//	Aviod divide by zero on 1st of month
- 	monTotDays = 1
+	if (monTotDays == 0) {
+		//	Aviod divide by zero on 1st of month
+		monTotDays = 1
  wkTotDays = 1 
 	}
 	def monAvgEnergy = monTotEnergy/monTotDays
@@ -605,7 +605,7 @@ def actionDirector(action, cmdResponse) {
 			engrStatsResponse(cmdResponse)
 			break
 		default:
-			log.info "Interface Error.  See SmartApp and Device error message."
+			log.info "Interface Error. See SmartApp and Device error message."
 	}
 }
 
@@ -646,6 +646,10 @@ def setRefreshRate(refreshRate) {
 		case "15":
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		case "30":
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
 		default:
 			runEvery30Minutes(refresh)

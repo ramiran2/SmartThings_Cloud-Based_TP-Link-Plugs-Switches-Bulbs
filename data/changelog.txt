@@ -78,6 +78,8 @@ a. Updated for new release of Device Handlers (@DaveGut)
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
+c. Removed code from switches (@ramiran2)
+d. Added Energy Monitor Plug to device selector (@ramiran2)
 
 2018-10-08 - Update to Version 3.1.3
 a. Small tweeks to code (@ramiran2)

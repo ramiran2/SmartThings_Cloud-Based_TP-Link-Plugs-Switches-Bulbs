@@ -71,7 +71,7 @@ metadata {
 				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"st.Appliances.appliances17", backgroundColor:"#e86d13",
 				nextState:"waiting"
 			}
- 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
+			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 		}
@@ -192,7 +192,7 @@ def off() {
 
 def getSystemInfo() {
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
-    runIn(2, getPower)
+	runIn(2, getPower)
 }
 
 def poll() {
@@ -203,7 +203,7 @@ def poll() {
 def refresh(){
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 	runIn(2, getPower)
-    runIn(7, getConsumption)
+	runIn(7, getConsumption)
 }
 
 def commandResponse(cmdResponse){
@@ -258,7 +258,7 @@ def useTodayResponse(cmdResponse) {
 		wattHrData = dayList[i]
 		if(wattHrData.day =~ state.dayToday) {
 			wattHrToday = wattHrData."${state.energyScale}"
- 		}
+		}
 	}
 	if (state.powerScale =~ "power") {
 		wattHrToday = Math.round(1000*wattHrToday)
@@ -315,7 +315,7 @@ def engrStatsResponse(cmdResponse) {
 	def wkTotEnergy = state.wkTotEnergy
 	def monTotDays = state.monTotDays
 	def wkTotDays = state.wkTotDays
-  def startDay = state.dayStart
+	def startDay = state.dayStart
 	def dataMonth = dayList[0].month
 	if (dataMonth == state.monthToday) {
 		for (int i = 0; i < dayList.size(); i++) {
@@ -334,7 +334,7 @@ def engrStatsResponse(cmdResponse) {
 			}
 		}
 	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
-  	startDay = 1
+		startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -373,10 +373,10 @@ def engrStatsResponse(cmdResponse) {
 	state.wkTotEnergy = wkTotEnergy
 	state.wkTotDays = wkTotDays
 	log.info "$device.name $device.label: Update 7 and 30 day energy consumption statistics"
-  if (monTotDays == 0) {
-  	//	Aviod divide by zero on 1st of month
-  	monTotDays = 1
-    wkTotDays = 1 
+	if (monTotDays == 0) {
+		//	Aviod divide by zero on 1st of month
+		monTotDays = 1
+		wkTotDays = 1
 	}
 	def monAvgEnergy = monTotEnergy/monTotDays
 	def wkAvgEnergy = wkTotEnergy/wkTotDays
@@ -537,6 +537,10 @@ def setRefreshRate(refreshRate) {
 		case "15":
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
+			break
+		case "30":
+			runEvery30Minutes(refresh)
+			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
 		default:
 			runEvery30Minutes(refresh)

@@ -235,7 +235,7 @@ def userSelectionPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-        section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
@@ -797,7 +797,7 @@ def addDevices() {
 		//	Energy Monitor Plugs
 		tpLinkModel << ["HS110" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
 		tpLinkModel << ["HS115" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
-		//	Soft White Bulbs
+			//	Soft White Bulbs
 		tpLinkModel << ["KB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	KB100
 		tpLinkModel << ["LB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB100
 		tpLinkModel << ["LB110" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB110
@@ -824,7 +824,7 @@ def addDevices() {
 		//	Energy Monitor Plugs
 		tpLinkModel << ["HS110" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
 		tpLinkModel << ["HS115" : "TP-Link Smart Energy Monitor Plug - Kasa Account"]		//	HS110
-		//	Soft White Bulbs
+			//	Soft White Bulbs
 		tpLinkModel << ["KB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	KB100
 		tpLinkModel << ["LB100" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB100
 		tpLinkModel << ["LB110" : "TP-Link Smart Soft White Bulb - Kasa Account"]			//	LB110
@@ -1064,7 +1064,7 @@ def removeChildDevice(alias, deviceNetworkId) {
 	}
 }
 
-def gitBranch()	{ return betaMarker() ? "beta" : "master"  }
+def gitBranch()	{ return betaMarker() ? "beta" : "master" }
 def getAppImg(imgName, on = null)	{ return (!appIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
