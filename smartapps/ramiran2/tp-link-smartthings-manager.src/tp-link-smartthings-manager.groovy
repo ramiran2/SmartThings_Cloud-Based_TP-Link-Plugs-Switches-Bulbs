@@ -489,7 +489,7 @@ def developerPage() {
 			paragraph title: "New Devices:", "${newDevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector:") {
-			href "welcomePagePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
 			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
@@ -514,7 +514,7 @@ def developerPage() {
 			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing page?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
-				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: Maverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
+				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
 		}
 	}
