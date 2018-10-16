@@ -40,7 +40,9 @@ def legacyDriverVersion() { return "3.0.0" }
 preferences {
 	page(name: "welcomePage")
 	page(name: "authenticationPage")
+	page(name: "computerSelectionAuthenticationPage")
 	page(name: "userSelectionPage")
+	page(name: "computerSelectionPage")
 	page(name: "addDevicesPage")
 	page(name: "removeDevicesPage")
 	page(name: "userApplicationPreferencesPage")
@@ -166,6 +168,7 @@ def welcomePage() {
 		section("Uninstall:") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to continue", image: getAppImg("uninstallpage.png")
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -176,7 +179,7 @@ def authenticationPage() {
 		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
 		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Hub. \n\r" +
 		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
-	return dynamicPage (name: "authenticationPage", title: "Login Page", install: false, uninstall: false) {
+	return dynamicPage (name: "authenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -218,7 +221,25 @@ def authenticationPage() {
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
+}
+
+//	----- COMPUTER SELECTION AUTHENTICATION PAGE -----
+def computerSelectionAuthenticationPage() {
+    switch (userSelectedOptionTwo) {
+      	case "Update Account":
+          	return tokenPage()
+            break
+        case "Activate Account":
+           	return addDevicesPage()
+            break
+        case "Remove Devices":
+           	return setDefaultPreferences()
+            break
+        default:
+           	return userSelectionPage()
+    }
 }
 
 //	----- USER SELECTION PAGE -----
@@ -233,7 +254,7 @@ def userSelectionPage() {
 		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
 			"\n\rPlease resolve the error and try again."
 	}
-	return dynamicPage (name: "userSelectionPage", title: "Launcher Page", install: false, uninstall: false) {
+	return dynamicPage (name: "userSelectionPage", title: "Launcher Page", nextPage: "computerSelectionPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -272,7 +293,28 @@ def userSelectionPage() {
 				href "tokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("tokenpage.png")
 			}
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
+}
+
+//	----- COMPUTER SELECTION PAGE -----
+def computerSelectionPage() {
+    switch (userSelectedOptionOne) {
+      	case "Initial Installation":
+          	return authenticationPage()
+            break
+        case "Add Devices":
+           	return addDevicesPage()
+            break
+        case "Remove Devices":
+           	return removeDevicesPage()
+            break
+        case "Update Token":
+           	return tokenPage()
+            break
+        default:
+           	return welcomePage()
+    }
 }
 
 //	----- ADD DEVICES PAGE -----
@@ -315,6 +357,7 @@ def addDevicesPage() {
 		section("Device Controller:") {
 			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -358,6 +401,7 @@ def removeDevicesPage() {
 		section("Device Controller:") {
 			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -384,6 +428,7 @@ def userApplicationPreferencesPage() {
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -418,6 +463,7 @@ def userDevicePreferencesPage() {
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -478,6 +524,7 @@ def tokenPage() {
 				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
 			}
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -543,6 +590,7 @@ def developerPage() {
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -628,6 +676,7 @@ def developerTestingPage() {
 			input ("userLightTransTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -673,6 +722,7 @@ def hiddenPage() {
 			href url: linkSteam(), style: "external", required: false, title: "Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
 			href url: linkFacebook(), style: "external", required: false, title: "Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -704,6 +754,7 @@ def aboutPage() {
 		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -717,6 +768,7 @@ def changeLogPage() {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
 		}
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
@@ -731,11 +783,11 @@ def uninstallPage() {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
+		section("Copyright 2018, Dave Gutheinz and Anthony Ramirez")
 	}
 }
 
 def updatePreferences() {
-	log.error "at updatePreferences"
 	userSelectedDevices.each {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
