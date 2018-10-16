@@ -65,16 +65,29 @@ def setInitialStates() {
 
 def setRecommendedOptions() {
 	if (userSelectedAssistant) {
+		getDevices()
+		def devices = state.devices
+		def newDevices = [:]
+		def oldDevices = [:]
+		devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+			if (isChild) {
+				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+			if (!isChild) {
+				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
 			settingUpdate("userSelectedOptionTwo", "Activate Account", type: "enum")
 		} else {
 			settingUpdate("userSelectedOptionTwo", "Update Account", type: "enum")
 		}
 		if (state.TpLinkToken != null) {
-			if (newDevices =~ [:]) {
+			if (newDevices != [:]) {
 				settingUpdate("userSelectedOptionOne", "Add Devices", type: "enum")
 			}
-			if (oldDevices =~ [:]) {
+			if (oldDevices != [:] && newDevices =~ [:]) {
 				settingUpdate("userSelectedOptionOne", "Remove Devices", type: "enum")
 			}
 		} else {
