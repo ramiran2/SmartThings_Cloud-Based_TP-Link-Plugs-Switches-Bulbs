@@ -615,11 +615,11 @@ def hiddenPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Members:") {
-			paragraph xkMembersInfo, image: getAppImg("xkillerclanpage.png")
+			paragraph xkMembersInfo, image: getAppImg("xkillerclanv2.png")
 			paragraph xkMembers, image: getAppImg("family.png")
 		}
 		section("Games:") {
-			paragraph xkGameInfo, image: getAppImg("xkillerclan.png")
+			paragraph xkGameInfo, image: getAppImg("xkillerclanv1.png")
 			paragraph "Halo 2 For Windows Vista - RIP late 2015", image: getAppImg("halo2.png")
 			paragraph "Battlefield 3", image: getAppImg("battlefield3.png")
 			paragraph "Garrys Mod", image: getAppImg("garrysmod.png")
