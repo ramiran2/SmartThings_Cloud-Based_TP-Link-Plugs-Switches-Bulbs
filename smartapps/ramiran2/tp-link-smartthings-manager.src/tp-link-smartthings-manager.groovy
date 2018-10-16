@@ -32,8 +32,8 @@ definition(
 	singleInstance: true
 )
 
-def appVersion() { return "3.6.0" }
-def appVerDate() { return "10-15-2018" }
+def appVersion() { return "3.7.0" }
+def appVerDate() { return "10-16-2018" }
 def currentDriverVersion() { return "3.2.0" }
 def legacyDriverVersion() { return "3.0.0" }
 
@@ -141,18 +141,18 @@ def welcomePage() {
 				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			}
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
 			} else {
-				href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+				href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
 			}
 		}
 		section("Settings:") {
-			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
-			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to continue", image: getAppImg("userapplicationpreferencespage.png")
+			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to continue", image: getAppImg("userdevicepreferencespage.png")
 		}
 		if (userSelectedDeveloper) {
 			section("Developer:") {
-				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
+				href "developerPage", title: "Developer Page", description: "Tap to continue", image: getAppImg("developerpage.png")
 			}
 		}
 		section("Help and Feedback:") {
@@ -160,11 +160,11 @@ def welcomePage() {
 			href url: getIssuePageUrl(), style: "embedded", required:false, title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
-			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
-			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
+			href "aboutPage", title: "About Page", description: "Tap to continue", image: getAppImg("aboutpage.png")
+			href "changeLogPage", title: "Changelog Page", description: "Tap to continue", image: getAppImg("changelogpage.png")
 		}
 		section("Uninstall:") {
-			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to continue", image: getAppImg("uninstallpage.png")
 		}
 	}
 }
@@ -209,13 +209,13 @@ def authenticationPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
-				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionTwo =~ "Update Account") {
-				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+				href "tokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("tokenpage.png")
 			}
 			if (userSelectedOptionTwo =~ "Remove Devices") {
-				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 		}
 	}
@@ -260,16 +260,16 @@ def userSelectionPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Installation") {
-				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
 			}
 			if (userSelectedOptionOne =~ "Add Devices") {
-				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Remove Devices") {
-				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Update Token") {
-				href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+				href "tokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("tokenpage.png")
 			}
 		}
 	}
@@ -313,7 +313,7 @@ def addDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
 	}
 }
@@ -356,7 +356,7 @@ def removeDevicesPage() {
 			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 	}
 }
@@ -475,7 +475,7 @@ def tokenPage() {
 				state.TpLinkToken = null
 			}
 			if (userSelectedOptionThree =~ "Update Credentials") {
-				href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
 			}
 		}
 	}
