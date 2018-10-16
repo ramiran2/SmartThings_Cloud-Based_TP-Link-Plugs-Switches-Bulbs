@@ -43,7 +43,8 @@ preferences {
 	page(name: "userSelectionPage")
 	page(name: "addDevicesPage")
 	page(name: "removeDevicesPage")
-	page(name: "userPreferencesPage")
+	page(name: "userApplicationPreferencesPage")
+	page(name: "userDevicePreferencesPage")
 	page(name: "tokenPage")
 	page(name: "developerPage")
 	page(name: "developerTestingPage")
@@ -146,7 +147,8 @@ def welcomePage() {
 			}
 		}
 		section("Settings:") {
-			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
+			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 		}
 		if (userSelectedDeveloper) {
 			section("Developer:") {
@@ -359,12 +361,12 @@ def removeDevicesPage() {
 	}
 }
 
-//	----- USER PREFERENCES PAGE -----
-def userPreferencesPage() {
-	def userPreferencesPageText = "Welcome to the application settings page. \n\r" +
+//	----- USER APPLICATION PREFERENCES PAGE -----
+def userApplicationPreferencesPage() {
+	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n\r" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
 		"Switch device handlers: You will be able to switch to the legacy device handlers provided you have them installed."
-	return dynamicPage (name: "userPreferencesPage", title: "Settings Page", install: true, uninstall: false) {
+	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -374,25 +376,47 @@ def userPreferencesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information:", userApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input ("userSelectedDevicePreferences", "bool", title: "Do you want to save your device preferences?", required: false, submitOnChange: true, image: getAppImg("devicesettings.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
-		section("Device Configuration:") {
-			if (userLightTransTime != null && userRefreshRate != null && userSelectedDevicePreferences) {
-				sendEvent(name: "lightTransTime", value: userLightTransTime)
-				sendEvent(name: "refreshRate", value: userRefreshRate)
-				paragraph sendingDataSuccess(), image: getAppImg("sent.png")
+	}
+}
+
+//	----- USER DEVICE PREFERENCES PAGE -----
+def userDevicePreferencesPage() {
+	getDevices()
+	def devices = state.devices
+	def oldDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	def userDevicePreferencesPageText = "Welcome to the device settings page. \n\r" +
+		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n\r" +
+		"After that you may procide to save by clicking the save button."
+	return dynamicPage (name: "userDevicePreferencesPage", title: "Device Settings Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics:", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null) {
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
-				paragraph sendingDataFailed(), image: getAppImg("issue.png")
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			input ("userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			paragraph title: "Information:", userDevicePreferencesPageText, image: getAppImg("information.png")
+		}
+		section("Device Configuration:") {
+			input ("userSelectedDevices", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
 }
@@ -434,14 +458,15 @@ def tokenPage() {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
-					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 					if (userSelectedOptionThree != "Update Credentials") {
 						paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
+					} else {
+						paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 					}
 				}
 			} else {
-				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 				paragraph sendingCommandFailed(), image: getAppImg("issue.png")
+				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionThree =~ "Update Token") {
 				getToken()
@@ -494,7 +519,8 @@ def developerPage() {
 			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-			href "userPreferencesPage", title: "Settings Page", description: "Tap to view", image: getAppImg("userpreferencespage.png")
+			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
 			if (devTestingLoaded) {
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
@@ -592,14 +618,14 @@ def developerTestingPage() {
 			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration:") {
-			input ("userSelectedDevicePreferences", "bool", title: "Do you want to save your device preferences?", required: false, submitOnChange: true, image: getAppImg("devicesettings.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("Device Configuration:") {
-			input ("userLightTransTime", type: "number", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", description: "0 to 60 seconds", image: getAppImg("transition.png"))
+			input ("userSelectedDevices", "enum", required: false, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 	}
@@ -705,6 +731,16 @@ def uninstallPage() {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
+	}
+}
+
+def updatePreferences() {
+	log.error "at updatePreferences"
+	userSelectedDevices.each {
+		def child = getChildDevice(it)
+		child.setLightTransTime(userLightTransTime)
+		child.setRefreshRate(userRefreshRate)
+		log.info "Kasa device ${child} preferences updated"
 	}
 }
 
@@ -1016,6 +1052,9 @@ def initialize() {
 	if (userSelectedDevicesRemove) {
 		removeDevices()
 	}
+	if (userSelectedDevices) {
+		updatePreferences()
+	}
 }
 
 def uninstalled() {
@@ -1074,8 +1113,6 @@ def driverNamespace()	{ return (userSelectedDriver) ? "DaveGut" : "ramiran2" }
 def gitRepo()		{ return "ramiran2/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
-def sendingDataSuccess()	{ return "Data Sent to All Devices" }
-def sendingDataFailed()	{ return "Ready to Send Data to All Devices" }
 def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
 def sendingCommandFailed()	{ return "Ready to Send Command to SmartThings Application" }
 def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
