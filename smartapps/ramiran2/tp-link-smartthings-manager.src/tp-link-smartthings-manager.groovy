@@ -58,9 +58,9 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settingUpdate("userSelectedReload", "false", "bool")
-	settingRemove("userSelectedDevicesRemove")
-	settingRemove("userSelectedDevicesAdd")
+	settingUpdate(name: "userSelectedReload", "false", type: "bool")
+	settingRemove(name: "userSelectedDevicesRemove")
+	settingRemove(name: "userSelectedDevicesAdd")
 }
 
 def setRecommendedOptions() {
@@ -79,35 +79,35 @@ def setRecommendedOptions() {
 			}
 		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
-			settingUpdate("userSelectedOptionTwo", "Activate Account", type: "enum")
+			settingUpdate(name: "userSelectedOptionTwo", "Activate Account", type: "enum")
 		} else {
-			settingUpdate("userSelectedOptionTwo", "Update Account", type: "enum")
+			settingUpdate(name: "userSelectedOptionTwo", "Update Account", type: "enum")
 		}
 		if (state.TpLinkToken != null) {
 			if (newDevices != [:]) {
-				settingUpdate("userSelectedOptionOne", "Add Devices", type: "enum")
+				settingUpdate(name: "userSelectedOptionOne", "Add Devices", type: "enum")
 			}
 			if (oldDevices != [:] && newDevices =~ [:]) {
-				settingUpdate("userSelectedOptionOne", "Remove Devices", type: "enum")
+				settingUpdate(name: "userSelectedOptionOne", "Remove Devices", type: "enum")
 			}
 		} else {
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				settingUpdate("userSelectedOptionOne", "Initial Installation", type: "enum")
+				settingUpdate(name: "userSelectedOptionOne", "Initial Installation", type: "enum")
 			} else {
-				settingUpdate("userSelectedOptionOne", "Update Token", type: "enum")
+				settingUpdate(name: "userSelectedOptionOne", "Update Token", type: "enum")
 			}
 		}
 		if (state.currentError != null) {
-			settingUpdate("userSelectedOptionThree", "Update Credentials", type: "enum")
+			settingUpdate(name: "userSelectedOptionThree", "Update Credentials", type: "enum")
 		} else {
 			if (state.TpLinkToken != null) {
 				if (userSelectedOptionTwo =~ "Update Account") {
-					settingUpdate("userSelectedOptionThree", "Update Token", type: "enum")
+					settingUpdate(name: "userSelectedOptionThree", "Update Token", type: "enum")
 				} else {
-					settingUpdate("userSelectedOptionThree", "Delete Token", type: "enum")
+					settingUpdate(name: "userSelectedOptionThree", "Delete Token", type: "enum")
 				}
 			} else {
-				settingUpdate("userSelectedOptionThree", "Update Token", type: "enum")
+				settingUpdate(name: "userSelectedOptionThree", "Update Token", type: "enum")
 			}
 		}
 	}
