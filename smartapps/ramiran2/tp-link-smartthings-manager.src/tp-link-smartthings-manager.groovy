@@ -612,14 +612,14 @@ def hiddenPage() {
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
 	dynamicPage (name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
 		section("") {
-			paragraph appInfoDesc(), image: getAppImg("xkillerclan.png")
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Members:") {
-			paragraph xkMembersInfo, image: getAppImg("information.png")
+			paragraph xkMembersInfo, image: getAppImg("xkillerclanpage.png")
 			paragraph xkMembers, image: getAppImg("family.png")
 		}
 		section("Games:") {
-			paragraph xkGameInfo, image: getAppImg("information.png")
+			paragraph xkGameInfo, image: getAppImg("xkillerclan.png")
 			paragraph "Halo 2 For Windows Vista - RIP late 2015", image: getAppImg("halo2.png")
 			paragraph "Battlefield 3", image: getAppImg("battlefield3.png")
 			paragraph "Garrys Mod", image: getAppImg("garrysmod.png")
