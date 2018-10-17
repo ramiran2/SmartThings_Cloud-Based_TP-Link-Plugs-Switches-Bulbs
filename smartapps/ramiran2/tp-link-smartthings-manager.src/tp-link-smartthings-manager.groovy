@@ -655,8 +655,14 @@ def developerTestingPage() {
 			paragraph title: "Current Error:", "${state.currentError}", image: getAppImg("error.png")
 			paragraph title: "Error Messages:", "${errMsg}", image: getAppImg("error.png")
 		}
+		section("Information and Diagnostics:") {
+			paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
+			paragraph tokenInfoOffline(), image: getAppImg("error.png")
+		}
 		section("Page Selector:") {
 			paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+			paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
+			paragraph sendingCommandFailed(), image: getAppImg("issue.png")
 			paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
