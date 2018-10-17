@@ -143,7 +143,7 @@ def welcomePage() {
 				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			}
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userSelectionAuthenticationPage.png")
+				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 			} else {
 				href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
 			}
@@ -219,7 +219,7 @@ def userSelectionAuthenticationPage() {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionTwo =~ "Update Account") {
-				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userSelectionTokenPage.png")
+				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
 			}
 			if (userSelectedOptionTwo =~ "Delete Account") {
 				settingRemove("userName")
@@ -287,7 +287,7 @@ def userSelectionPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Installation") {
-				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userSelectionAuthenticationPage.png")
+				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 			}
 			if (userSelectedOptionOne =~ "Add Devices") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
@@ -296,7 +296,7 @@ def userSelectionPage() {
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Update Token") {
-				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userSelectionTokenPage.png")
+				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -563,7 +563,7 @@ def developerPage() {
 		}
 		section("Page Selector:") {
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
-			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userSelectionAuthenticationPage.png")
+			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			if (devTestingLoaded) {
 				href "userSelectionuserSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
@@ -575,10 +575,10 @@ def developerPage() {
 			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-			href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userSelectionTokenPage.png")
+			href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			if (devTestingLoaded) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
-				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
+				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testingpage.png")
 			}
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
 				href "hiddenPage", title: "xKiller Clan Page", description: "Tap to view", image: getAppImg("xkillerclanpage.png")
