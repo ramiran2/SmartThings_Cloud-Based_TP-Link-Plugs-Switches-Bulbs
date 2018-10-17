@@ -888,31 +888,31 @@ def addDevices() {
 	def tpLinkModel = [:]
 	if (userSelectedDriver) {
 		//	Plug-Switch Devices (no energy monitor capability)
-		tpLinkModel << ["HS100" : "(Cloud) TP-Link Plug"]								//	HS100
-		tpLinkModel << ["HS103" : "(Cloud) TP-Link Plug"]								//	HS103
-		tpLinkModel << ["HS105" : "(Cloud) TP-Link Plug"]								//	HS105
-		tpLinkModel << ["HS200" : "(Cloud) TP-Link Switch"]								//	HS200
-		tpLinkModel << ["HS210" : "(Cloud) TP-Link Switch"]								//	HS210
-		tpLinkModel << ["KP100" : "(Cloud) TP-Link Plug"]								//	KP100
+		tpLinkModel << ["HS100" : "(Cloud) TP-Link Plug"]									//	HS100
+		tpLinkModel << ["HS103" : "(Cloud) TP-Link Plug"]									//	HS103
+		tpLinkModel << ["HS105" : "(Cloud) TP-Link Plug"]									//	HS105
+		tpLinkModel << ["HS200" : "(Cloud) TP-Link Switch"]									//	HS200
+		tpLinkModel << ["HS210" : "(Cloud) TP-Link Switch"]									//	HS210
+		tpLinkModel << ["KP100" : "(Cloud) TP-Link Plug"]									//	KP100
 		//	Dimming Plug Devices
-		tpLinkModel << ["HS220" : "(Cloud) TP-Link Dimming Switch"]						//	HS220
+		tpLinkModel << ["HS220" : "(Cloud) TP-Link Dimming Switch"]							//	HS220
 		//	Energy Monitor Plugs
-		tpLinkModel << ["HS110" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
-		tpLinkModel << ["HS115" : "(Cloud) TP-Link EnergyMonitor Plug"]					//	HS110
+		tpLinkModel << ["HS110" : "(Cloud) TP-Link EnergyMonitor Plug"]						//	HS110
+		tpLinkModel << ["HS115" : "(Cloud) TP-Link EnergyMonitor Plug"]						//	HS110
 			//	Soft White Bulbs
-		tpLinkModel << ["KB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	KB100
-		tpLinkModel << ["LB100" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB100
-		tpLinkModel << ["LB110" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB110
-		tpLinkModel << ["KL110" : "(Cloud) TP-Link SoftWhite Bulb"]						//	KL110
-		tpLinkModel << ["LB200" : "(Cloud) TP-Link SoftWhite Bulb"]						//	LB200
+		tpLinkModel << ["KB100" : "(Cloud) TP-Link SoftWhite Bulb"]							//	KB100
+		tpLinkModel << ["LB100" : "(Cloud) TP-Link SoftWhite Bulb"]							//	LB100
+		tpLinkModel << ["LB110" : "(Cloud) TP-Link SoftWhite Bulb"]							//	LB110
+		tpLinkModel << ["KL110" : "(Cloud) TP-Link SoftWhite Bulb"]							//	KL110
+		tpLinkModel << ["LB200" : "(Cloud) TP-Link SoftWhite Bulb"]							//	LB200
 		//	Tunable White Bulbs
-		tpLinkModel << ["LB120" : "(Cloud) TP-Link TunableWhite Bulb"]					//	LB120
-		tpLinkModel << ["KL120" : "(Cloud) TP-Link TunableWhite Bulb"]					//	KL120
+		tpLinkModel << ["LB120" : "(Cloud) TP-Link TunableWhite Bulb"]						//	LB120
+		tpLinkModel << ["KL120" : "(Cloud) TP-Link TunableWhite Bulb"]						//	KL120
 		//	Color Bulbs
-		tpLinkModel << ["KB130" : "(Cloud) TP-Link Color Bulb"]							//	KB130
-		tpLinkModel << ["LB130" : "(Cloud) TP-Link Color Bulb"]							//	LB130
-		tpLinkModel << ["KL130" : "(Cloud) TP-Link Color Bulb"]							//	KL130
-		tpLinkModel << ["LB230" : "(Cloud) TP-Link Color Bulb"]							//	LB230
+		tpLinkModel << ["KB130" : "(Cloud) TP-Link Color Bulb"]								//	KB130
+		tpLinkModel << ["LB130" : "(Cloud) TP-Link Color Bulb"]								//	LB130
+		tpLinkModel << ["KL130" : "(Cloud) TP-Link Color Bulb"]								//	KL130
+		tpLinkModel << ["LB230" : "(Cloud) TP-Link Color Bulb"]								//	LB230
 	} else {
 		//	Plug-Switch Devices (no energy monitor capability)
 		tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
