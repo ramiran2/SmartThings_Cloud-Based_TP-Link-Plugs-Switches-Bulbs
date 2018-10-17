@@ -142,13 +142,13 @@ def welcomePage() {
 			} else {
 				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			}
-			if ("${userName}" =~ null || "${userPassword}" =~ null) {
+			if ("${userName}" =~ null && "${userPassword}" =~ null) {
 				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 			} else {
 				href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
 			}
 		}
-		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+		if ("${userName}" != null && "${userPassword}" != null) {
 			section("Device Manager:") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
