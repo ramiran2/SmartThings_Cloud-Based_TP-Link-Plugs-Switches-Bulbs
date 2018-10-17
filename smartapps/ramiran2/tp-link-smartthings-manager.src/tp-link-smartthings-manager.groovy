@@ -790,8 +790,8 @@ def uninstallPage() {
 		section("Information:") {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
-		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
 		section("${textCopyright()}")
+		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
 	}
 }
 
