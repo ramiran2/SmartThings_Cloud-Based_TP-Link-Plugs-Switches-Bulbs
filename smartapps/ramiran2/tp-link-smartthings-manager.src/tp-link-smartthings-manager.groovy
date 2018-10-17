@@ -155,24 +155,24 @@ def welcomePage() {
 			}
 		}
 		section("Settings:") {
-			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to continue", image: getAppImg("userapplicationpreferencespage.png")
-			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to continue", image: getAppImg("userdevicepreferencespage.png")
+			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 		}
 		if (userSelectedDeveloper) {
 			section("Developer:") {
-				href "developerPage", title: "Developer Page", description: "Tap to continue", image: getAppImg("developerpage.png")
+				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			}
 		}
 		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style: "embedded", required:false, title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
-			href url: getIssuePageUrl(), style: "embedded", required:false, title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+			href url: getWikiPageUrl(), style: "embedded", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style: "embedded", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
-			href "aboutPage", title: "About Page", description: "Tap to continue", image: getAppImg("aboutpage.png")
-			href "changeLogPage", title: "Changelog Page", description: "Tap to continue", image: getAppImg("changelogpage.png")
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("Uninstall:") {
-			href "uninstallPage", title: "Uninstall Page", description: "Tap to continue", image: getAppImg("uninstallpage.png")
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		section("${textCopyright()}")
 	}
@@ -429,10 +429,10 @@ def userApplicationPreferencesPage() {
 			paragraph title: "Information:", userApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
-			input ("appIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
+			input ("appIcons", "bool", title: "Disable App Icons?", submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -465,7 +465,7 @@ def userDevicePreferencesPage() {
 			paragraph title: "Information:", userDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration:") {
-			input ("userSelectedDevices", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
@@ -588,11 +588,11 @@ def developerPage() {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		section("Application Configuration:") {
-			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", required: false, submitOnChange: true, image: getAppImg("sync.png"))
+			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedReload) {
-				setInitialStates()
+				checkError()
 			}
-			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, required: false, image: getAppImg("developer.png"))
+			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
@@ -686,9 +686,9 @@ def developerTestingPage() {
 			input ("userSelectedDriver", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("Device Configuration:") {
-			input ("userSelectedDevices", "enum", required: false, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -802,7 +802,7 @@ def uninstallPage() {
 }
 
 def updatePreferences() {
-	userSelectedDevices.each {
+	userSelectedDevicesUpdate.each {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
@@ -1119,7 +1119,7 @@ def initialize() {
 	if (userSelectedDevicesRemove) {
 		removeDevices()
 	}
-	if (userSelectedDevices) {
+	if (userSelectedDevicesUpdate) {
 		updatePreferences()
 	}
 }
