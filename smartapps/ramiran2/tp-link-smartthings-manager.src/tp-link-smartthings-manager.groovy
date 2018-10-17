@@ -32,14 +32,14 @@ definition(
 	singleInstance: true
 )
 
-def appVersion() { return "3.7.0" }
+def appVersion() { return "3.8.0" }
 def appVerDate() { return "10-16-2018" }
 def currentDriverVersion() { return "3.2.0" }
 def legacyDriverVersion() { return "3.0.0" }
 
 preferences {
 	page(name: "welcomePage")
-	page(name: "authenticationPage")
+	page(name: "userSelectionAuthenticationPage")
 	page(name: "computerSelectionAuthenticationPage")
 	page(name: "userSelectionPage")
 	page(name: "computerSelectionPage")
@@ -47,7 +47,7 @@ preferences {
 	page(name: "removeDevicesPage")
 	page(name: "userApplicationPreferencesPage")
 	page(name: "userDevicePreferencesPage")
-	page(name: "tokenPage")
+	page(name: "userSelectionTokenPage")
 	page(name: "developerPage")
 	page(name: "developerTestingPage")
 	page(name: "hiddenPage")
@@ -102,7 +102,7 @@ def setRecommendedOptions() {
 			}
 		}
 		if (state.currentError != null) {
-			settingUpdate("userSelectedOptionThree", "Update Credentials", "enum")
+			settingUpdate("userSelectedOptionThree", "Recheck Token", "enum")
 		} else {
 			if (state.TpLinkToken != null) {
 				if (userSelectedOptionTwo =~ "Update Account") {
@@ -143,9 +143,15 @@ def welcomePage() {
 				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			}
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
+				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userSelectionAuthenticationPage.png")
 			} else {
 				href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
+			}
+		}
+		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+			section("Device Manager:") {
+				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
@@ -173,13 +179,13 @@ def welcomePage() {
 }
 
 //	----- AUTHENTICATION PAGE -----
-def authenticationPage() {
-	def authenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
+def userSelectionAuthenticationPage() {
+	def userSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
 		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n\r" +
 		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
-	return dynamicPage (name: "authenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
+	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -189,17 +195,14 @@ def authenticationPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", authenticationPageText, image: getAppImg("information.png")
+			paragraph title: "Information:", userSelectionAuthenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Remove Devices"]], image: getAppImg("userinput.png"))
-			if (userSelectedOptionTwo =~ "Activate Account") {
-				getToken()
-			}
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionTwo != null) {
@@ -212,13 +215,16 @@ def authenticationPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
+				getToken()
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionTwo =~ "Update Account") {
-				href "tokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("tokenpage.png")
+				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userSelectionTokenPage.png")
 			}
-			if (userSelectedOptionTwo =~ "Remove Devices") {
-				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
+			if (userSelectedOptionTwo =~ "Delete Account") {
+				settingRemove("userName")
+				settingRemove("userPassword")
+				href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -227,18 +233,18 @@ def authenticationPage() {
 
 //	----- COMPUTER SELECTION AUTHENTICATION PAGE -----
 def computerSelectionAuthenticationPage() {
-    switch (userSelectedOptionTwo) {
-      	case "Update Account":
-          	return tokenPage()
-            break
-        case "Activate Account":
-           	return addDevicesPage()
-            break
-        case "Remove Devices":
-           	return setDefaultPreferences()
-            break
-        default:
-           	return userSelectionPage()
+	switch (userSelectedOptionTwo) {
+		case "Update Account":
+			return userSelectionTokenPage()
+			break
+		case "Activate Account":
+			return addDevicesPage()
+			break
+		case "Delete Account":
+			return welcomePage()
+			break
+		default:
+			return userSelectionPage()
     }
 }
 
@@ -281,7 +287,7 @@ def userSelectionPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Installation") {
-				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
+				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userSelectionAuthenticationPage.png")
 			}
 			if (userSelectedOptionOne =~ "Add Devices") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
@@ -290,7 +296,7 @@ def userSelectionPage() {
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Update Token") {
-				href "tokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("tokenpage.png")
+				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userSelectionTokenPage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -300,20 +306,20 @@ def userSelectionPage() {
 //	----- COMPUTER SELECTION PAGE -----
 def computerSelectionPage() {
     switch (userSelectedOptionOne) {
-      	case "Initial Installation":
-          	return authenticationPage()
-            break
-        case "Add Devices":
-           	return addDevicesPage()
-            break
-        case "Remove Devices":
-           	return removeDevicesPage()
-            break
-        case "Update Token":
-           	return tokenPage()
-            break
-        default:
-           	return welcomePage()
+		case "Initial Installation":
+			return userSelectionAuthenticationPage()
+			break
+		case "Add Devices":
+			return addDevicesPage()
+			break
+		case "Remove Devices":
+			return removeDevicesPage()
+			break
+		case "Update Token":
+			return userSelectionTokenPage()
+			break
+		default:
+			return welcomePage()
     }
 }
 
@@ -468,12 +474,12 @@ def userDevicePreferencesPage() {
 }
 
 //	----- TOKEN MANAGER PAGE -----
-def tokenPage() {
-	def tokenPageText = "Your current token: ${state.TpLinkToken}" + 
+def userSelectionTokenPage() {
+	def userSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" + 
 		"\n\rAvailable actions:\n\r" +
-		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
-		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account.\n\r" +
-		"Update Credentials: Updates your out of date credentials so you can get a new token."
+		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n\r" +
+		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n\r" +
+		"Recheck Token: This will attempt to check if the token is valid as well as check for errors."
 		def errorMsgTok = "None"
 		if (state.TpLinkToken == null) {
 			errorMsgTok = "You will be unable to control your devices until you get a new token."
@@ -481,12 +487,12 @@ def tokenPage() {
 		if (state.currentError != null) {
 			errorMsgTok = "You may not be able to control your devices until you update your credentials."
 		}
-	dynamicPage (name: "tokenPage", title: "Token Manager Page", install: false, uninstall: false) {
+	dynamicPage (name: "userSelectionTokenPage", title: "Token Manager Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", tokenPageText, image: getAppImg("information.png")
+			paragraph title: "Information:", userSelectionTokenPageText, image: getAppImg("information.png")
 			paragraph title: "Account Error:", errorMsgTok, image: getAppImg("error.png")
 		}
 		section("Account Status:") {
@@ -497,22 +503,17 @@ def tokenPage() {
 			}
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Update Credentials", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
-		section("Page Selector:") {
+		section("Command Status:") {
 			if (userSelectedOptionThree != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
-					if (userSelectedOptionThree != "Update Credentials") {
-						paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
-					} else {
-						paragraph pageSelectorText(), image: getAppImg("pageselected.png")
-					}
+					paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 				}
 			} else {
 				paragraph sendingCommandFailed(), image: getAppImg("issue.png")
-				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionThree =~ "Update Token") {
 				getToken()
@@ -520,8 +521,8 @@ def tokenPage() {
 			if (userSelectedOptionThree =~ "Delete Token") {
 				state.TpLinkToken = null
 			}
-			if (userSelectedOptionThree =~ "Update Credentials") {
-				href "authenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("authenticationpage.png")
+			if (userSelectedOptionThree =~ "Recheck Token") {
+				checkError()
 			}
 		}
 		section("${textCopyright()}")
@@ -562,9 +563,9 @@ def developerPage() {
 		}
 		section("Page Selector:") {
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
-			href "authenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("authenticationpage.png")
+			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userSelectionAuthenticationPage.png")
 			if (devTestingLoaded) {
-				href "userSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+				href "userSelectionuserSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
 			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (devTestingLoaded) {
@@ -574,9 +575,9 @@ def developerPage() {
 			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Settings Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-			href "tokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("tokenpage.png")
+			href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userSelectionTokenPage.png")
 			if (devTestingLoaded) {
-				href "developerPage", title: "Developer Page", description: "Tap to continue", image: getAppImg("developerpage.png")
+				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testing.png")
 			}
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
@@ -1085,6 +1086,7 @@ def uninstManagerApp() {
 	try {
 		//Revokes TP-Link Auth Token
 		state.TpLinkToken = null
+		sendNotificationEvent("${appLabel()} is uninstalled")
 	} catch (ex) {
 		log.error "uninstManagerApp Exception:", ex
 	}
@@ -1123,7 +1125,7 @@ def uninstalled() {
 //	----- PERIODIC CLOUD MX TASKS -----
 def checkError() {
 	if (state.currentError == null || state.currentError == "none") {
-		log.info "TP-Link Connect did not have any set errors."
+		log.info "${appLabel()} did not find any errors."
 		if (state.currentError == "none") {
 			state.currentError = null
 		}
