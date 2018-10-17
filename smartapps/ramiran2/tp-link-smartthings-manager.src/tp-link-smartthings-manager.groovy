@@ -122,7 +122,7 @@ def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
 		def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
-		def driverVersionText = "TP-Link Kasa Drivers for SmartThings: " + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${legacyDriverVersion()} " + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
+		def driverVersionText = "TP-Link Kasa Drivers: " + "\n" + "Current Driver Version: ${currentDriverVersion()}" + "\n" + "Legacy Driver Version: ${legacyDriverVersion()} " + "\n" + "Note: Drivers from the original repository will work with this version of the application but you have to enable it in the settings page."
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
