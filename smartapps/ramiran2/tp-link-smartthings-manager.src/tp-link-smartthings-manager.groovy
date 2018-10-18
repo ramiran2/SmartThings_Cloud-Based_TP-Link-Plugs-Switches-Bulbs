@@ -75,7 +75,7 @@ def setInitialStates() {
 		settingRemove("userSelectedOptionThree")
 	}
 	if (!userSelectedDeveloper) {
-		if ("${userName}" =~ null && "${userPassword}" =~ null) {
+		if ("${userName}" =~ null || "${userPassword}" =~ null) {
 			state.TpLinkToken = null
 			state.currentError = null
 			state.errorCount = 0
@@ -163,7 +163,7 @@ def welcomePage() {
 				} else {
 					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 				}
-				if ("${userName}" =~ null && "${userPassword}" =~ null) {
+				if ("${userName}" =~ null || "${userPassword}" =~ null) {
 					href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 				} else {
 					href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
@@ -295,7 +295,7 @@ def computerSelectionAuthenticationPage() {
 			return welcomePage()
 			break
 		default:
-			if ("${userName}" =~ null && "${userPassword}" =~ null) {
+			if ("${userName}" =~ null || "${userPassword}" =~ null) {
 				return welcomePage()
 			} else {
 				return userSelectionPage()
@@ -495,8 +495,9 @@ def userApplicationPreferencesPage() {
 			paragraph title: "Information:", userApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration:") {
-			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedAppIcons && userSelectedAssistant && userSelectedReload || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
@@ -883,6 +884,9 @@ def updatePreferences() {
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
 		log.info "Kasa device ${child} preferences updated"
+		if (userSelectedNotification) {
+			sendPush("Successfully updated TP-Link $deviceModel with alias ${device.value.alias}")
+		}
 	}
 }
 
@@ -932,6 +936,9 @@ def removeDevices() {
 			if (isChild) {
 				def delete = isChild
 				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
+			}
+			if (userSelectedNotification) {
+				sendPush("Successfully uninstalled TP-Link $deviceModel with alias ${device.value.alias}")
 			}
 		} catch (e) {
 			log.debug "Error deleting ${it.deviceNetworkId}: ${e}"
@@ -1010,6 +1017,9 @@ def addDevices() {
 					]
 				)
 				log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
+				if (userSelectedNotification) {
+					sendPush("Successfully installed TP-Link $deviceModel with alias ${device.value.alias}")
+				}
 			}
 		} catch (e) {
 			log.debug "Error Adding ${deviceModel}: ${e}"
@@ -1143,7 +1153,11 @@ def uninstManagerApp() {
 		settingRemove("userName")
 		settingRemove("userPassword")
 		settingRemove("restrictedRecordPasswordPrompt")
-		sendPush("${appLabel()} is uninstalled")
+		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+			if (userSelectedNotification) {
+				sendPush("${appLabel()} is uninstalled")
+			}
+		}
 	} catch (ex) {
 		log.error "uninstManagerApp Exception:", ex
 	}
