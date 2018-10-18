@@ -1184,7 +1184,7 @@ def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
 def appNamespace()	{ return "ramiran2" }
-def gitRepo()		{ return (userSelectedNamespace) ? "${appNamespace()}/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" : "${appNamespace()}/TP-Link-SmartThings" }
+def gitRepo()		{ return (userSelectedNamespace) ? "DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" : "ramiran2/TP-Link-SmartThings" }
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
 def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
