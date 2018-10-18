@@ -67,6 +67,9 @@ def setInitialStates() {
 	if (userSelectedOptionTwo =~ "Delete Account") {
 		settingRemove("userSelectedOptionTwo")
 	}
+	if (userSelectedOptionThree =~ "Delete Token") {
+		settingRemove("userSelectedOptionThree")
+	}
 	if (!userSelectedDeveloper) {
 		if ("${userName}" =~ null && "${userPassword}" =~ null) {
 			state.TpLinkToken = null
@@ -114,6 +117,17 @@ def setRecommendedOptions() {
 				settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
+			}
+		}
+		if (state.currentError != null) {
+			settingUpdate("userSelectedOptionThree", "Recheck Token", "enum")
+		} else {
+			if (state.TpLinkToken != null) {
+				if (userSelectedOptionTwo =~ "Update Account") {
+					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
+				}
+			} else {
+				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 			}
 		}
 	}
