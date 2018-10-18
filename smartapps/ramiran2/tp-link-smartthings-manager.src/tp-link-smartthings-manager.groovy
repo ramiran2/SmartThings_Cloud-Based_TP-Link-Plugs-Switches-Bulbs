@@ -63,8 +63,15 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
+	settingRemove("userSelectedOptionThree")
+	if (userSelectedOptionTwo =~ "Delete Account") {
+		settingRemove("userSelectedOptionTwo")
+	}
 	if (!userSelectedDeveloper) {
 		if ("${userName}" =~ null && "${userPassword}" =~ null) {
+			state.TpLinkToken = null
+			state.currentError = null
+			state.errorCount = 0
 			settingUpdate("userSelectedLauncher", "false", "bool")
 			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
@@ -107,19 +114,6 @@ def setRecommendedOptions() {
 				settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
 			} else {
 				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
-			}
-		}
-		if (state.currentError != null) {
-			settingUpdate("userSelectedOptionThree", "Recheck Token", "enum")
-		} else {
-			if (state.TpLinkToken != null) {
-				if (userSelectedOptionTwo =~ "Update Account") {
-					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
-				} else {
-					settingUpdate("userSelectedOptionThree", "Delete Token", "enum")
-				}
-			} else {
-				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 			}
 		}
 	}
@@ -197,7 +191,8 @@ def userSelectionAuthenticationPage() {
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
 		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n\r" +
-		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account."
+		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n\r" +
+		"Delete Account: Deletes your credentials to login into your TP-Link Kasa Account."
 	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -282,7 +277,11 @@ def computerSelectionAuthenticationPage() {
 			return welcomePage()
 			break
 		default:
-			return userSelectionPage()
+			if ("${userName}" =~ null && "${userPassword}" =~ null) {
+				return welcomePage()
+			} else {
+				return userSelectionPage()
+			}
     }
 }
 
