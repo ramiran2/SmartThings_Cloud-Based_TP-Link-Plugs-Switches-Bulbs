@@ -66,8 +66,10 @@ def setInitialStates() {
 	if (!userSelectedDeveloper) {
 		if ("${userName}" =~ null && "${userPassword}" =~ null) {
 			settingUpdate("userSelectedLauncher", "false", "bool")
+			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
 			settingUpdate("userSelectedLauncher", "true", "bool")
+			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
 	}
@@ -156,14 +158,14 @@ def welcomePage() {
 				}
 			}
 		}
-		if (userSelectedLauncher) {
+		if (userSelectedQuickControl) {
 			section("Device Manager:") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
-			if (userSelectedLauncher) {
+			if (userSelectedQuickControl) {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
@@ -451,8 +453,7 @@ def removeDevicesPage() {
 def userApplicationPreferencesPage() {
 	def hiddenInput = 0
 	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n\r" +
-		"Recommended options: Will allow your device to pick a option for you that you are likely to pick. \n\r" +
-		"Switch Repositories: You will be able to switch to the legacy device handlers provided you have them installed."
+		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
 	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -471,7 +472,8 @@ def userApplicationPreferencesPage() {
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			if (userSelectedDeveloper) {
-				input ("userSelectedLauncher", "bool", title: "Do you want to enable the Page Launcher?", submitOnChange: true, image: getAppImg("launcher.png"))
+				input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
+				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
 				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 			}
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
