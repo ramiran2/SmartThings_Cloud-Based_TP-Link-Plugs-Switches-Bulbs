@@ -156,14 +156,14 @@ def welcomePage() {
 				}
 			}
 		}
-		if (oldDevices != [:]) {
+		if (userSelectedLauncher) {
 			section("Device Manager:") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
-			if (oldDevices != [:]) {
+			if (userSelectedLauncher) {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
