@@ -74,13 +74,13 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
-	def newDevices = [:]
-	def oldDevices = [:]
 	if (state.TpLinkToken != null) {
 		getDevices()
 		def devices = state.devices
+		def newDevices = [:]
+		def oldDevices = [:]
 		devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
+			def isChild = getChildDevice(it.value.deviceMac)
 			if (isChild) {
 				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 			}
@@ -129,8 +129,8 @@ def setRecommendedOptions() {
 def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
-		def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
-		def driverVersionText = "TP-Link Kasa Drivers: " + "\n" + "Current Driver Version: ${currentDriverVersion()}"
+	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
+	def driverVersionText = "TP-Link Kasa Drivers: " + "\n" + "Current Driver Version: ${currentDriverVersion()}"
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
