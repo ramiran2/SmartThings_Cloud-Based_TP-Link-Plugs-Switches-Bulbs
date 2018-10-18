@@ -70,7 +70,7 @@ def setInitialStates() {
 			settingUpdate("userSelectedLauncher", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
-		settingUpdate("userSelectedNamespace", "false", "bool")
+		settingUpdate("userSelectedNamespace", "true", "bool")
 	}
 }
 
