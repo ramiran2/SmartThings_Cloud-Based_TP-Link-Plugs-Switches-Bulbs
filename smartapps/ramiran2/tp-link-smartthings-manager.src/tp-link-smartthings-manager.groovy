@@ -467,9 +467,13 @@ def userApplicationPreferencesPage() {
 	def hiddenRecordInput = 0
 	def hiddenDeveloperInput = 0
 	if (userSelectedDeveloper) {
+		hiddenDeveloperInput = 0
+	} else {
 		hiddenDeveloperInput = 1
 	}
 	if ("${restrictedRecordPasswordPrompt}" =~ null) {
+		hiddenRecordInput = 0
+	} else {
 		hiddenRecordInput = 1
 	}
 	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n\r" +
