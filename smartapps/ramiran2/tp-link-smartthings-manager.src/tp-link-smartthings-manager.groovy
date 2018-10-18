@@ -1183,7 +1183,7 @@ def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "http
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
-def appNamespace()	{ return (userSelectedNamespace) ? "ramiran2" : "DaveGut" }
+def appNamespace()	{ return (userSelectedNamespace) ? "ramiran2" : "davegut" }
 def gitRepo()		{ return (userSelectedNamespace) ? "${appNamespace()}/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" : "${appNamespace()}/TP-Link-SmartThings"}
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
