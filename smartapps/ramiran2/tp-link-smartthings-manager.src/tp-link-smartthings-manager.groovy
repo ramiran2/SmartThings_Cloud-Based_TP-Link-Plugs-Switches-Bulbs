@@ -70,6 +70,7 @@ def setInitialStates() {
 			settingUpdate("userSelectedLauncher", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
+		settingUpdate("userSelectedNamespace", "true", "bool")
 	}
 }
 
@@ -156,14 +157,14 @@ def welcomePage() {
 				}
 			}
 		}
-		if ("${userName}" != null && "${userPassword}" != null) {
+		if (!"${userName}" && !"${userPassword}") {
 			section("Device Manager:") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
-			if ("${userName}" != null && "${userPassword}" != null) {
+			if (!"${userName}" && !"${userPassword}") {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "userAuthenticationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
@@ -1183,7 +1184,7 @@ def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
 def appNamespace()	{ return "ramiran2" }
-def gitRepo()		{ return (userSelectedNamespace) ? "${appNamespace()}/TP-Link-SmartThings" : "${appNamespace()}/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+def gitRepo()		{ return (userSelectedNamespace) ? "${appNamespace()}/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" : "${appNamespace()}/TP-Link-SmartThings" }
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
 def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
