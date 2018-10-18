@@ -1099,6 +1099,8 @@ def uninstManagerApp() {
 		state.TpLinkToken = null
 		settingRemove("userName")
 		settingRemove("userPassword")
+		settingRemove("restrictedRecordPasswordPrompt")
+		state.currentError = null
 		sendPush("${appLabel()} is uninstalled")
 	} catch (ex) {
 		log.error "uninstManagerApp Exception:", ex
