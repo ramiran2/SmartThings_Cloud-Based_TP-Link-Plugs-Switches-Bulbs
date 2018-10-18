@@ -138,7 +138,7 @@ def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
 	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
-	def driverVersionText = "TP-Link Kasa Drivers: " + "\n" + "Current Driver Version: ${currentDriverVersion()}"
+	def driverVersionText = "Current Driver Version: ${currentDriverVersion()}"
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -464,7 +464,14 @@ def removeDevicesPage() {
 
 //	----- USER APPLICATION PREFERENCES PAGE -----
 def userApplicationPreferencesPage() {
-	def hiddenInput = 0
+	def hiddenRecordInput = 0
+	def hiddenDeveloperInput = 0
+	if (userSelectedDeveloper) {
+		hiddenDeveloperInput = 1
+	}
+	if ("${restrictedRecordPasswordPrompt}" =~ null) {
+		hiddenRecordInput = 1
+	}
 	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n\r" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
 	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
@@ -483,14 +490,17 @@ def userApplicationPreferencesPage() {
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
-			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			if (userSelectedAppIcons && userSelectedAssistant && userSelectedReload || hiddenDeveloperInput == 1) {
+				hiddenDeveloperInput = 1
+				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			}
 			if (userSelectedDeveloper) {
 				input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
 				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 			}
-			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
-				hiddenInput = 1
+			if (devTestingLoaded && userSelectedReload || hiddenRecordInput == 1) {
+				hiddenRecordInput = 1
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
 			if (userSelectedReload && state.TpLinkToken != null) {
