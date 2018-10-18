@@ -74,7 +74,7 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
-	if (state.TpLinkToken) {
+	if (userSelectedAssistant) {
 		getDevices()
 		def devices = state.devices
 		def newDevices = [:]
@@ -88,8 +88,6 @@ def setRecommendedOptions() {
 				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 			}
 		}
-	}
-	if (userSelectedAssistant) {
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
 			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
 		} else {
@@ -480,9 +478,16 @@ def userApplicationPreferencesPage() {
 				hiddenInput = 1
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
-			if (userSelectedReload) {
+			if (userSelectedReload && state.TpLinkToken != null) {
 				checkError()
 				setInitialStates()
+			} else {
+				settingUpdate("userSelectedReload", "false", "bool")
+			}
+			if (userSelectedAssistant && state.TpLinkToken != null) {
+				setRecommendedOptions()
+			} else {
+				settingUpdate("userSelectedAssistant", "false", "bool")
 			}
 		}
 		section("${textCopyright()}")
@@ -1100,10 +1105,11 @@ def uninstManagerApp() {
 	try {
 		//Revokes TP-Link Auth Token
 		state.TpLinkToken = null
+		state.currentError = null
+		state.errorCount = null
 		settingRemove("userName")
 		settingRemove("userPassword")
 		settingRemove("restrictedRecordPasswordPrompt")
-		state.currentError = null
 		sendPush("${appLabel()} is uninstalled")
 	} catch (ex) {
 		log.error "uninstManagerApp Exception:", ex
