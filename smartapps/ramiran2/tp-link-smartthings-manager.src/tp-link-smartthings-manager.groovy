@@ -74,11 +74,11 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
+	def newDevices = [:]
+	def oldDevices = [:]
 	if (state.TpLinkToken != null) {
 		getDevices()
 		def devices = state.devices
-		def newDevices = [:]
-		def oldDevices = [:]
 		devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 			if (isChild) {
