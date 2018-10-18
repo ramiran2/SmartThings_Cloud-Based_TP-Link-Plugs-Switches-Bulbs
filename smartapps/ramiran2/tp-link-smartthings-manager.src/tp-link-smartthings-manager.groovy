@@ -74,7 +74,7 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
-	if (state.TpLinkToken != null) {
+	if (state.TpLinkToken) {
 		getDevices()
 		def devices = state.devices
 		def newDevices = [:]
