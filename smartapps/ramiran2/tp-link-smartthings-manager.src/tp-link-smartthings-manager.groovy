@@ -70,7 +70,6 @@ def setInitialStates() {
 			settingUpdate("userSelectedLauncher", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
-		settingUpdate("userSelectedNamespace", "true", "bool")
 	}
 }
 
@@ -474,7 +473,6 @@ def userApplicationPreferencesPage() {
 			if (userSelectedDeveloper) {
 				input ("userSelectedLauncher", "bool", title: "Do you want to enable the Page Launcher?", submitOnChange: true, image: getAppImg("launcher.png"))
 				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developer.png"))
-				input ("userSelectedNamespace", "bool", title: "Do you want to switch repositories?", submitOnChange: true, image: getAppImg("switchnamespace.png"))
 			}
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
@@ -721,7 +719,6 @@ def developerTestingPage() {
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", required: false, submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			input ("userSelectedAppIcons", "bool", title: "Disable App Icons?", required: false, submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("userSelectedNamespace", "bool", title: "Do you want to switch the device handlers to legacy mode?", required: false, submitOnChange: true, image: getAppImg("switchdrivers.png"))
 		}
 		section("Device Configuration:") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
@@ -1077,7 +1074,7 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 			if (state.currentError != null) {
 				state.currentError = null
 				sendEvent(name: "currentError", value: null)
-			log.debug "state.errorCount = ${state.errorCount}	//	state.currentError = ${state.currentError}"
+				log.debug "state.errorCount = ${state.errorCount}	//	state.currentError = ${state.currentError}"
 			}
 		//log.debug "state.errorCount = ${state.errorCount}		//	state.currentError = ${state.currentError}"
 		} else if (resp.status != 200) {
@@ -1100,7 +1097,9 @@ def uninstManagerApp() {
 	try {
 		//Revokes TP-Link Auth Token
 		state.TpLinkToken = null
-		sendNotificationEvent("${appLabel()} is uninstalled")
+		settingRemove("userName")
+		settingRemove("userPassword")
+		sendPush("${appLabel()} is uninstalled")
 	} catch (ex) {
 		log.error "uninstManagerApp Exception:", ex
 	}
