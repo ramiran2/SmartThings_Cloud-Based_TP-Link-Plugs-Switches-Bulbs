@@ -70,7 +70,6 @@ def setInitialStates() {
 			settingUpdate("userSelectedLauncher", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
-		settingUpdate("userSelectedNamespace", "true", "bool")
 	}
 }
 
@@ -1183,7 +1182,7 @@ def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "http
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
-def appNamespace()	{ return (userSelectedNamespace) ? "ramiran2" : "davegut" }
+def appNamespace()	{ return "ramiran2" }
 def gitRepo()		{ return (userSelectedNamespace) ? "${appNamespace()}/TP-Link-SmartThings" : "${appNamespace()}/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
