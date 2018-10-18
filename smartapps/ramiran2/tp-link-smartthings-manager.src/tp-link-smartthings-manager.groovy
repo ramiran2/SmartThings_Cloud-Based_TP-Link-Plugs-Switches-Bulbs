@@ -164,8 +164,8 @@ def welcomePage() {
 		}
 		section("Settings:") {
 			if (oldDevices != [:]) {
-				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
@@ -472,7 +472,7 @@ def userApplicationPreferencesPage() {
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			if (userSelectedDeveloper) {
 				input ("userSelectedLauncher", "bool", title: "Do you want to enable the Page Launcher?", submitOnChange: true, image: getAppImg("launcher.png"))
-				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developer.png"))
+				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 			}
 			if (devTestingLoaded && userSelectedReload || hiddenInput == 1) {
 				hiddenInput = 1
@@ -480,6 +480,7 @@ def userApplicationPreferencesPage() {
 			}
 			if (userSelectedReload) {
 				checkError()
+				setInitialStates()
 			}
 		}
 		section("${textCopyright()}")
