@@ -830,6 +830,7 @@ def aboutPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
 		section("Donations:") {
+			paragraph title: "Donations (@DaveGut)", "Donate to your favorite charity", state: "complete", image: getAppImg("heart.png")
 			href url: textDonateLinkAntR(), style: "external", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
