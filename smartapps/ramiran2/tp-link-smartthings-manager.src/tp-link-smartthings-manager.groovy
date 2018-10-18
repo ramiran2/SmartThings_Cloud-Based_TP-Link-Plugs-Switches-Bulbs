@@ -165,8 +165,8 @@ def welcomePage() {
 		}
 		section("Settings:") {
 			if (oldDevices != [:]) {
+				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-				href "userAuthenticationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
@@ -248,7 +248,7 @@ def userAuthenticationPreferencesPage() {
 	def userAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
-	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Page", install: false, uninstall: false) {
+	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Settings Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
