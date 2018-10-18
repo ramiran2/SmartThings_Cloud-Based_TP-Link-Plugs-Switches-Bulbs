@@ -74,17 +74,19 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
-	getDevices()
-	def devices = state.devices
-	def newDevices = [:]
-	def oldDevices = [:]
-	devices.each {
-	def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+	if (state.TpLinkToken != null) {
+		getDevices()
+		def devices = state.devices
+		def newDevices = [:]
+		def oldDevices = [:]
+		devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+			if (isChild) {
+				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+			if (!isChild) {
+				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
 		}
 	}
 	if (userSelectedAssistant) {
