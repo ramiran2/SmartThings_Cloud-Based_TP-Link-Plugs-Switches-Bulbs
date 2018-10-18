@@ -64,6 +64,10 @@ def setInitialStates() {
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
 	settingRemove("userSelectedOptionThree")
+	if ("${userName}" =~ null || "${userPassword}" =~ null) {
+		settingRemove("userName")
+		settingRemove("userPassword")
+	}
 	if (userSelectedOptionTwo =~ "Delete Account") {
 		settingRemove("userSelectedOptionTwo")
 	}
