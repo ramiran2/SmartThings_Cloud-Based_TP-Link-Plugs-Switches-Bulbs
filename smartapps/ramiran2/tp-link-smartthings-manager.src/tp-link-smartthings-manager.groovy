@@ -75,20 +75,20 @@ def setInitialStates() {
 }
 
 def setRecommendedOptions() {
-	if (userSelectedAssistant) {
-		getDevices()
-		def devices = state.devices
-		def newDevices = [:]
-		def oldDevices = [:]
-		devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-			if (isChild) {
-				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
-			if (!isChild) {
-				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
+	getDevices()
+	def devices = state.devices
+	def newDevices = [:]
+	def oldDevices = [:]
+	devices.each {
+	def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	if (userSelectedAssistant) {
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
 			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
 		} else {
@@ -157,14 +157,14 @@ def welcomePage() {
 				}
 			}
 		}
-		if (!"${userName}" && !"${userPassword}") {
+		if (oldDevices != [:]) {
 			section("Device Manager:") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
-			if (!"${userName}" && !"${userPassword}") {
+			if (oldDevices != [:]) {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "userAuthenticationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
