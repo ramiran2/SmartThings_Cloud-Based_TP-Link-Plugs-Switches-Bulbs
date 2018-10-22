@@ -900,25 +900,25 @@ def checkForUpdates() {
 	def devices = app.getChildDevices(true)
 	devices?.each {
 		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
-		if (strDeviceType = "Tunable White Bulb") {
+		if (strDeviceType =~ "Tunable White Bulb") {
 			def strTWB = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Soft White Bulb") {
+		if (strDeviceType =~ "Soft White Bulb") {
 			def strSWB = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Color Bulb") {
+		if (strDeviceType =~ "Color Bulb") {
 			def strCB = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Plug") {
+		if (strDeviceType =~ "Plug") {
 			def strPG = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Energy Monitor Plug") {
+		if (strDeviceType =~ "Energy Monitor Plug") {
 			def strEMPG = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Switch") {
+		if (strDeviceType =~ "Switch") {
 			def strSH = it?.currentState("devVer")?.value?.toString()
 		}
-		if (strDeviceType = "Dimming Switch") {
+		if (strDeviceType =~ "Dimming Switch") {
 			def strDSH = it?.currentState("devVer")?.value?.toString()
 		}
 	}
