@@ -176,8 +176,8 @@ metadata {
 def initialize() {
 	log.trace "Initialized..."
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
-	sendEvent(name: "devVer", value: "devVer()", displayed: false)
-	sendEvent(name: "deviceType", value: "deviceType", displayed: false)
+	sendEvent(name: "devVer", value: devVer(), displayed: false)
+	sendEvent(name: "deviceType", value: deviceType, displayed: false)
 	state.swVersion = devVer()
 }
 
@@ -189,12 +189,12 @@ def ping() {
 def installed() {
 	log.trace "Installed..."
 	update()
-	initialize()
 }
 
 def updated() {
 	log.trace "Updated..."
 	runIn(2, update)
+	runIn(5, initialize)
 }
 
 /*	__________________________________________________________
