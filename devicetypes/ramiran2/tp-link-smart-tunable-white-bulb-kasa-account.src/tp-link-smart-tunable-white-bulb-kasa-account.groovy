@@ -159,7 +159,6 @@ def installed() {
 def updated() {
 	log.trace "Updated..."
 	runIn(2, update)
-	runIn(5, initialize)
 }
 
 /*	__________________________________________________________
@@ -169,6 +168,7 @@ def updated() {
 */
 def update() {
 	log.trace "Update..."
+	initialize()
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
 	unschedule()
