@@ -31,6 +31,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	==========================================================
 
 def devVer() { return "3.2.0" }
+def devTyp() { return "${deviceType}" }
 
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
@@ -142,7 +143,7 @@ def initialize() {
 	log.trace "Initialized..."
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
-	sendEvent(name: "deviceType", value: "${deviceType}", displayed: false)
+	sendEvent(name: "deviceType", value: devTyp(), displayed: false)
 	state.swVersion = devVer()
 }
 
