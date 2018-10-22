@@ -30,7 +30,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	===========================================================
 
 def devVer() { return "3.2.0" }
-def devTyp() { return "${deviceType}" }
+def devTyp() { return "Plug" }
 
 metadata {
 	definition (name: "TP-Link Smart ${deviceType} - ${installType}",
