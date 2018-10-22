@@ -637,7 +637,7 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def strCurrentSmartAppVersion() = textCurrentVersion()
+	def strCurrentSmartAppVersion() = "${textCurrentSmartAppVersion()}"
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -1283,7 +1283,7 @@ def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textCurrentVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
+def textCurrentSmartAppVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
 def textDonateLinkAntR()	{ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
 def linkGitHubDavG()	{ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
 def linkGitHubAntR()	{ return "https://github.com/ramiran2/TP-Link-SmartThings" }
