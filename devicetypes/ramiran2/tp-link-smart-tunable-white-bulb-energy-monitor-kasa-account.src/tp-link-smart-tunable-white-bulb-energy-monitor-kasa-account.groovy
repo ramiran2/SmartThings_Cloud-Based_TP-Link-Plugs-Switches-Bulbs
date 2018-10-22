@@ -63,6 +63,7 @@ metadata {
 		capability "Energy Meter"
 		command "getEnergyStats"
 		attribute "devVer", "string"
+		attribute "deviceType", "string"
 		attribute "lightTransTime", "string"
 		attribute "refreshRate", "string"
 		attribute "monthTotalE", "string"

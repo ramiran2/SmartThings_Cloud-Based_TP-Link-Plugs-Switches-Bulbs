@@ -48,6 +48,7 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
+		attribute "deviceType", "string"
 		attribute "lightTransTime", "string"
 		attribute "refreshRate", "string"
 		if (deviceType =~ "Dimming Switch") {
