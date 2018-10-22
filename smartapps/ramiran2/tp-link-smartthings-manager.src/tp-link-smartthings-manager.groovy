@@ -638,6 +638,7 @@ def developerPage() {
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	checkForUpdates()
+	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -646,8 +647,10 @@ def developerPage() {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
 			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
 			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
-			paragraph title: "Beta Build:", "${strCurrentSmartAppVersion()}", image: getAppImg("beta.png")
-			paragraph title: "Device Handlers Version:", "${currentDriverVersion()}", image: getAppImg("devices.png")
+			paragraph title: "Latest Smart Application Version:", "${strCurrentSmartAppVersion}", image: getAppImg("kasa.png")
+			paragraph title: "Latest Device Handlers Version:", "${currentDriverVersion()}", image: getAppImg("devices.png")
+			paragraph title: "Current Smart Application Version:", "${appVersion}", image: getAppImg("kasa.png")
+			paragraph title: "Current Device Handlers Version:", "${strTWB}, ${strSWB}, ${strCB}, ${strPG}, ${strEMPG}, ${strSH}, ${strDSH}", image: getAppImg("devices.png")
 			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
 			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
 			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")
@@ -893,8 +896,32 @@ def uninstallPage() {
 }
 
 def checkForUpdates() {
-	def strCurrentSmartAppVersion = "Unknown"
-	strCurrentSmartAppVersion = textCurrentVersion()
+	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
+	def devices = app.getChildDevices(true)
+	devices?.each {
+		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
+		if (strDeviceType = "Tunable White Bulb") {
+			def strTWB = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Soft White Bulb") {
+			def strSWB = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Color Bulb") {
+			def strCB = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Plug") {
+			def strPG = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Energy Monitor Plug") {
+			def strEMPG = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Switch") {
+			def strSH = it?.currentState("devVer")?.value?.toString()
+		}
+		if (strDeviceType = "Dimming Switch") {
+			def strDSH = it?.currentState("devVer")?.value?.toString()
+		}
+	}
 }
 
 def updatePreferences() {
