@@ -637,8 +637,10 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	oldDevices?.each {
-		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
+	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
+	def childDevices = app.getChildDevices(true)
+	childDevices?.each {
+		def strDeviceType = it?.currentState("devTyp")?.value?.toString()
 		if (strDeviceType =~ "Tunable White Bulb") {
 			def strTWB = it?.currentState("devVer")?.value?.toString()
 		}
@@ -661,7 +663,6 @@ def developerPage() {
 			def strDSH = it?.currentState("devVer")?.value?.toString()
 		}
 	}
-	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -673,7 +674,7 @@ def developerPage() {
 			paragraph title: "Latest Smart Application Version:", "${strCurrentSmartAppVersion}", image: getAppImg("kasa.png")
 			paragraph title: "Latest Device Handlers Version:", "${currentDriverVersion()}", image: getAppImg("devices.png")
 			paragraph title: "Current Smart Application Version:", "${appVersion()}", image: getAppImg("kasa.png")
-			paragraph title: "Current Device Handlers Version:", "${strTWB}, ${strSWB}, ${strCB}, ${strPG}, ${strEMPG}, ${strSH}, ${strDSH}", image: getAppImg("devices.png")
+			paragraph title: "Current Device Handlers Version:", "${strTWB}, ${strSWB}, ${strCB}, ${strPG}, ${strEMPG}, ${strDeviceType}, ${strDSH}", image: getAppImg("devices.png")
 			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
 			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
 			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")

@@ -49,7 +49,7 @@ metadata {
 		capability "Actuator"
 		capability "Health Check"
 		attribute "devVer", "string"
-		attribute "deviceType", "string"
+		attribute "devTyp", "string"
 		attribute "lightTransTime", "string"
 		attribute "refreshRate", "string"
 		if (deviceType =~ "Dimming Switch") {
@@ -109,7 +109,7 @@ def initialize() {
 	log.trace "Initialized..."
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
-	sendEvent(name: "deviceType", value: devTyp(), displayed: false)
+	sendEvent(name: "devTyp", value: devTyp(), displayed: false)
 	state.swVersion = devVer()
 }
 
