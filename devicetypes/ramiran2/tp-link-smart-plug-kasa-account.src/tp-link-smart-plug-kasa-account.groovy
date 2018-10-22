@@ -112,6 +112,7 @@ def ping() {
 def installed() {
 	log.trace "Installed..."
 	update()
+	initialize()
 }
 
 def updated() {
