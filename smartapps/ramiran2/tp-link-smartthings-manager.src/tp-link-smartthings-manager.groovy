@@ -637,6 +637,7 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
+	def strCurrentSmartAppVersion() = textCurrentVersion()
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -645,6 +646,8 @@ def developerPage() {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
 			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
 			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
+			paragraph title: "Beta Build:", "${strCurrentSmartAppVersion()}", image: getAppImg("beta.png")
+			paragraph title: "Device Handlers Version:", "${currentDriverVersion()}", image: getAppImg("devices.png")
 			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
 			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
 			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")
@@ -887,6 +890,10 @@ def uninstallPage() {
 		section("${textCopyright()}")
 		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
 	}
+}
+
+def checkForUpdates() {
+	def strCurrentSmartAppVersion() = textCurrentVersion()
 }
 
 def updatePreferences() {
@@ -1274,9 +1281,9 @@ def appInfoDesc()	{
 def appAuthor() { return "Dave Gutheinz, Anthony Ramirez" }
 def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
-def textVerInfo()	{ return "${appVerInfo()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
+def textCurrentVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/version.txt", contentType: "text/plain; charset=UTF-8"], "version") }
 def textDonateLinkAntR()	{ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
 def linkGitHubDavG()	{ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
 def linkGitHubAntR()	{ return "https://github.com/ramiran2/TP-Link-SmartThings" }
