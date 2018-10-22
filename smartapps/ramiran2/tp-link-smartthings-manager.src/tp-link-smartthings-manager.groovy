@@ -637,7 +637,7 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def strCurrentSmartAppVersion() = "${textCurrentSmartAppVersion()}"
+	checkForUpdates()
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -893,7 +893,8 @@ def uninstallPage() {
 }
 
 def checkForUpdates() {
-	def strCurrentSmartAppVersion() = textCurrentVersion()
+	def strCurrentSmartAppVersion = "Unknown"
+	strCurrentSmartAppVersion = textCurrentVersion()
 }
 
 def updatePreferences() {
