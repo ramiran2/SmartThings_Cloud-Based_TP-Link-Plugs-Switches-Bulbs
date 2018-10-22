@@ -637,8 +637,8 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def devices = app.getChildDevices(true)
-	devices?.each {
+	def activedevices = app.getChildDevices(true)
+	activedevices?.each {
 		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
 		if (strDeviceType =~ "Tunable White Bulb") {
 			def strTWB = it?.currentState("devVer")?.value?.toString()
