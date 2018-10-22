@@ -637,8 +637,8 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def activedevices = app.getChildDevices(true)
-	activedevices?.each {
+	def childDevices = app.getChildDevices(true)
+	childDevices?.each {
 		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
 		if (strDeviceType =~ "Tunable White Bulb") {
 			def strTWB = it?.currentState("devVer")?.value?.toString()
@@ -920,7 +920,6 @@ def uninstallPage() {
 }
 
 def checkForUpdates() {
-	getDevices()
 	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
 	def devices = app.getChildDevices(true)
 	devices?.each {
