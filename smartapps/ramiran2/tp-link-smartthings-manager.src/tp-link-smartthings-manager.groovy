@@ -506,9 +506,10 @@ def userApplicationPreferencesPage() {
 			if (userSelectedDeveloper) {
 				input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
-				input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
 			}
-			if (devTestingLoaded && userSelectedReload || hiddenRecordInput == 1) {
+			if (userSelectedTestingPage && userSelectedReload || hiddenRecordInput == 1) {
 				hiddenRecordInput = 1
 				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
 			}
@@ -644,7 +645,9 @@ def developerPage() {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
 			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
 			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
+			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
 			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
+			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")
 			paragraph title: "Username:", "${userName}", image: getAppImg("email.png")
 			paragraph title: "Password:", "${userPassword}", image: getAppImg("password.png")
 			paragraph title: "Managed Devices:", "${oldDevices}", image: getAppImg("devices.png")
@@ -654,11 +657,11 @@ def developerPage() {
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
-			if (devTestingLoaded) {
+			if (userSelectedTestingPage) {
 				href "computerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
 			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
-			if (devTestingLoaded) {
+			if (userSelectedTestingPage) {
 				href "computerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
 			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
@@ -666,7 +669,7 @@ def developerPage() {
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
-			if (devTestingLoaded) {
+			if (userSelectedTestingPage) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testingpage.png")
 			}
@@ -766,7 +769,8 @@ def developerTestingPage() {
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
 			input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
-			input ("devTestingLoaded", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+			input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
 		}
 		section("Device Configuration:") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
@@ -1011,7 +1015,7 @@ def addDevices() {
 				def device = state.devices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
 				addChildDevice(
-					"${appNamespace()}",
+					"${driverNamespace()}",
 					tpLinkModel["${deviceModel}"],
 					device.value.deviceMac,
 					hubId, [
@@ -1247,6 +1251,7 @@ def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "http
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
+def driverNamespace()	{ return userSelectedDriverNamespace ? "DaveGut" : "ramiran2" }
 def appNamespace()	{ return "ramiran2" }
 def gitName()		{ return "TP-Link-SmartThings"}
 def gitRepo()		{ return "${appNamespace()}/${gitName()}" }
