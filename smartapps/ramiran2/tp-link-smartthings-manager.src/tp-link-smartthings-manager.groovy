@@ -196,8 +196,8 @@ def welcomePage() {
 			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
-			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 		}
 		section("${textCopyright()}")
 	}
@@ -1309,6 +1309,7 @@ def initialize() {
 	unsubscribe()
 	unschedule()
 	runEvery5Minutes(checkError)
+	runEvery3Hours(checkForUpdates)
 	schedule("0 30 2 ? * WED", getToken)
 	if (userSelectedDevicesAdd) {
 		addDevices()
