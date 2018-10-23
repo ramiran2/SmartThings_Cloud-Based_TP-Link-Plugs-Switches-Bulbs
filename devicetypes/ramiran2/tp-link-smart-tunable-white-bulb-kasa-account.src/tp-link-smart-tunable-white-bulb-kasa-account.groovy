@@ -144,7 +144,6 @@ def initialize() {
 	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
 	sendEvent(name: "devTyp", value: devTyp(), displayed: false)
-	state.swVersion = devVer()
 }
 
 def ping() {
@@ -172,6 +171,7 @@ def update() {
 	initialize()
 	state.deviceType = metadata.definition.deviceType
 	state.installType = metadata.definition.installType
+	state.swVersion = devVer()
 	unschedule()
 	if (refreshRate) {
 		setRefreshRate(refreshRate)

@@ -34,7 +34,6 @@ definition(
 
 def appVersion() { return "3.9.0" }
 def appVerDate() { return "10-17-2018" }
-def currentDriverVersion() { return "3.2.0" }
 
 preferences {
 	page(name: "welcomePage")
@@ -141,8 +140,9 @@ def setRecommendedOptions() {
 def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
+	def strLatestDriverVersion = textDriverVersion()
 	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices."
-	def driverVersionText = "Current Driver Version: ${currentDriverVersion()}"
+	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -623,6 +623,7 @@ def userSelectionTokenPage() {
 //	----- DEVELOPER PAGE -----
 def developerPage() {
 	getDevices()
+	checkForUpdates()
 	def devices = state.devices
 	def newDevices = [:]
 	def oldDevices = [:]
@@ -637,32 +638,9 @@ def developerPage() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
-	def childDevices = app.getChildDevices(true)
-	childDevices?.each {
-		def strDeviceType = it?.currentState("devTyp")?.value?.toString()
-		if (strDeviceType =~ "Tunable White Bulb") {
-			def strTWB = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Soft White Bulb") {
-			def strSWB = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Color Bulb") {
-			def strCB = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Plug") {
-			def strPG = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Energy Monitor Plug") {
-			def strEMPG = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Switch") {
-			def strSH = it?.currentState("devVer")?.value?.toString()
-		}
-		if (strDeviceType =~ "Dimming Switch") {
-			def strDSH = it?.currentState("devVer")?.value?.toString()
-		}
-	}
+	def strLatestSmartAppVersion = textSmartAppVersion()
+	def strLatestDriverVersion = textDriverVersion()
+	def strLoadedDriverVersion = "Tunable White Bulb: ${atomicState?.devTWBVer}, Soft White Bulb: ${atomicState?.devSWBVer}, Color Bulb: ${atomicState?.devCBVer}, Plug: ${atomicState?.devPGVer}, Energy Monitor Plug: ${atomicState?.devEMPGVer}, Switch: ${atomicState?.devSHVer}, Dimming Switch: ${atomicState?.devDSHVer}"
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -671,10 +649,10 @@ def developerPage() {
 			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
 			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
 			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
-			paragraph title: "Latest Smart Application Version:", "${strCurrentSmartAppVersion}", image: getAppImg("kasa.png")
-			paragraph title: "Latest Device Handlers Version:", "${currentDriverVersion()}", image: getAppImg("devices.png")
+			paragraph title: "Latest Smart Application Version:", "${strLatestSmartAppVersion}", image: getAppImg("kasa.png")
+			paragraph title: "Latest Device Handlers Version:", "${strLatestDriverVersion}", image: getAppImg("devices.png")
 			paragraph title: "Current Smart Application Version:", "${appVersion()}", image: getAppImg("kasa.png")
-			paragraph title: "Current Device Handlers Version:", "${strTWB}, ${strSWB}, ${strCB}, ${strPG}, ${strEMPG}, ${strDeviceType}, ${strDSH}", image: getAppImg("devices.png")
+			paragraph title: "Current Device Handlers Version:", "${strLoadedDriverVersion}", image: getAppImg("devices.png")
 			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
 			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
 			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")
@@ -920,30 +898,55 @@ def uninstallPage() {
 }
 
 def checkForUpdates() {
-	def strCurrentSmartAppVersion = textCurrentSmartAppVersion()
-	def devices = app.getChildDevices(true)
-	devices?.each {
-		def strDeviceType = it?.currentState("deviceType")?.value?.toString()
-		if (strDeviceType =~ "Tunable White Bulb") {
-			def strTWB = it?.currentState("devVer")?.value?.toString()
+	def strLatestSmartAppVersion = textSmartAppVersion()
+	def strLatestDriverVersion = textDriverVersion()
+	def childDevices = app.getChildDevices(true)
+	childDevices?.each {
+		def strTypRawData = it?.currentState("devTyp")?.value?.toString()
+		def strDeviceType = atomicState?.devTyp ?: [:]
+		strDeviceType["devTyp"] = strTypRawData ?: ""
+		atomicState?.devTyp = strDeviceType
+		if (atomicState?.devTyp =~ "Tunable White Bulb") {
+			def strTWBRawData = it?.currentState("devVer")?.value?.toString()
+			def strTWB = atomicState?.devTWBVer ?: [:]
+			strTWB["devVer"] = strTWBRawData ?: ""
+			atomicState?.devTWBVer = strTWB
 		}
-		if (strDeviceType =~ "Soft White Bulb") {
-			def strSWB = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Soft White Bulb") {
+			def strSWBRawData = it?.currentState("devVer")?.value?.toString()
+			def strSWB = atomicState?.devSWBVer ?: [:]
+			strSWB["devVer"] = strSWBRawData ?: ""
+			atomicState?.devSWBVer = strSWB
 		}
-		if (strDeviceType =~ "Color Bulb") {
-			def strCB = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Color Bulb") {
+			def strCBRawData = it?.currentState("devVer")?.value?.toString()
+			def strCB = atomicState?.devCBVer ?: [:]
+			strCB["devVer"] = strCBRawData ?: ""
+			atomicState?.devCBVer = strCB
 		}
-		if (strDeviceType =~ "Plug") {
-			def strPG = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Plug") {
+			def strPGRawData = it?.currentState("devVer")?.value?.toString()
+			def strPG = atomicState?.devPGVer ?: [:]
+			strPG["devVer"] = strPGRawData ?: ""
+			atomicState?.devPGVer = strPG
 		}
-		if (strDeviceType =~ "Energy Monitor Plug") {
-			def strEMPG = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Energy Monitor Plug") {
+			def strEMPGRawData = it?.currentState("devVer")?.value?.toString()
+			def strEMPG = atomicState?.devEMPGVer ?: [:]
+			strEMPG["devVer"] = strEMPGRawData ?: ""
+			atomicState?.devEMPGVer = strEMPG
 		}
-		if (strDeviceType =~ "Switch") {
-			def strSH = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Switch") {
+			def strSHRawData = it?.currentState("devVer")?.value?.toString()
+			def strSH = atomicState?.devSHVer ?: [:]
+			strSH["devVer"] = strSHRawData ?: ""
+			atomicState?.devSHVer = strSH
 		}
-		if (strDeviceType =~ "Dimming Switch") {
-			def strDSH = it?.currentState("devVer")?.value?.toString()
+		if (atomicState?.devTyp =~ "Dimming Switch") {
+			def strDSHRawData = it?.currentState("devVer")?.value?.toString()
+			def strDSH = atomicState?.devDSHVer ?: [:]
+			strDSH["devVer"] = strDSHRawData ?: ""
+			atomicState?.devDSHVer = strDSH
 		}
 	}
 }
@@ -1335,7 +1338,8 @@ def textVersion()	{ return "Version: ${appVersion()}" }
 def textModified()	{ return "Updated: ${appVerDate()}" }
 def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
 def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textCurrentSmartAppVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
+def textSmartAppVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
+def textDriverVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/driverversion.txt", contentType: "text/plain; charset=UTF-8"], "driverversion") }
 def textDonateLinkAntR()	{ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
 def linkGitHubDavG()	{ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
 def linkGitHubAntR()	{ return "https://github.com/ramiran2/TP-Link-SmartThings" }
