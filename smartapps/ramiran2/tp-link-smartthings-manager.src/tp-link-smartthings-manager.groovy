@@ -896,10 +896,10 @@ def changeLogPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Check for Updates:") {
-			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" == "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 				paragraph upToDate, image: getAppImg("success.png")
 			} else {
-				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 					paragraph updateNeeded, image: getAppImg("error.png")
 				} else {
 					if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
@@ -990,26 +990,40 @@ def checkForUpdates() {
 	}
 	if (atomicState?.devTWBVer =~ null) {
 		atomicState?.devTWBVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devTWBVer
 	}
 	if (atomicState?.devSWBVer =~ null) {
 		atomicState?.devSWBVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devSWBVer
 	}
 	if (atomicState?.devCBVer =~ null) {
 		atomicState?.devCBVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devCBVer
 	}
 	if (atomicState?.devPGVer =~ null) {
 		atomicState?.devPGVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devPGVer
 	}
 	if (atomicState?.devEMPGVer =~ null) {
 		atomicState?.devEMPGVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devEMPGVer
 	}
 	if (atomicState?.devSHVer =~ null) {
 		atomicState?.devSHVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devSHVer
 	}
 	if (atomicState?.devDSHVer =~ null) {
 		atomicState?.devDSHVer = strDevVersion
+	} else {
+		atomicState?.devVerLnk = atomicState?.devDSHVer
 	}
-	if ("${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+	if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 		if (userSelectedNotification) {
 			sendPush("${appLabel()} Device Handlers need to be update")
 		}
