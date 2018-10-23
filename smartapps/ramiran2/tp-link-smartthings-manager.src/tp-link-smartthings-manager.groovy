@@ -896,7 +896,7 @@ def changeLogPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Check for Updates:") {
-			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" ==~ "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
 				paragraph upToDate, image: getAppImg("success.png")
 			} else {
 				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
