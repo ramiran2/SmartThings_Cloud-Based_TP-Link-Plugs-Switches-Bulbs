@@ -63,14 +63,6 @@ def setInitialStates() {
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
 	settingRemove("userSelectedOptionThree")
-	atomicState?.devManVer = null
-	atomicState?.devTWBVer = null
-	atomicState?.devSWBVer = null
-	atomicState?.devCBVer = null
-	atomicState?.devPGVer = null
-	atomicState?.devEMPGVer = null
-	atomicState?.devSHVer = null
-	atomicState?.devDSHVer = null
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingRemove("userName")
 		settingRemove("userPassword")
@@ -643,6 +635,7 @@ def userSelectionTokenPage() {
 //	----- DEVELOPER PAGE -----
 def developerPage() {
 	getDevices()
+	cleanStorage()
 	checkForUpdates()
 	def devices = state.devices
 	def newDevices = [:]
@@ -891,6 +884,7 @@ def aboutPage() {
 
 //	----- CHANGELOG PAGE -----
 def changeLogPage() {
+	cleanStorage()
 	checkForUpdates()
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def updateNeeded = "Both the Smart Application and Device Handlers need to be updated"
@@ -910,8 +904,7 @@ def changeLogPage() {
 				} else {
 					if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
 						paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
-					}
-					if ("${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+					} else {
 						paragraph driverUpdateNeeded, image: getAppImg("issue.png")
 					}
 				}
