@@ -285,6 +285,7 @@ def poll() {
 }
 
 def refresh(){
+	sendEvent(name: "devVer", value: devVer(), displayed: false)
 	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 	runIn(2, getPower)
 	runIn(7, getConsumption)
