@@ -916,7 +916,7 @@ def changeLogPage() {
 					} else {
 						intUpdateCheckTwo = 1
 					}
-					if (intUpdateCheckOne = 1 && intUpdateCheckTwo = 1) {
+					if (intUpdateCheckOne == 1 && intUpdateCheckTwo == 1) {
 						paragraph updateFailed, image: getAppImg("issue.png")
 					}
 				}
