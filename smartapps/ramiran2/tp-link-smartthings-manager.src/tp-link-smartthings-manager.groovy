@@ -97,6 +97,7 @@ def cleanStorage() {
 	atomicState?.devEMPGVer = null
 	atomicState?.devSHVer = null
 	atomicState?.devDSHVer = null
+	atomicState?.devVerLnk = null
 }
 
 def setRecommendedOptions() {
