@@ -63,6 +63,14 @@ def setInitialStates() {
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
 	settingRemove("userSelectedOptionThree")
+	atomicState?.devManVer = null
+	atomicState?.devTWBVer = null
+	atomicState?.devSWBVer = null
+	atomicState?.devCBVer = null
+	atomicState?.devPGVer = null
+	atomicState?.devEMPGVer = null
+	atomicState?.devSHVer = null
+	atomicState?.devDSHVer = null
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingRemove("userName")
 		settingRemove("userPassword")
@@ -86,6 +94,17 @@ def setInitialStates() {
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
 	}
+}
+
+def cleanStorage() {
+	atomicState?.devManVer = null
+	atomicState?.devTWBVer = null
+	atomicState?.devSWBVer = null
+	atomicState?.devCBVer = null
+	atomicState?.devPGVer = null
+	atomicState?.devEMPGVer = null
+	atomicState?.devSHVer = null
+	atomicState?.devDSHVer = null
 }
 
 def setRecommendedOptions() {
@@ -1308,6 +1327,7 @@ def initialize() {
 	unsubscribe()
 	unschedule()
 	runEvery5Minutes(checkError)
+	runEvery3Hours(cleanStorage)
 	runEvery3Hours(checkForUpdates)
 	schedule("0 30 2 ? * WED", getToken)
 	if (userSelectedDevicesAdd) {
