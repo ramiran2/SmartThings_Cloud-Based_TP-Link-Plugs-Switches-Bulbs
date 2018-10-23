@@ -1,8 +1,28 @@
 ##### TP-Link SmartThings Manager #####
-2018-10-15 - Update to Version 3.6.0
-a. Added 3 new page/icons (@ramiran2)
-b. Improved UI Elements (@ramiran2)
-f. Added Recommended Options (@ramiran2)
+2018-10-23 - Update to Version 4.0.0
+a. Improved/Added UI Elements (@ramiran2)
+b. Improved Logic (@ramiran2)
+c. Added Check for Updates (@ramiran2)
+
+2018-10-22 - Update to Version 3.9.0
+a. Improved/Added UI Elements (@ramiran2)
+b. Improved Logic (@ramiran2)
+c. Added a post login page
+d. Improved Recommended Options (@ramiran2)
+
+2018-10-17 - Update to Version 3.8.0
+a. Improved UI Elements (@ramiran2)
+b. Improved Logic (@ramiran2)
+
+2018-10-16 - Update to Version 3.7.0
+a. Improved UI Elements (@ramiran2)
+b. Added 2 new selector pages (@ramiran2)
+c. Improved Logic (@ramiran2)
+
+2018-10-16 - Update to Version 3.6.0
+a. Improved UI Elements (@ramiran2)
+b. Improved Recommended Options (@ramiran2)
+c. Improved Logic (@ramiran2)
 
 2018-10-13 - Update to Version 3.5.0
 a. Added a new page/icons (@ramiran2)
@@ -75,6 +95,9 @@ c. Added app version (@ramiran2)
 a. Updated for new release of Device Handlers (@DaveGut)
 
 ##### TP-Link Smart Plug #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -105,6 +128,9 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Energy Monitor Plug #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -145,6 +171,9 @@ c. Update remaining code. (@DaveGut)
 a. Update setCurrentDate to eliminate error for some users. (@DaveGut)
 
 ##### TP-Link Smart Tunable White Bulb #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -172,6 +201,9 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@ramiran2)
 
 ##### TP-Link Smart Tunable White Bulb Energy Monitor #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -212,6 +244,9 @@ c. Update remaining code. (@DaveGut)
 a. Update setCurrentDate to eliminate error for some users. (@DaveGut)
 
 ##### TP-Link Smart Soft White Bulb #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -239,6 +274,9 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Soft White Bulb Energy Monitor #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -279,6 +317,9 @@ c. Update remaining code. (@DaveGut)
 a. Update setCurrentDate to eliminate error for some users. (@DaveGut)
 
 ##### TP-Link Smart Color Bulb #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -306,6 +347,9 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Color Bulb Energy Monitor #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -346,6 +390,9 @@ c. Update remaining code. (@DaveGut)
 a. Update setCurrentDate to eliminate error for some users. (@DaveGut)
 
 ##### TP-Link Smart Dimming Switch #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
@@ -373,6 +420,9 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Switch #####
+2018-10-23 - Update to Version 3.3.0
+a. Added device type/ device version to send event (@ramiran2)
+
 2018-10-16 - Update to Version 3.2.0
 a. Added modifcation from original repo (@DaveGut)
 b. Improved Lighting Transition Time / Device Refresh Rate control (@DaveGut)
