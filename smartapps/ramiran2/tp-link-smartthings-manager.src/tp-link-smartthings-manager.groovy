@@ -887,17 +887,20 @@ def aboutPage() {
 def changeLogPage() {
 	cleanStorage()
 	checkForUpdates()
+	def intUpdateCheckOne = 0
+	def intUpdateCheckTwo = 0
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def updateNeeded = "Both the Smart Application and Device Handlers need to be updated"
 	def upToDate = "Both the Smart Application and Device Handlers are up to date"
-	def driverUpdateNeeded = "Your Device Handlers need to be update"
-	def smartAppUpdateNeeded = "Your Smart Application needs to be update"
+	def driverUpdateNeeded = "Your Device Handlers need to be updated"
+	def smartAppUpdateNeeded = "Your Smart Application needs to be updated"
+	def updateFailed = "We are unable to check for updates"
 	dynamicPage (name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Check for Updates:") {
-			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
+			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" == "${atomicState?.devVerLnk}") {
 				paragraph upToDate, image: getAppImg("success.png")
 			} else {
 				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
@@ -906,7 +909,15 @@ def changeLogPage() {
 					if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
 						paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
 					} else {
+						intUpdateCheckOne = 1
+					} 
+					if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 						paragraph driverUpdateNeeded, image: getAppImg("issue.png")
+					} else {
+						intUpdateCheckTwo = 1
+					}
+					if (intUpdateCheckOne = 1 && intUpdateCheckTwo = 1) {
+						paragraph updateFailed, image: getAppImg("issue.png")
 					}
 				}
 			}
@@ -1026,12 +1037,12 @@ def checkForUpdates() {
 	}
 	if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 		if (userSelectedNotification) {
-			sendPush("${appLabel()} Device Handlers need to be update")
+			sendPush("${appLabel()} Device Handlers need to be updated")
 		}
 	}
 	if ("${strLatestSmartAppVersion}" != "${appVersion()}" ) {
 		if (userSelectedNotification) {
-			sendPush("${appLabel()} needs to be update")
+			sendPush("${appLabel()} needs to be updated")
 		}
 	}
 }
