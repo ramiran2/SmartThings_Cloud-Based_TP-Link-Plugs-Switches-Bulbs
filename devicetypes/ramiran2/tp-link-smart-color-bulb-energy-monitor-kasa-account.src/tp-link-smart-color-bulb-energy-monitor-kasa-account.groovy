@@ -30,7 +30,7 @@ TP-Link devices; primarily various users on GitHub.com.
 	//def installType = "Node Applet"
 //	==========================================================
 
-def devVer() { return "3.2.0" }
+def devVer() { return "3.3.0" }
 def devTyp() { return "Color Bulb" }
 
 metadata {

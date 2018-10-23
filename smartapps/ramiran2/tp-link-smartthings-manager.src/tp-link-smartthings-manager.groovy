@@ -1,5 +1,5 @@
 /*
-TP-Link SmartThings Manager, 2018 Version 3
+TP-Link SmartThings Manager, 2018 Version 4
 
 	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
@@ -32,8 +32,8 @@ definition(
 	singleInstance: true
 )
 
-def appVersion() { return "3.9.0" }
-def appVerDate() { return "10-17-2018" }
+def appVersion() { return "4.0.0" }
+def appVerDate() { return "10-23-2018" }
 
 preferences {
 	page(name: "welcomePage")
@@ -192,8 +192,8 @@ def welcomePage() {
 			}
 		}
 		section("Help and Feedback:") {
-			href url: getWikiPageUrl(), style: "embedded", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
-			href url: getIssuePageUrl(), style: "embedded", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
 		section("About and Changelog:") {
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
@@ -471,9 +471,9 @@ def userApplicationPreferencesPage() {
 	def hiddenRecordInput = 0
 	def hiddenDeveloperInput = 0
 	if (userSelectedDeveloper) {
-		hiddenDeveloperInput = 0
-	} else {
 		hiddenDeveloperInput = 1
+	} else {
+		hiddenDeveloperInput = 0
 	}
 	if ("${restrictedRecordPasswordPrompt}" =~ null) {
 		hiddenRecordInput = 0
@@ -498,6 +498,7 @@ def userApplicationPreferencesPage() {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: true, image: getAppImg("browsermode.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedAppIcons && userSelectedAssistant && userSelectedReload || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
@@ -773,6 +774,7 @@ def developerTestingPage() {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
+			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: true, image: getAppImg("browsermode.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
@@ -820,16 +822,16 @@ def hiddenPage() {
 			paragraph "Minecraft Bedrock Edition - Realm: 0EOy4uYzhxQ", image: getAppImg("minecraft.png")
 		}
 		section("Easter Eggs:") {
-			href url: linkYoutubeEE1(), style: "external", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE2(), style: "external", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
-			href url: linkYoutubeEE3(), style: "external", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE1(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE2(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
+			href url: linkYoutubeEE3(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 		}
 		section("Contact:") {
-			href url: linkDiscord(), style: "external", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
-			href url: linkWaypoint(), style: "external", required: false, title: "Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
-			href url: linkXbox(), style: "external", required: false, title: "Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
-			href url: linkSteam(), style: "external", required: false, title: "Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
-			href url: linkFacebook(), style: "external", required: false, title: "Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
+			href url: linkDiscord(), style: "${strBrowserMode()}", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
+			href url: linkWaypoint(), style: "${strBrowserMode()}", required: false, title: "Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
+			href url: linkXbox(), style: "${strBrowserMode()}", required: false, title: "Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
+			href url: linkSteam(), style: "${strBrowserMode()}", required: false, title: "Steam", description: "Tap to open in browser", state: "complete", image: getAppImg("steam.png")
+			href url: linkFacebook(), style: "${strBrowserMode()}", required: false, title: "Facebook", description: "Tap to open in browser", state: "complete", image: getAppImg("facebook.png")
 		}
 		section("${textCopyright()}")
 	}
@@ -843,7 +845,7 @@ def aboutPage() {
 		}
 		section("Donations:") {
 			paragraph title: "Donations (@DaveGut)", "Donate to a charity", state: "complete", image: getAppImg("heart.png")
-			href url: textDonateLinkAntR(), style: "external", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
+			href url: textDonateLinkAntR(), style: "${strBrowserMode()}", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
 		section("Credits:") {
 			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
@@ -857,9 +859,9 @@ def aboutPage() {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
 		section("GitHub:") {
-			href url: linkGitHubDavG(), style: "external", required: false, title: "Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntR(), style: "external", required: false, title: "Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
-			href url: linkGitHubAntS(), style: "external", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubDavG(), style: "${strBrowserMode()}", required: false, title: "Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntR(), style: "${strBrowserMode()}", required: false, title: "Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
+			href url: linkGitHubAntS(), style: "${strBrowserMode()}", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("Licensing Information:") {
 			paragraph "${textCopyright()}\n${textLicense()}"
@@ -870,9 +872,31 @@ def aboutPage() {
 
 //	----- CHANGELOG PAGE -----
 def changeLogPage() {
+	checkForUpdates()
+	def strLatestSmartAppVersion = textSmartAppVersion()
+	def updateNeeded = "Both the Smart Application and Device Handlers need to be updated"
+	def upToDate = "Both the Smart Application and Device Handlers are up to date"
+	def driverUpdateNeeded = "Your Device Handlers need to be update"
+	def smartAppUpdateNeeded = "Your Smart Application needs to be update"
 	dynamicPage (name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Check for Updates:") {
+			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+				paragraph upToDate, image: getAppImg("success.png")
+			} else {
+				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+					paragraph updateNeeded, image: getAppImg("error.png")
+				} else {
+					if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
+						paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
+					}
+					if ("${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+						paragraph driverUpdateNeeded, image: getAppImg("issue.png")
+					}
+				}
+			}
 		}
 		section("Changelog:") {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
@@ -901,6 +925,10 @@ def checkForUpdates() {
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
 	def childDevices = app.getChildDevices(true)
+	def strVerRawData = strLatestDriverVersion
+	def strDevVersion = atomicState?.devManVer ?: [:]
+	strDevVersion["devVer"] = strVerRawData ?: ""
+	atomicState?.devManVer = strDevVersion
 	childDevices?.each {
 		def strTypRawData = it?.currentState("devTyp")?.value?.toString()
 		def strDeviceType = atomicState?.devTyp ?: [:]
@@ -947,6 +975,37 @@ def checkForUpdates() {
 			def strDSH = atomicState?.devDSHVer ?: [:]
 			strDSH["devVer"] = strDSHRawData ?: ""
 			atomicState?.devDSHVer = strDSH
+		}
+	}
+	if (atomicState?.devTWBVer =~ null) {
+		atomicState?.devTWBVer = strDevVersion
+	}
+	if (atomicState?.devSWBVer =~ null) {
+		atomicState?.devSWBVer = strDevVersion
+	}
+	if (atomicState?.devCBVer =~ null) {
+		atomicState?.devCBVer = strDevVersion
+	}
+	if (atomicState?.devPGVer =~ null) {
+		atomicState?.devPGVer = strDevVersion
+	}
+	if (atomicState?.devEMPGVer =~ null) {
+		atomicState?.devEMPGVer = strDevVersion
+	}
+	if (atomicState?.devSHVer =~ null) {
+		atomicState?.devSHVer = strDevVersion
+	}
+	if (atomicState?.devDSHVer =~ null) {
+		atomicState?.devDSHVer = strDevVersion
+	}
+	if ("${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+		if (userSelectedNotification) {
+			sendPush("${appLabel()} Device Handlers need to be update")
+		}
+	}
+	if ("${strLatestSmartAppVersion}" != "${appVersion()}" ) {
+		if (userSelectedNotification) {
+			sendPush("${appLabel()} needs to be update")
 		}
 	}
 }
@@ -1313,6 +1372,7 @@ def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "http
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 def appLabel()	{ return "TP-Link SmartThings Manager" }
+def strBrowserMode()	{ return userSelectedBrowserMode ? "embedded" : "external" }
 def driverNamespace()	{ return userSelectedDriverNamespace ? "DaveGut" : "ramiran2" }
 def appNamespace()	{ return "ramiran2" }
 def gitName()		{ return "TP-Link-SmartThings"}

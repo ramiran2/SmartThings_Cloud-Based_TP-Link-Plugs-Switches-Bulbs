@@ -3,7 +3,7 @@ Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Devices;
 primarily various users on GitHub.com.
 
-TP-Link SmartThings Manager, 2018 Version 3
+TP-Link SmartThings Manager, 2018 Version 4
 TP Link Bulbs Device Handler, 2018 Version 3
 TP-Link Plug Device Handler, 2018, Version 3
 TP-Link Switch Device Handler, 2018, Version 3
