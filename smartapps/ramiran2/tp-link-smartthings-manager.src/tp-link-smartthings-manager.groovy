@@ -195,7 +195,7 @@ def welcomePage() {
 			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
-		section("About and Changelog:") {
+		section("Changelog and About:") {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 		}
@@ -883,7 +883,7 @@ def changeLogPage() {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Check for Updates:") {
-			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
+			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" ==~ "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
 				paragraph upToDate, image: getAppImg("success.png")
 			} else {
 				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devTWBVer}" && "${atomicState?.devSWBVer}" && "${atomicState?.devCBVer}" && "${atomicState?.devPGVer}" && "${atomicState?.devEMPGVer}" && "${atomicState?.devSHVer}" && "${atomicState?.devDSHVer}") {
@@ -924,11 +924,10 @@ def uninstallPage() {
 def checkForUpdates() {
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
-	def childDevices = app.getChildDevices(true)
-	def strVerRawData = strLatestDriverVersion
 	def strDevVersion = atomicState?.devManVer ?: [:]
-	strDevVersion["devVer"] = strVerRawData ?: ""
+	strDevVersion["devVer"] = strLatestDriverVersion ?: ""
 	atomicState?.devManVer = strDevVersion
+	def childDevices = app.getChildDevices(true)
 	childDevices?.each {
 		def strTypRawData = it?.currentState("devTyp")?.value?.toString()
 		def strDeviceType = atomicState?.devTyp ?: [:]
