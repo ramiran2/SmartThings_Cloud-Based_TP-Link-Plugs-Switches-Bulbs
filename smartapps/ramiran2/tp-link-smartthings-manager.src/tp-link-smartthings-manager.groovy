@@ -153,7 +153,7 @@ def welcomePage() {
 	setInitialStates()
 	setRecommendedOptions()
 	def strLatestDriverVersion = textDriverVersion()
-	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. " + "\n" + "If you want to check for updates you can now do that in the changelog page."
+	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
