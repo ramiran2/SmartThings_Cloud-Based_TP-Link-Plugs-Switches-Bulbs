@@ -1460,8 +1460,8 @@ def pageSelectorErrorText()	{ return "Please continue with caution, we have dete
 def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
-	str += "\n" + "• ${textVersion()}"
-	str += "\n" + "• ${textModified()}"
+	str += "\n" + "â€¢ ${textVersion()}"
+	str += "\n" + "â€¢ ${textModified()}"
 	return str
 }
 def appAuthor() { return "Dave Gutheinz, Anthony Ramirez" }
@@ -1483,5 +1483,5 @@ def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=337
 def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
 def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
 def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
-def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
+def textCopyright()	{ return "CopyrightÂ© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc()	{ return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
