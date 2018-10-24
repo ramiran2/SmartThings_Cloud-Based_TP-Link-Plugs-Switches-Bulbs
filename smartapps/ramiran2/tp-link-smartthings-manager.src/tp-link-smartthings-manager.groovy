@@ -287,7 +287,7 @@ def userAuthenticationPreferencesPage() {
 			paragraph title: "Information:", userAuthenticationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
-			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true, image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
 		section("${textCopyright()}")
@@ -877,7 +877,7 @@ def aboutPage() {
 			href url: linkGitHubAntS(), style: "${strBrowserMode()}", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
 		section("Licensing Information:") {
-			paragraph "${textCopyright()}\n${textLicense()}"
+			paragraph "${textLicense()}"
 		}
 		section("${textCopyright()}")
 	}
@@ -1138,6 +1138,34 @@ def getWebData(params, desc, text=true) {
 
 def addDevices() {
 	def tpLinkModel = [:]
+	if (userSelectedDriverNamespace) {
+		//	Plug-Switch Devices (no energy monitor capability)
+		tpLinkModel << ["HS100" : "(Cloud) TP-Link Plug"]									//	HS100
+		tpLinkModel << ["HS103" : "(Cloud) TP-Link Plug"]									//	HS103
+		tpLinkModel << ["HS105" : "(Cloud) TP-Link Plug"]									//	HS105
+		tpLinkModel << ["HS200" : "(Cloud) TP-Link Switch"]									//	HS200
+		tpLinkModel << ["HS210" : "(Cloud) TP-Link Switch"]									//	HS210
+		tpLinkModel << ["KP100" : "(Cloud) TP-Link Plug"]									//	KP100
+		//	Dimming Switch Devices
+		tpLinkModel << ["HS220" : "(Cloud) TP-Link Dimming Switch"]							//	HS220
+		//	Energy Monitor Plugs
+		tpLinkModel << ["HS110" : "(Cloud) TP-Link Energy Monitor Plug"]					//	HS110
+		tpLinkModel << ["HS115" : "(Cloud) TP-Link Energy Monitor Plug"]					//	HS110
+			//	Soft White Bulbs
+		tpLinkModel << ["KB100" : "(Cloud) TP-Link Soft White Bulb"]						//	KB100
+		tpLinkModel << ["LB100" : "(Cloud) TP-Link Soft White Bulb"]						//	LB100
+		tpLinkModel << ["LB110" : "(Cloud) TP-Link Soft White Bulb"]						//	LB110
+		tpLinkModel << ["KL110" : "(Cloud) TP-Link Soft White Bulb"]						//	KL110
+		tpLinkModel << ["LB200" : "(Cloud) TP-Link Soft White Bulb"]						//	LB200
+		//	Tunable White Bulbs
+		tpLinkModel << ["LB120" : "(Cloud) TP-Link Tunable White Bulb"]						//	LB120
+		tpLinkModel << ["KL120" : "(Cloud) TP-Link Tunable White Bulb"]						//	KL120
+		//	Color Bulbs
+		tpLinkModel << ["KB130" : "(Cloud) TP-Link Color Bulb"]								//	KB130
+		tpLinkModel << ["LB130" : "(Cloud) TP-Link Color Bulb"]								//	LB130
+		tpLinkModel << ["KL130" : "(Cloud) TP-Link Color Bulb"]								//	KL130
+		tpLinkModel << ["LB230" : "(Cloud) TP-Link Color Bulb"]								//	LB230
+	} else {
 		//	Plug-Switch Devices (no energy monitor capability)
 		tpLinkModel << ["HS100" : "TP-Link Smart Plug - Kasa Account"]						//	HS100
 		tpLinkModel << ["HS103" : "TP-Link Smart Plug - Kasa Account"]						//	HS103
@@ -1164,6 +1192,7 @@ def addDevices() {
 		tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB130
 		tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Kasa Account"]				//	KL130
 		tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Kasa Account"]				//	LB230
+	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	userSelectedDevicesAdd.each { dni ->
@@ -1406,15 +1435,18 @@ def removeChildDevice(alias, deviceNetworkId) {
 	}
 }
 
+//	def appNamespace()	{ return "davegut" }
+	def appNamespace()	{ return "ramiran2" }
+//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+	def gitName()	{ return "TP-Link-SmartThings" }
+//	def appLabel()	{ return "TP-Link Cloud Connect" }
+	def appLabel()	{ return "TP-Link SmartThings Manager" }
 def gitBranch()	{ return betaMarker() ? "beta" : "master" }
 def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
-def appLabel()	{ return "TP-Link SmartThings Manager" }
-def strBrowserMode()	{ return userSelectedBrowserMode ? "embedded" : "external" }
-def driverNamespace()	{ return userSelectedDriverNamespace ? "DaveGut" : "ramiran2" }
-def appNamespace()	{ return "ramiran2" }
-def gitName()		{ return "TP-Link-SmartThings"}
+def strBrowserMode()	{ return (userSelectedBrowserMode) ? "embedded" : "external" }
+def driverNamespace()	{ return (userSelectedDriverNamespace) ? "DaveGut" : "ramiran2" }
 def gitRepo()		{ return "${appNamespace()}/${gitName()}" }
 def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 def betaMarker()	{ return false }
@@ -1428,8 +1460,8 @@ def pageSelectorErrorText()	{ return "Please continue with caution, we have dete
 def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
-	str += "\n" + "â€¢ ${textVersion()}"
-	str += "\n" + "â€¢ ${textModified()}"
+	str += "\n" + "• ${textVersion()}"
+	str += "\n" + "• ${textModified()}"
 	return str
 }
 def appAuthor() { return "Dave Gutheinz, Anthony Ramirez" }
@@ -1451,5 +1483,5 @@ def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=337
 def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
 def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
 def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
-def textCopyright()	{ return "CopyrightÂ© 2018 - Dave Gutheinz, Anthony Ramirez" }
+def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 def textDesc()	{ return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
