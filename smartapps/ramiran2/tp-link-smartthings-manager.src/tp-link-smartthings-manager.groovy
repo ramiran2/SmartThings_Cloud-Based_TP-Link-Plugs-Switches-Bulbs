@@ -65,6 +65,7 @@ def setInitialStates() {
 	if (!state.errorCount) {state.errorCount = 0}
 	settingRemove("userSelectedDevicesRemove")
 	settingRemove("userSelectedDevicesAdd")
+	settingRemove("userSelectedDevicesUpdate")
 	settingRemove("userSelectedOptionThree")
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingRemove("userName")
@@ -232,8 +233,8 @@ def userSelectionAuthenticationPage() {
 			paragraph title: "Information: ", userSelectionAuthenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration: ") {
-			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
-			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false,image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
 		section("User Configuration: ") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
@@ -284,8 +285,8 @@ def userAuthenticationPreferencesPage() {
 			paragraph title: "Information: ", userAuthenticationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration: ") {
-			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true, image: getAppImg("email.png"))
-			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
 		section("${textCopyright()}")
 	}

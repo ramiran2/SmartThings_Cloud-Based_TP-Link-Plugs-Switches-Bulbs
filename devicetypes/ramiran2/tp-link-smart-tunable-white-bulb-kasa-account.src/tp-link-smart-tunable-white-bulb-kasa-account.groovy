@@ -118,7 +118,7 @@ metadata {
 		}
 	}
 	preferences {
-		if (installType() == "Node Applet" || installType() == "Hub") {
+		if (installType() == "Node Applet") {
 			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
 			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
 		}
@@ -163,7 +163,7 @@ def updated() {
 }
 
 void uninstalled() {
-	if (installType() == "Kasa Account" || installType() == "Cloud") {
+	if (installType() == "Kasa Account") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
@@ -296,7 +296,7 @@ def refreshResponse(cmdResponse){
 //	===== Send the Command =====
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
-		if (installType() == "Kasa Account" || installType() == "Cloud") {
+		if (installType() == "Kasa Account") {
 			sendCmdtoCloud(command, hubCommand, action)
 		} else {
 			sendCmdtoHub(command, hubCommand, action)
