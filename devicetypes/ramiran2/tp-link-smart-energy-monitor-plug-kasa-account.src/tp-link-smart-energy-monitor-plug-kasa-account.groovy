@@ -405,6 +405,8 @@ def currentDateResponse(cmdResponse) {
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
 		if (installType() == "Kasa Account") {
+			sendCmdtoCloud(command, hubCommand, action)
+		} else {
 			if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
 				sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
 				sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
@@ -412,8 +414,6 @@ private sendCmdtoServer(command, hubCommand, action) {
 			} else {
 				sendCmdtoHub(command, hubCommand, action)
 			}
-		} else {
-			sendCmdtoCloud(command, hubCommand, action)
 		}
 	} catch (ex) {
 		log.error "Sending Command Exception: ", ex
