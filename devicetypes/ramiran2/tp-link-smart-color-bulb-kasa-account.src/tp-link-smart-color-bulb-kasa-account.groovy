@@ -124,7 +124,6 @@ metadata {
 		}
 		input ("transitionTime", "enum", title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getDevImg("transition.png"))
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
-		input ("resetAllData", "bool", title: "Reset All Stored Event Data", image: getDevImg("history.png"))
 	}
 }
 
@@ -147,7 +146,6 @@ def installed() {
 def updated() {
 	log.info "Updated ${device.label}..."
 	unschedule()
-	checkStateClear()
 	if (refreshRate) {
 		setRefreshRate(refreshRate)
 	} else {
@@ -401,23 +399,6 @@ def setRefreshRate(refreshRate) {
 		default:
 			runEvery30Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
-	}
-}
-
-def getStateSize()	{ return state?.toString().length() }
-def getStateSizePerc()	{ return (int) ((stateSize/100000)*100).toDouble().round(0) }
-
-void checkStateClear() {
-	def before = getStateSizePerc()
-	if(!state?.resetAllData && resetAllData) {
-		def data = getState()?.findAll
-		data.each { item ->
-			state.remove(item?.key.toString())
-		}
-		state.resetAllData = true
-		log.info "Device State Data: before: $before  after: ${getStateSizePerc()}"
-	} else if(state?.resetAllData && !resetAllData) {
-		state.resetAllData = false
 	}
 }
 

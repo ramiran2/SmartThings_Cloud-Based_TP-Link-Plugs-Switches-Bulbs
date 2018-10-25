@@ -109,7 +109,6 @@ metadata {
 			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
 		}
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
-		input ("resetAllData", "bool", title: "Reset All Stored Event Data", image: getDevImg("history.png"))
 	}
 }
 
@@ -135,7 +134,6 @@ def updated() {
 	state.emeterText = "emeter"
 	state.getTimeText = "time"
 	unschedule()
-	checkStateClear()
 	//	Update Refresh Rate Preference
 	if (refreshRate) {
 		setRefreshRate(refreshRate)
@@ -504,23 +502,6 @@ def setRefreshRate(refreshRate) {
 		default:
 			runEvery30Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
-	}
-}
-
-def getStateSize()	{ return state?.toString().length() }
-def getStateSizePerc()	{ return (int) ((stateSize/100000)*100).toDouble().round(0) }
-
-void checkStateClear() {
-	def before = getStateSizePerc()
-	if(!state?.resetAllData && resetAllData) {
-		def data = getState()?.findAll
-		data.each { item ->
-			state.remove(item?.key.toString())
-		}
-		state.resetAllData = true
-		log.info "Device State Data: before: $before  after: ${getStateSizePerc()}"
-	} else if(state?.resetAllData && !resetAllData) {
-		state.resetAllData = false
 	}
 }
 
