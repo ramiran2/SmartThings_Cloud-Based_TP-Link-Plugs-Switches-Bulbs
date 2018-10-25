@@ -68,49 +68,49 @@ metadata {
 		attribute "devType", "string"
 	}
 	tiles(scale: 2) {
-		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
+		multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.Lighting.light13", backgroundColor:"#00a0dc",
-				nextState:"waiting"
-				attributeState "off", label:'${name}', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#ffffff",
-				nextState:"waiting"
-				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#15EE10",
-				nextState:"waiting"
-				attributeState "Unavailable", label: 'Unavailable', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#e86d13",
-				nextState:"waiting"
+				attributeState "on", label:'${name}', action: "switch.off", icon: "st.Lighting.light13", backgroundColor: "#00a0dc",
+				nextState: "waiting"
+				attributeState "off", label:'${name}', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#ffffff",
+				nextState: "waiting"
+				attributeState "waiting", label:'${name}', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#15EE10",
+				nextState: "waiting"
+				attributeState "Unavailable", label: 'Unavailable', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#e86d13",
+				nextState: "waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 			tileAttribute ("device.level", key: "SLIDER_CONTROL") {
-				attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel"
+				attributeState "level", label: "Brightness: ${currentValue}", action: "switch level.setLevel"
 			}
 			if (deviceType() == "Color Bulb") {
 				tileAttribute ("device.color", key: "COLOR_CONTROL") {
-					attributeState "color", action:"setColor"
+					attributeState "color", action: "setColor"
 				}
 			}
 		}
 		standardTile("refresh", "capability.refresh", width: 2, height: 1, decoration: "flat") {
-			state "default", label:"Refresh", action:"refresh.refresh"
+			state "default", label: "Refresh", action: "refresh.refresh"
 		}
 		if (deviceType() == "Tunable White Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
-			range:"(2700..6500)") {
-				state "colorTemperature", action:"color temperature.setColorTemperature"
+			range: "(2700..6500)") {
+				state "colorTemperature", action: "color temperature.setColorTemperature"
 			}
 		} else if (deviceType() == "Color Bulb") {
 			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
-			range:"(2500..9000)") {
-				state "colorTemperature", action:"color temperature.setColorTemperature"
+			range: "(2500..9000)") {
+				state "colorTemperature", action: "color temperature.setColorTemperature"
 			}
 		}
 		valueTile("colorTemp", "default", inactiveLabel: false, decoration: "flat", height: 1, width: 2) {
 			state "default", label: 'Color\n\rTemperature'
 		}
 		standardTile("bulbMode", "bulbMode", width: 2, height: 1, decoration: "flat") {
-			state "normal", label:'Circadian\n\rOFF', action:"setModeCircadian", nextState: "circadian"
-			state "circadian", label:'Circadian\n\rOn', action:"setModeNormal", nextState: "normal"
+			state "normal", label:'Circadian\n\rOFF', action: "setModeCircadian", nextState: "circadian"
+			state "circadian", label:'Circadian\n\rOn', action: "setModeNormal", nextState: "normal"
 		}
 		main("switch")
 		if (deviceType() == "Soft White Bulb") {
@@ -120,25 +120,25 @@ metadata {
 		}
 	}
 	def rates = [:]
-	rates << ["1" : "Refresh every minute (Not Recommended)"]
+	rates << ["1" : "Refresh every minute"]
 	rates << ["5" : "Refresh every 5 minutes"]
 	rates << ["10" : "Refresh every 10 minutes"]
 	rates << ["15" : "Refresh every 15 minutes"]
-	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
+	rates << ["30" : "Refresh every 30 minutes"]
 	preferences {
 		if (installType() == "Node Applet" || installType() == "Hub") {
-			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
-			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
+			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
-		input name: "transitionTime", type: "enum", description: "", title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], defaultValue: 1000
-		input name: "refreshRate", type: "enum", title: "Device Refresh Rate", metadata: [values:rates], description: "Select Refresh Rate", required: false
+		input ("transitionTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getAppImg("transition.png"))
+		input ("refreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getAppImg("refresh.png"))
 	}
 }
 
 //	===== Update when installed or setting changed =====
 def initialize() {
 	log.info "Initialized ${device.label}..."
-	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
+	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol" : "cloud", "scheme" : "untracked"]), displayed: false)
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
 	sendEvent(name: "devTyp", value: deviceType(), displayed: false)
 }
@@ -180,11 +180,11 @@ void uninstalled() {
 
 //	===== Basic Bulb Control/Status =====
 def on() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"on_off" :1,"transition_period" :${state.transTime}}}}""", "deviceCommand", "commandResponse")
 }
 
 def off() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"on_off" :0,"transition_period" :${state.transTime}}}}""", "deviceCommand", "commandResponse")
 }
 
 def setLevel(percentage) {
@@ -198,13 +198,13 @@ def setLevel(percentage, rate) {
 	}
 	percentage = percentage as int
 	rate = rate.toInteger()
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"brightness":${percentage},"transition_period":${rate}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"brightness" :${percentage},"transition_period" :${rate}}}}""", "deviceCommand", "commandResponse")
 }
 
 def setColorTemperature(kelvin) {
 	if (kelvin == null) kelvin = state.lastColorTemp
 	switch(deviceType()) {
-		case "Tunable White Bulb":
+		case "Tunable White Bulb" :
 			if (kelvin < 2700) kelvin = 2700
 			if (kelvin > 6500) kelvin = 6500
 			break
@@ -213,15 +213,15 @@ def setColorTemperature(kelvin) {
 			if (kelvin > 9000) kelvin = 9000
 	}
 	kelvin = kelvin as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"color_temp" : ${kelvin},"hue" :0,"saturation" :0}}}""", "deviceCommand", "commandResponse")
 }
 
 def setModeNormal() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"mode" : "normal"}}}""", "deviceCommand", "commandResponse")
 }
 
 def setModeCircadian() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"mode" : "circadian"}}}""", "deviceCommand", "commandResponse")
 }
 
 def setHue(hue) {
@@ -243,11 +243,11 @@ def setColor(Map color) {
 	}
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"color_temp" :0,"hue" :${hue},"saturation" :${saturation}}}}""", "deviceCommand", "commandResponse")
 }
 
 def refresh(){
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
 }
 
 def refreshResponse(cmdResponse){
@@ -263,10 +263,10 @@ def refreshResponse(cmdResponse){
 	sendEvent(name: "switch", value: onOff)
 	sendEvent(name: "level", value: level)
 	switch(deviceType()) {
-		case "Soft White Bulb":
+		case "Soft White Bulb" :
 			log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}%"
 			break
-		case "Tunable White Bulb":
+		case "Tunable White Bulb" :
 			def circadianMode = status.mode
 			def color_temp = status.color_temp
 			sendEvent(name: "circadianMode", value: circadianMode)
@@ -310,7 +310,7 @@ private sendCmdtoServer(command, hubCommand, action) {
 			sendCmdtoHub(command, hubCommand, action)
 		}
 	} catch (ex) {
-		log.error "Sending Command Exception:", ex
+		log.error "Sending Command Exception: ", ex
 	}
 }
 
@@ -360,10 +360,10 @@ def hubResponseParse(response) {
 
 def actionDirector(action, cmdResponse) {
 	switch(action) {
-		case "commandResponse":
+		case "commandResponse" :
 			refresh()
 			break
-		case "refreshResponse":
+		case "refreshResponse" :
 			refreshResponse(cmdResponse)
 			break
 		default:
@@ -384,23 +384,23 @@ def setLightTransTime(newTransTime) {
 
 def setRefreshRate(refreshRate) {
 	switch(refreshRate) {
-		case "1":
+		case "1" :
 			runEvery1Minute(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every minute"
 			break
-		case "5":
+		case "5" :
 			runEvery5Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 5 minutes"
 			break
-		case "10":
+		case "10" :
 			runEvery10Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 10 minutes"
 			break
-		case "15":
+		case "15" :
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
 			break
-		case "30":
+		case "30" :
 			runEvery30Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
@@ -409,3 +409,20 @@ def setRefreshRate(refreshRate) {
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 	}
 }
+
+def setIconStatus(newAppIcons) {
+	userSelectedAppIcons = newAppIcons
+	if (userSelectedAppIcons == null) {
+		userSelectedAppIcons = false
+	}
+}
+
+//	======== GitHub Values =====================================================================================================================================================================================
+//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+	def gitName()	{ return "TP-Link-SmartThings" }
+	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
+	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def gitRepo()		{ return "${devNamespace()}/${gitName()}" }
+	def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
+	def betaMarker()	{ return false }
+//	============================================================================================================================================================================================================

@@ -97,6 +97,7 @@ def setInitialStates() {
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
+		settingUpdate("userSelectedDriverNamespace", "false", "bool")	\\	If true the DaveGut is set as default
 	}
 }
 
@@ -113,49 +114,35 @@ def cleanStorage() {
 }
 
 def setRecommendedOptions() {
-	if (userSelectedAssistant) {
-		getDevices()
-		def devices = state.devices
-		def newDevices = [:]
-		def oldDevices = [:]
-		devices.each {
-			def isChild = getChildDevice(it.value.deviceMac)
-			if (isChild) {
-				oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
-			if (!isChild) {
-				newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
+	def childDevices = app.getChildDevices(true)
+	if ("${userName}" =~ null || "${userPassword}" =~ null) {
+		settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
+	} else {
+		settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
+	}
+	if (state.TpLinkToken != null) {
+		if (newDevices != [:]) {
+			settingUpdate("userSelectedOptionOne", "Add Devices", "enum")
 		}
+		if (childDevices) {
+			settingUpdate("userSelectedOptionOne", "Remove Devices", "enum")
+		}
+	} else {
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
-			settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
+			settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
 		} else {
-			settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
+			settingUpdate("userSelectedOptionOne", "Update Token", "enum")
 		}
+	}
+	if (state.currentError != null) {
+		settingUpdate("userSelectedOptionThree", "Recheck Token", "enum")
+	} else {
 		if (state.TpLinkToken != null) {
-			if (newDevices != [:]) {
-				settingUpdate("userSelectedOptionOne", "Add Devices", "enum")
-			}
-			if (oldDevices != [:] && newDevices =~ [:]) {
-				settingUpdate("userSelectedOptionOne", "Remove Devices", "enum")
-			}
-		} else {
-			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				settingUpdate("userSelectedOptionOne", "Initial Installation", "enum")
-			} else {
-				settingUpdate("userSelectedOptionOne", "Update Token", "enum")
-			}
-		}
-		if (state.currentError != null) {
-			settingUpdate("userSelectedOptionThree", "Recheck Token", "enum")
-		} else {
-			if (state.TpLinkToken != null) {
-				if (userSelectedOptionTwo =~ "Update Account") {
-					settingUpdate("userSelectedOptionThree", "Update Token", "enum")
-				}
-			} else {
+			if (userSelectedOptionTwo =~ "Update Account") {
 				settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 			}
+		} else {
+			settingUpdate("userSelectedOptionThree", "Update Token", "enum")
 		}
 	}
 }
@@ -163,25 +150,27 @@ def setRecommendedOptions() {
 //	----- WELCOME PAGE -----
 def welcomePage() {
 	setInitialStates()
-	setRecommendedOptions()
 	def strLatestDriverVersion = textDriverVersion()
 	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
+	if (userSelectedAssistant) {
+		setRecommendedOptions()
+	}
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", welcomePageText, image: getAppImg("information.png")
-			paragraph title: "Driver Version:", driverVersionText, image: getAppImg("devices.png")
+			paragraph title: "Information: ", welcomePageText, image: getAppImg("information.png")
+			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
 		}
 		if (!userSelectedLauncher) {
-			section("Page Selector:") {
+			section("Page Selector: ") {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
@@ -195,31 +184,31 @@ def welcomePage() {
 			}
 		}
 		if (userSelectedQuickControl) {
-			section("Device Manager:") {
+			section("Device Manager: ") {
 				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
-		section("Settings:") {
+		section("Settings: ") {
 			if (userSelectedQuickControl) {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
-		section("Uninstall:") {
+		section("Uninstall: ") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		if (userSelectedDeveloper) {
-			section("Developer:") {
+			section("Developer: ") {
 				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			}
 		}
-		section("Help and Feedback:") {
+		section("Help and Feedback: ") {
 			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
-		section("Changelog and About:") {
+		section("Changelog and About: ") {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 		}
@@ -239,22 +228,22 @@ def userSelectionAuthenticationPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userSelectionAuthenticationPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", userSelectionAuthenticationPageText, image: getAppImg("information.png")
 		}
-		section("Account Configuration:") {
+		section("Account Configuration: ") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
-		section("User Configuration:") {
+		section("User Configuration: ") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 		}
-		section("Page Selector:") {
+		section("Page Selector: ") {
 			if (userSelectedOptionTwo != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -274,6 +263,7 @@ def userSelectionAuthenticationPage() {
 			if (userSelectedOptionTwo =~ "Delete Account") {
 				settingRemove("userName")
 				settingRemove("userPassword")
+				state.TpLinkToken = null
 				href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
@@ -290,15 +280,15 @@ def userAuthenticationPreferencesPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userAuthenticationPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", userAuthenticationPreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Account Configuration:") {
+		section("Account Configuration: ") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true, image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
@@ -309,13 +299,13 @@ def userAuthenticationPreferencesPage() {
 //	----- COMPUTER SELECTION AUTHENTICATION PAGE -----
 def computerSelectionAuthenticationPage() {
 	switch (userSelectedOptionTwo) {
-		case "Update Account":
+		case "Update Account" :
 			return userSelectionTokenPage()
 			break
-		case "Activate Account":
+		case "Activate Account" :
 			return addDevicesPage()
 			break
-		case "Delete Account":
+		case "Delete Account" :
 			return welcomePage()
 			break
 		default:
@@ -343,19 +333,19 @@ def userSelectionPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userSelectionPageText, image: getAppImg("information.png")
-			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
+			paragraph title: "Information: ", userSelectionPageText, image: getAppImg("information.png")
+			paragraph title: "Communication Error: ", errorMsgCom, image: getAppImg("error.png")
 		}
-		section("User Configuration:") {
+		section("User Configuration: ") {
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
-		section("Page Selector:") {
+		section("Page Selector: ") {
 			if (userSelectedOptionOne != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -385,16 +375,16 @@ def userSelectionPage() {
 //	----- COMPUTER SELECTION PAGE -----
 def computerSelectionPage() {
     switch (userSelectedOptionOne) {
-		case "Initial Installation":
+		case "Initial Installation" :
 			return userSelectionAuthenticationPage()
 			break
-		case "Add Devices":
+		case "Add Devices" :
 			return addDevicesPage()
 			break
-		case "Remove Devices":
+		case "Remove Devices" :
 			return removeDevicesPage()
 			break
-		case "Update Token":
+		case "Update Token" :
 			return userSelectionTokenPage()
 			break
 		default:
@@ -430,16 +420,16 @@ def addDevicesPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", addDevicesPageText, image: getAppImg("information.png")
-			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
+			paragraph title: "Information: ", addDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller:") {
+		section("Device Controller: ") {
 			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
@@ -474,16 +464,16 @@ def removeDevicesPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", removeDevicesPageText, image: getAppImg("information.png")
-			paragraph title: "Device Error:", errorMsgDev, image: getAppImg("error.png")
+			paragraph title: "Information: ", removeDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller:") {
+		section("Device Controller: ") {
 			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
@@ -504,21 +494,22 @@ def userApplicationPreferencesPage() {
 	} else {
 		hiddenRecordInput = 1
 	}
+	updateAppIcons()
 	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
 	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userApplicationPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", userApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Application Configuration:") {
+		section("Application Configuration: ") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
@@ -529,7 +520,7 @@ def userApplicationPreferencesPage() {
 				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			}
 			if (userSelectedDeveloper) {
-				input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
+				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
 				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
@@ -544,10 +535,8 @@ def userApplicationPreferencesPage() {
 			} else {
 				settingUpdate("userSelectedReload", "false", "bool")
 			}
-			if (userSelectedAssistant && state.TpLinkToken != null) {
+			if (userSelectedAssistant) {
 				setRecommendedOptions()
-			} else {
-				settingUpdate("userSelectedAssistant", "false", "bool")
 			}
 		}
 		section("${textCopyright()}")
@@ -572,18 +561,18 @@ def userDevicePreferencesPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information:", userDevicePreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", userDevicePreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Device Configuration:") {
+		section("Device Configuration: ") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -607,21 +596,21 @@ def userSelectionTokenPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information and Diagnostics:", hideable: true, hidden: true) {
-			paragraph title: "Information:", userSelectionTokenPageText, image: getAppImg("information.png")
-			paragraph title: "Account Error:", errorMsgTok, image: getAppImg("error.png")
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", userSelectionTokenPageText, image: getAppImg("information.png")
+			paragraph title: "Account Error: ", errorMsgTok, image: getAppImg("error.png")
 		}
-		section("Account Status:") {
+		section("Account Status: ") {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
 		}
-		section("User Configuration:") {
+		section("User Configuration: ") {
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
-		section("Command Status:") {
+		section("Command Status: ") {
 			if (userSelectedOptionThree != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -671,23 +660,23 @@ def developerPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Application Information:", hideable: true, hidden: true) {
-			paragraph title: "TP-Link Token:", "${state.TpLinkToken}", image: getAppImg("token.png")
-			paragraph title: "Hub:", "${hub}", image: getAppImg("samsunghub.png")
-			paragraph title: "Hub ID:", "${hubId}", image: getAppImg("samsunghub.png")
-			paragraph title: "Latest Smart Application Version:", "${strLatestSmartAppVersion}", image: getAppImg("kasa.png")
-			paragraph title: "Latest Device Handlers Version:", "${strLatestDriverVersion}", image: getAppImg("devices.png")
-			paragraph title: "Current Smart Application Version:", "${appVersion()}", image: getAppImg("kasa.png")
-			paragraph title: "Current Device Handlers Version:", "${strLoadedDriverVersion}", image: getAppImg("devices.png")
-			paragraph title: "Beta Build:", "${betaMarker()}", image: getAppImg("beta.png")
-			paragraph title: "GitHub Namespace:", "${appNamespace()}", image: getAppImg("github.png")
-			paragraph title: "Device Handlers Namespace:", "${driverNamespace()}", image: getAppImg("devices.png")
-			paragraph title: "Username:", "${userName}", image: getAppImg("email.png")
-			paragraph title: "Password:", "${userPassword}", image: getAppImg("password.png")
-			paragraph title: "Managed Devices:", "${oldDevices}", image: getAppImg("devices.png")
-			paragraph title: "New Devices:", "${newDevices}", image: getAppImg("devices.png")
+		section("Application Information: ", hideable: true, hidden: true) {
+			paragraph title: "TP-Link Token: ", "${state.TpLinkToken}", image: getAppImg("token.png")
+			paragraph title: "Hub: ", "${hub}", image: getAppImg("samsunghub.png")
+			paragraph title: "Hub ID: ", "${hubId}", image: getAppImg("samsunghub.png")
+			paragraph title: "Latest Smart Application Version: ", "${strLatestSmartAppVersion}", image: getAppImg("kasa.png")
+			paragraph title: "Latest Device Handlers Version: ", "${strLatestDriverVersion}", image: getAppImg("devices.png")
+			paragraph title: "Current Smart Application Version: ", "${appVersion()}", image: getAppImg("kasa.png")
+			paragraph title: "Current Device Handlers Version: ", "${strLoadedDriverVersion}", image: getAppImg("devices.png")
+			paragraph title: "Beta Build: ", "${betaMarker()}", image: getAppImg("beta.png")
+			paragraph title: "GitHub Namespace: ", "${appNamespace()}", image: getAppImg("github.png")
+			paragraph title: "Device Handlers Namespace: ", "${driverNamespace()}", image: getAppImg("devices.png")
+			paragraph title: "Username: ", "${userName}", image: getAppImg("email.png")
+			paragraph title: "Password: ", "${userPassword}", image: getAppImg("password.png")
+			paragraph title: "Managed Devices: ", "${oldDevices}", image: getAppImg("devices.png")
+			paragraph title: "New Devices: ", "${newDevices}", image: getAppImg("devices.png")
 		}
-		section("Page Selector:") {
+		section("Page Selector: ") {
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
@@ -761,56 +750,56 @@ def developerTestingPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Application Information:", hideable: true, hidden: true) {
-			paragraph title: "Communication Error:", errorMsgCom, image: getAppImg("error.png")
-			paragraph title: "Finding Devices Error:", errorMsgDev, image: getAppImg("error.png")
-			paragraph title: "New Devices Error:", errorMsgNew, image: getAppImg("error.png")
-			paragraph title: "Current Devices Error:", errorMsgOld, image: getAppImg("error.png")
-			paragraph title: "Account Error:", errorMsgTok, image: getAppImg("error.png")
-			paragraph title: "Error Count:", "${state.errorCount}", image: getAppImg("error.png")
-			paragraph title: "Current Error:", "${state.currentError}", image: getAppImg("error.png")
-			paragraph title: "Error Messages:", "${errMsg}", image: getAppImg("error.png")
+		section("Application Information: ", hideable: true, hidden: true) {
+			paragraph title: "Communication Error: ", errorMsgCom, image: getAppImg("error.png")
+			paragraph title: "Finding Devices Error: ", errorMsgDev, image: getAppImg("error.png")
+			paragraph title: "New Devices Error: ", errorMsgNew, image: getAppImg("error.png")
+			paragraph title: "Current Devices Error: ", errorMsgOld, image: getAppImg("error.png")
+			paragraph title: "Account Error: ", errorMsgTok, image: getAppImg("error.png")
+			paragraph title: "Error Count: ", "${state.errorCount}", image: getAppImg("error.png")
+			paragraph title: "Current Error: ", "${state.currentError}", image: getAppImg("error.png")
+			paragraph title: "Error Messages: ", "${errMsg}", image: getAppImg("error.png")
 		}
-		section("Information and Diagnostics:") {
+		section("Information and Diagnostics: ") {
 			paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			paragraph tokenInfoOffline(), image: getAppImg("error.png")
 		}
-		section("Page Selector:") {
+		section("Page Selector: ") {
 			paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 			paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 			paragraph sendingCommandFailed(), image: getAppImg("issue.png")
 			paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
-		section("Account Configuration:") {
+		section("Account Configuration: ") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: true,image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: true, image: getAppImg("password.png"))
 		}
-		section("User Configuration:") {
+		section("User Configuration: ") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
-		section("Device Controller:") {
+		section("Device Controller: ") {
 			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
-		section("Application Configuration:") {
+		section("Application Configuration: ") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
 			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: true, image: getAppImg("browsermode.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
-			input ("userSelectedLauncher", "bool", title: "Do you want to enable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
+			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
 			input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
 			input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
 		}
-		section("Device Configuration:") {
+		section("Device Configuration: ") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500": "1/2 second", "1000": "1 second", "2000": "2 seconds", "5000": "5 seconds", "10000": "10 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute (Not Recommended)", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes (Recommended)"]], image: getAppImg("refresh.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500" : "1/2 second", "1000" : "1 second", "2000" : "2 seconds", "5000" : "5 seconds", "10000" : "10 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -825,11 +814,11 @@ def hiddenPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Members:") {
+		section("Members: ") {
 			paragraph xkMembersInfo, image: getAppImg("xkillerclanv2.png")
 			paragraph xkMembers, image: getAppImg("family.png")
 		}
-		section("Games:") {
+		section("Games: ") {
 			paragraph xkGameInfo, image: getAppImg("xkillerclanv1.png")
 			paragraph "Halo 2 For Windows Vista - RIP late 2015", image: getAppImg("halo2.png")
 			paragraph "Battlefield 3", image: getAppImg("battlefield3.png")
@@ -846,12 +835,12 @@ def hiddenPage() {
 			paragraph "Vainglory - Guild: XKILLER, Team: xKiller Clan", image: getAppImg("vainglory.png")
 			paragraph "Minecraft Bedrock Edition - Realm: 0EOy4uYzhxQ", image: getAppImg("minecraft.png")
 		}
-		section("Easter Eggs:") {
+		section("Easter Eggs: ") {
 			href url: linkYoutubeEE1(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE2(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE3(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 		}
-		section("Contact:") {
+		section("Contact: ") {
 			href url: linkDiscord(), style: "${strBrowserMode()}", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
 			href url: linkWaypoint(), style: "${strBrowserMode()}", required: false, title: "Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
 			href url: linkXbox(), style: "${strBrowserMode()}", required: false, title: "Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
@@ -868,27 +857,27 @@ def aboutPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
-		section("Donations:") {
+		section("Donations: ") {
 			paragraph title: "Donations (@DaveGut)", "Donate to a charity", state: "complete", image: getAppImg("heart.png")
 			href url: textDonateLinkAntR(), style: "${strBrowserMode()}", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
-		section("Credits:") {
-			paragraph title: "Creator:", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
-			paragraph title: "Co-Author:", "Anthony R. (@ramiran2)", state: "complete", image: getAppImg("bigmac.png")
+		section("Credits: ") {
+			paragraph title: "Creator: ", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
+			paragraph title: "Co-Author: ", "Anthony R. (@ramiran2)", state: "complete", image: getAppImg("bigmac.png")
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
-			paragraph title: "Unknown:", "Lindsey M. (@Unknown)", state: "complete", image: getAppImg("unknown.png")
+			paragraph title: "Unknown: ", "Lindsey M. (@Unknown)", state: "complete", image: getAppImg("unknown.png")
 			}
-			paragraph title: "Collaborator:", "Anthony S. (@tonesto7)", state: "complete", image: getAppImg("tonesto7.png")
+			paragraph title: "Collaborator: ", "Anthony S. (@tonesto7)", state: "complete", image: getAppImg("tonesto7.png")
 		}
-		section("Application Changes Details:") {
+		section("Application Changes Details: ") {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
-		section("GitHub:") {
+		section("GitHub: ") {
 			href url: linkGitHubDavG(), style: "${strBrowserMode()}", required: false, title: "Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: linkGitHubAntR(), style: "${strBrowserMode()}", required: false, title: "Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: linkGitHubAntS(), style: "${strBrowserMode()}", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
-		section("Licensing Information:") {
+		section("Licensing Information: ") {
 			paragraph "${textLicense()}"
 		}
 		section("${textCopyright()}")
@@ -913,7 +902,7 @@ def changeLogPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Check for Updates:") {
+		section("Check for Updates: ") {
 			if (childDevices) {
 				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
 					paragraph upToDate, image: getAppImg("success.png")
@@ -944,7 +933,7 @@ def changeLogPage() {
 				}
 			}
 		}
-		section("Changelog:") {
+		section("Changelog: ") {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
 		}
@@ -959,7 +948,7 @@ def uninstallPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information:") {
+		section("Information: ") {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		section("${textCopyright()}")
@@ -1078,6 +1067,14 @@ def checkForUpdates() {
 	}
 }
 
+def updateAppIcons() {
+	def child = app.getChildDevices(true)
+	child?.each {
+		child.setIconStatus(userSelectedAppIcons)
+		log.info "Kasa device ${child} preferences updated"
+	}
+}
+
 def updatePreferences() {
 	userSelectedDevicesUpdate.each {
 		def child = getChildDevice(it)
@@ -1120,7 +1117,7 @@ def getDevices() {
 		device["deviceModel"] = it.deviceModel
 		device["deviceId"] = it.deviceId
 		device["appServerUrl"] = it.appServerUrl
-		devices << ["${it.deviceMac}": device]
+		devices << ["${it.deviceMac}" : device]
 		def isChild = getChildDevice(it.deviceMac)
 		if (isChild) {
 			isChild.syncAppServerUrl(it.appServerUrl)
@@ -1161,7 +1158,7 @@ def getWebData(params, desc, text=true) {
 		if(ex instanceof groovyx.net.http.HttpResponseException) {
 			log.warn "${desc} file not found"
 		} else {
-			log.error "getWebData(params: $params, desc: $desc, text: $text) Exception:", ex
+			log.error "getWebData(params: $params, desc: $desc, text: $text) Exception: ", ex
 		}
 		return "${label} info not found"
 	}
@@ -1237,11 +1234,11 @@ def addDevices() {
 					tpLinkModel["${deviceModel}"],
 					device.value.deviceMac,
 					hubId, [
-						"label": device.value.alias,
-							"name": device.value.deviceModel,
-						"data": [
+						"label" : device.value.alias,
+							"name" : device.value.deviceModel,
+						"data" : [
 							"deviceId" : device.value.deviceId,
-							"appServerUrl": device.value.appServerUrl,
+							"appServerUrl" : device.value.appServerUrl,
 						]
 					]
 				)
@@ -1395,7 +1392,7 @@ def uninstManagerApp() {
 			}
 		}
 	} catch (ex) {
-		log.error "uninstManagerApp Exception:", ex
+		log.error "uninstManagerApp Exception: ", ex
 	}
 }
 

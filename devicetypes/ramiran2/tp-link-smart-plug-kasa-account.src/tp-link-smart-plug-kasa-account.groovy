@@ -64,39 +64,39 @@ metadata {
 		attribute "devTyp", "string"
 	}
 	tiles(scale: 2) {
-		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
+		multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"${deviceIcon()}", backgroundColor:"#00a0dc",
-				nextState:"waiting"
-				attributeState "off", label:'${name}', action:"switch.on", icon:"${deviceIcon()}", backgroundColor:"#ffffff",
-				nextState:"waiting"
-				attributeState "waiting", label:'${name}', action:"switch.on", icon:"${deviceIcon()}", backgroundColor:"#15EE10",
-				nextState:"waiting"
-				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"${deviceIcon()}", backgroundColor:"#e86d13",
-				nextState:"waiting"
+				attributeState "on", label:'${name}', action: "switch.off", icon: "${deviceIcon()}", backgroundColor: "#00a0dc",
+				nextState: "waiting"
+				attributeState "off", label:'${name}', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#ffffff",
+				nextState: "waiting"
+				attributeState "waiting", label:'${name}', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#15EE10",
+				nextState: "waiting"
+				attributeState "Unavailable", label:'Unavailable', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#e86d13",
+				nextState: "waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
 		}
 		standardTile("refresh", "capability.refresh", width: 2, height: 1, decoration: "flat") {
-			state "default", label:"Refresh", action:"refresh.refresh"
+			state "default", label: "Refresh", action: "refresh.refresh"
 		}
 		main("switch")
 		details("switch", "refresh")
 	}
 	def rates = [:]
-	rates << ["1" : "Refresh every minute (Not Recommended)"]
+	rates << ["1" : "Refresh every minute"]
 	rates << ["5" : "Refresh every 5 minutes"]
 	rates << ["10" : "Refresh every 10 minutes"]
 	rates << ["15" : "Refresh every 15 minutes"]
-	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
+	rates << ["30" : "Refresh every 30 minutes"]
 	preferences {
 		if (installType() == "Node Applet" || installType() == "Hub") {
-			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
-			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
+			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
-		input name: "refreshRate", type: "enum", title: "Device Refresh Rate", metadata: [values:rates], description: "Select Refresh Rate", required: false
+		input ("refreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"])
 	}
 }
 
@@ -105,7 +105,7 @@ def initialize() {
 	log.info "Initialized ${device.label}..."
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
 	sendEvent(name: "devTyp", value: deviceType(), displayed: false)
-	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
+	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol" : "cloud", "scheme" : "untracked"]), displayed: false)
 }
 
 def ping() {
@@ -141,11 +141,11 @@ void uninstalled() {
 
 //	===== Basic Plug Control/Status =====
 def on() {
-	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 1}}}', "deviceCommand", "commandResponse")
 }
 
 def off() {
-	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 0}}}', "deviceCommand", "commandResponse")
 }
 
 def setLevel(percentage) {
@@ -154,11 +154,11 @@ def setLevel(percentage) {
 		percentage = 50
 	}
 	percentage = percentage as int
-	sendCmdtoServer("""{"smartlife.iot.dimmer":{"set_brightness":{"brightness":${percentage}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.dimmer" :{"set_brightness" :{"brightness" :${percentage}}}}""", "deviceCommand", "commandResponse")
 }
 
 def refresh(){
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
 }
 
 def refreshResponse(cmdResponse){
@@ -187,7 +187,7 @@ private sendCmdtoServer(command, hubCommand, action) {
 			sendCmdtoHub(command, hubCommand, action)
 		}
 	} catch (ex) {
-		log.error "Sending Command Exception:", ex
+		log.error "Sending Command Exception: ", ex
 	}
 }
 
@@ -237,10 +237,10 @@ def hubResponseParse(response) {
 
 def actionDirector(action, cmdResponse) {
 	switch(action) {
-		case "commandResponse":
+		case "commandResponse" :
 			refresh()
 			break
-		case "refreshResponse":
+		case "refreshResponse" :
 			refreshResponse(cmdResponse)
 			break
 		default:
@@ -260,23 +260,23 @@ def setLightTransTime(lightTransTime) {
 
 def setRefreshRate(refreshRate) {
 	switch(refreshRate) {
-		case "1":
+		case "1" :
 			runEvery1Minute(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every minute"
 			break
-		case "5":
+		case "5" :
 			runEvery5Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 5 minutes"
 			break
-		case "10":
+		case "10" :
 			runEvery10Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 10 minutes"
 			break
-		case "15":
+		case "15" :
 			runEvery15Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 15 minutes"
 			break
-		case "30":
+		case "30" :
 			runEvery30Minutes(refresh)
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 			break
@@ -285,3 +285,20 @@ def setRefreshRate(refreshRate) {
 			log.info "${device.name} ${device.label} Refresh Scheduled for every 30 minutes"
 	}
 }
+
+def setIconStatus(newAppIcons) {
+	userSelectedAppIcons = newAppIcons
+	if (userSelectedAppIcons == null) {
+		userSelectedAppIcons = false
+	}
+}
+
+//	======== GitHub Values =====================================================================================================================================================================================
+//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+	def gitName()	{ return "TP-Link-SmartThings" }
+	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
+	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def gitRepo()		{ return "${devNamespace()}/${gitName()}" }
+	def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
+	def betaMarker()	{ return false }
+//	============================================================================================================================================================================================================
