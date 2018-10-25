@@ -39,15 +39,17 @@ TP-Link devices; primarily various users on GitHub.com.
 //	======== Other System Values =============================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
 	def devVer()	{ return "3.4.0" }														//	Device Handler Version
+	def ocfType()	{ return "oic.d.light" }												//	Open Connectivity Foundation Device Type: Light Bulb
+	def vidValue()	{ return "generic-rgbw-color-bulb" }									//	Vendor ID: RGBW Color Light Bulb
 //	==========================================================================================
 
 metadata {
 	definition (name: "${devName()}",
 				namespace: "${devNamespace()}",
 				author: "${devAuthor()}",
-				ocfDeviceType: "oic.d.light",
+				ocfDeviceType: "${ocfType()}",
 				mnmn: "SmartThings",
-				vid: "generic-rgbw-color-bulb") {
+				vid: "${vidValue()}") {
 		capability "Switch"
 		capability "Switch Level"
 		capability "refresh"

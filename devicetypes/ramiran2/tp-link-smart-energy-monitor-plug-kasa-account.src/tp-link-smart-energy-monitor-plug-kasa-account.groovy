@@ -37,15 +37,17 @@ TP-Link devices; primarily various users on GitHub.com.
 //	======== Other System Values =============================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
 	def devVer()	{ return "3.4.0" }														//	Device Handler Version
+	def ocfType()	{ return "oic.d.smartplug" }											//	Open Connectivity Foundation Device Type: Smart Plug
+	def vidValue()	{ return "generic-switch-power-energy" }								//	Vendor ID: Switch With Energy Monitoring
 //	==========================================================================================
 
 metadata {
 	definition (name: "${devName()}",
 				namespace: "${devNamespace()}",
 				author: "${devAuthor()}",
-				ocfDeviceType: "oic.d.smartplug",
+				ocfDeviceType: "${ocfType()}",
 				mnmn: "SmartThings",
-				vid: "generic-switch-power-energy") {
+				vid: "${vidValue()}") {
 		capability "Switch"
 		capability "refresh"
 		capability "Health Check"
