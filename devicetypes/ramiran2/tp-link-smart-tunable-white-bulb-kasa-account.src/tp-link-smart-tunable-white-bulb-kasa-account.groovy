@@ -74,7 +74,7 @@ metadata {
 				nextState: "waiting"
 				attributeState "waiting", label:'${name}', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#15EE10",
 				nextState: "waiting"
-				attributeState "Unavailable", label: 'Unavailable', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#e86d13",
+				attributeState "unavailable", label: 'unavailable', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#e86d13",
 				nextState: "waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
@@ -172,11 +172,11 @@ void uninstalled() {
 
 //	===== Basic Bulb Control/Status =====
 def on() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"on_off" :1,"transition_period" :${state.transTime}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
 }
 
 def off() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"on_off" :0,"transition_period" :${state.transTime}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
 }
 
 def setLevel(percentage) {
@@ -190,7 +190,7 @@ def setLevel(percentage, rate) {
 	}
 	percentage = percentage as int
 	rate = rate.toInteger()
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"brightness" :${percentage},"transition_period" :${rate}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"brightness":${percentage},"transition_period":${rate}}}}""", "deviceCommand", "commandResponse")
 }
 
 def setColorTemperature(kelvin) {
@@ -205,15 +205,15 @@ def setColorTemperature(kelvin) {
 			if (kelvin > 9000) kelvin = 9000
 	}
 	kelvin = kelvin as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"color_temp" : ${kelvin},"hue" :0,"saturation" :0}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "deviceCommand", "commandResponse")
 }
 
 def setModeNormal() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"mode" : "normal"}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "deviceCommand", "commandResponse")
 }
 
 def setModeCircadian() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"mode" : "circadian"}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "deviceCommand", "commandResponse")
 }
 
 def setHue(hue) {
@@ -235,24 +235,40 @@ def setColor(Map color) {
 	}
 	def hue = color.hue * 3.6 as int
 	def saturation = color.saturation as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice" :{"transition_light_state" :{"ignore_default" :1,"on_off" :1,"color_temp" :0,"hue" :${hue},"saturation" :${saturation}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "deviceCommand", "commandResponse")
 }
 
 def refresh(){
-	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 }
 
 def refreshResponse(cmdResponse){
 	def status = cmdResponse.system.get_sysinfo.light_state
 	def onOff = status.on_off
-	if (onOff == 1) {
-		onOff = "on"
+	if (installType() == "Node Applet") {
+		if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+			sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+			sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+			sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+		} else {
+			if (onOff == 1) {
+				onOff = "on"
+			} else {
+				onOff = "off"
+				status = status.dft_on_state
+			}
+			sendEvent(name: "switch", value: onOff)
+		}
 	} else {
-		onOff = "off"
-		status = status.dft_on_state
+		if (onOff == 1) {
+			onOff = "on"
+		} else {
+			onOff = "off"
+			status = status.dft_on_state
+		}
+		sendEvent(name: "switch", value: onOff)
 	}
 	def level = status.brightness
-	sendEvent(name: "switch", value: onOff)
 	sendEvent(name: "level", value: level)
 	switch(deviceType()) {
 		case "Soft White Bulb" :
@@ -297,7 +313,13 @@ def refreshResponse(cmdResponse){
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
 		if (installType() == "Kasa Account") {
-			sendCmdtoHub(command, hubCommand, action)
+			if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+				sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+				sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+				sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+			} else {
+				sendCmdtoHub(command, hubCommand, action)
+			}
 		} else {
 			sendCmdtoCloud(command, hubCommand, action)
 		}
@@ -314,7 +336,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	if (cmdResp.substring(0,5) == "ERROR"){
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
-		sendEvent(name: "switch", value: "Unavailable", descriptionText: errMsg)
+		sendEvent(name: "switch", value: "unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""

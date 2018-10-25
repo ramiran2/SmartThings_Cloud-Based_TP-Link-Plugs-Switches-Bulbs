@@ -69,7 +69,7 @@ metadata {
 				nextState: "waiting"
 				attributeState "waiting", label:'${name}', action: "switch.on", icon: "st.Appliances.appliances17", backgroundColor: "#15EE10",
 				nextState: "waiting"
-				attributeState "Unavailable", label:'Unavailable', action: "switch.on", icon: "st.Appliances.appliances17", backgroundColor: "#e86d13",
+				attributeState "unavailable", label:'unavailable', action: "switch.on", icon: "st.Appliances.appliances17", backgroundColor: "#e86d13",
 				nextState: "waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
@@ -159,32 +159,48 @@ void uninstalled() {
 
 //	===== Basic Plug Control/Status =====
 def on() {
-	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 1}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "deviceCommand", "commandResponse")
 	runIn(2, refresh)
 }
 
 def off() {
-	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 0}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "deviceCommand", "commandResponse")
 	runIn(2, refresh)
 }
 
 def getSystemInfo() {
-	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 	runIn(2, getPower)
 }
 
 def refresh(){
-	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 	runIn(2, getPower)
 	runIn(7, getConsumption)
 }
 
 def refreshResponse(cmdResponse){
 	def status = cmdResponse.system.get_sysinfo.relay_state
-	if (status == 1) {
-		status = "on"
+	if (installType() == "Node Applet") {
+		if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+			sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+			sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+			sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+		} else {
+			if (status == 1) {
+				status = "on"
+			} else {
+				status = "off"
+			}
+			sendEvent(name: "switch", value: status)
+		}
 	} else {
-		status = "off"
+		if (status == 1) {
+			status = "on"
+		} else {
+			status = "off"
+		}
+		sendEvent(name: "switch", value: status)
 	}
 	log.info "${device.name} ${device.label}: Power: ${status}"
 	sendEvent(name: "switch", value: status)
@@ -192,7 +208,7 @@ def refreshResponse(cmdResponse){
 
 //	===== Get Current Energy Data =====
 def getPower(){
-	sendCmdtoServer("""{"${state.emeterText}" :{"get_realtime" :{}}}""", "deviceCommand", "energyMeterResponse")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_realtime":{}}}""", "deviceCommand", "energyMeterResponse")
 }
 
 def energyMeterResponse(cmdResponse) {
@@ -216,7 +232,7 @@ def energyMeterResponse(cmdResponse) {
 
 //	===== Get Today's Consumption =====
 def getConsumption(){
-	sendCmdtoServer("""{"${state.emeterText}" :{"get_daystat" :{"month" : ${state.monthToday}, "year" : ${state.yearToday}}}}""", "emeterCmd", "useTodayResponse")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthToday}, "year": ${state.yearToday}}}}""", "emeterCmd", "useTodayResponse")
 }
 
 def useTodayResponse(cmdResponse) {
@@ -242,7 +258,7 @@ def getEnergyStats() {
 	state.monTotDays = 0
 	state.wkTotEnergy = 0
 	state.wkTotDays = 0
-	sendCmdtoServer("""{"${state.emeterText}" :{"get_daystat" :{"month" : ${state.monthToday}, "year" : ${state.yearToday}}}}""", "emeterCmd", "engrStatsResponse")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthToday}, "year": ${state.yearToday}}}}""", "emeterCmd", "engrStatsResponse")
 	runIn(4, getPrevMonth)
 }
 
@@ -259,13 +275,13 @@ def getPrevMonth() {
 		prevMonth = prevMonth + 1
 		runIn(4, getJan)
 	}
-	sendCmdtoServer("""{"${state.emeterText}" :{"get_daystat" :{"month" : ${prevMonth}, "year" : ${state.yearStart}}}}""", "emeterCmd", "UseJanWatts")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${prevMonth}, "year": ${state.yearStart}}}}""", "emeterCmd", "UseJanWatts")
 }
 
 def getJan() {
 //	Gets January data on March 1 and 2. Only access if current month = 3
 //	and start month = 1
-	sendCmdtoServer("""{"${state.emeterText}" :{"get_daystat" :{"month" : ${state.monthStart}, "year" : ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthStart}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
 }
 
 def engrStatsResponse(cmdResponse) {
@@ -389,7 +405,13 @@ def currentDateResponse(cmdResponse) {
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
 		if (installType() == "Kasa Account") {
-			sendCmdtoHub(command, hubCommand, action)
+			if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+				sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+				sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+				sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+			} else {
+				sendCmdtoHub(command, hubCommand, action)
+			}
 		} else {
 			sendCmdtoCloud(command, hubCommand, action)
 		}
@@ -406,7 +428,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	if (cmdResp.substring(0,5) == "ERROR"){
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
-		sendEvent(name: "switch", value: "commsError", descriptionText: errMsg)
+		sendEvent(name: "switch", value: "unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""

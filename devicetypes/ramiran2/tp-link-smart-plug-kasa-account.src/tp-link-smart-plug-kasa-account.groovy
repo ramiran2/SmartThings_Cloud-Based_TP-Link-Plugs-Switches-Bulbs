@@ -70,7 +70,7 @@ metadata {
 				nextState: "waiting"
 				attributeState "waiting", label:'${name}', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#15EE10",
 				nextState: "waiting"
-				attributeState "Unavailable", label:'Unavailable', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#e86d13",
+				attributeState "unavailable", label:'unavailable', action: "switch.on", icon: "${deviceIcon()}", backgroundColor: "#e86d13",
 				nextState: "waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
@@ -133,11 +133,11 @@ void uninstalled() {
 
 //	===== Basic Plug Control/Status =====
 def on() {
-	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 1}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "deviceCommand", "commandResponse")
 }
 
 def off() {
-	sendCmdtoServer('{"system" :{"set_relay_state" :{"state" : 0}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "deviceCommand", "commandResponse")
 }
 
 def setLevel(percentage) {
@@ -150,17 +150,32 @@ def setLevel(percentage) {
 }
 
 def refresh(){
-	sendCmdtoServer('{"system" :{"get_sysinfo" :{}}}', "deviceCommand", "refreshResponse")
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 }
 
 def refreshResponse(cmdResponse){
 	def onOff = cmdResponse.system.get_sysinfo.relay_state
-	if (onOff == 1) {
-		onOff = "on"
+	if (installType() == "Node Applet") {
+		if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+			sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+			sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+			sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+		} else {
+			if (onOff == 1) {
+				onOff = "on"
+			} else {
+				onOff = "off"
+			}
+			sendEvent(name: "switch", value: onOff)
+		}
 	} else {
-		onOff = "off"
+		if (onOff == 1) {
+			onOff = "on"
+		} else {
+			onOff = "off"
+		}
+		sendEvent(name: "switch", value: onOff)
 	}
-	sendEvent(name: "switch", value: onOff)
 	if (deviceType() == "Dimming Switch") {
 		def level = cmdResponse.system.get_sysinfo.brightness
 	 	sendEvent(name: "level", value: level)
@@ -174,7 +189,13 @@ def refreshResponse(cmdResponse){
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
 		if (installType() == "Node Applet") {
-			sendCmdtoHub(command, hubCommand, action)
+			if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
+				sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+				sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
+				sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
+			} else {
+				sendCmdtoHub(command, hubCommand, action)
+			}
 		} else {
 			sendCmdtoCloud(command, hubCommand, action)
 		}
@@ -191,7 +212,7 @@ private sendCmdtoCloud(command, hubCommand, action){
 	if (cmdResp.substring(0,5) == "ERROR"){
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
-		sendEvent(name: "switch", value: "commsError", descriptionText: errMsg)
+		sendEvent(name: "switch", value: "unavailable", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""
