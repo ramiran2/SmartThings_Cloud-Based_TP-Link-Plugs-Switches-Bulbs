@@ -1068,8 +1068,9 @@ def checkForUpdates() {
 }
 
 def updateAppIcons() {
-	def child = app.getChildDevices(true)
-	child?.each {
+	def childDevices = app.getChildDevices(true)
+	childDevices?.each {
+		def child = getChildDevice(it)
 		child.setIconStatus(userSelectedAppIcons)
 		log.info "Kasa device ${child} preferences updated"
 	}
