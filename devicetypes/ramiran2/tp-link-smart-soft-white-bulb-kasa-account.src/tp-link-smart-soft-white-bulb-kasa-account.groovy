@@ -297,9 +297,9 @@ def refreshResponse(cmdResponse){
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
 		if (installType() == "Kasa Account") {
-			sendCmdtoCloud(command, hubCommand, action)
-		} else {
 			sendCmdtoHub(command, hubCommand, action)
+		} else {
+			sendCmdtoCloud(command, hubCommand, action)
 		}
 	} catch (ex) {
 		log.error "Sending Command Exception: ", ex
