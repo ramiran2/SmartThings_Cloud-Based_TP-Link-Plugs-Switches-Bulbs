@@ -918,9 +918,7 @@ def changeLogPage() {
 				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
 					paragraph upToDate, image: getAppImg("success.png")
 				} else {
-					if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
-						paragraph updateNeeded, image: getAppImg("error.png")
-					} else {
+					if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
 						if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
 							paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
 						} else {
@@ -934,6 +932,8 @@ def changeLogPage() {
 						if (intUpdateCheckOne == 1 && intUpdateCheckTwo == 1) {
 							paragraph updateFailed, image: getAppImg("error.png")
 						}
+					} else {
+						paragraph updateNeeded, image: getAppImg("error.png")
 					}
 				}
 			} else {
@@ -963,7 +963,7 @@ def uninstallPage() {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		section("${textCopyright()}")
-		remove("Uninstall this application", "WARNING!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis App, All Devices will be removed")
+		remove("Uninstall this application", "Warning!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis will remove All Devices including this application")
 	}
 }
 
@@ -1057,12 +1057,14 @@ def checkForUpdates() {
 	} else {
 		atomicState?.devVerLnk = atomicState?.devDSHVer
 	}
-	if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
+	if ("${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+	} else {
 		if (userSelectedNotification) {
 			sendPush("${appLabel()} Device Handlers need to be updated")
 		}
 	}
-	if ("${strLatestSmartAppVersion}" != "${appVersion()}" ) {
+	if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" ) {
+	} else {
 		if (userSelectedNotification) {
 			sendPush("${appLabel()} needs to be updated")
 		}
