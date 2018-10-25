@@ -147,6 +147,7 @@ def installed() {
 def updated() {
 	log.info "Updated ${device.label}..."
 	unschedule()
+	checkStateClear()
 	if (refreshRate) {
 		setRefreshRate(refreshRate)
 	} else {

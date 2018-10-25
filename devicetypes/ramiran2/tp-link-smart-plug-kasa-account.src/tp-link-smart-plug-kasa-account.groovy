@@ -112,12 +112,13 @@ def installed() {
 def updated() {
 	log.info "Updated ${device.label}..."
 	unschedule()
-		//	Update Refresh Rate Preference
-		if (refreshRate) {
-			setRefreshRate(refreshRate)
-		} else {
-			setRefreshRate(30)
-		}
+	checkStateClear()
+	//	Update Refresh Rate Preference
+	if (refreshRate) {
+		setRefreshRate(refreshRate)
+	} else {
+		setRefreshRate(30)
+	}
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
 	sendEvent(name: "devTyp", value: deviceType(), displayed: false)
 	runIn(2, refresh)

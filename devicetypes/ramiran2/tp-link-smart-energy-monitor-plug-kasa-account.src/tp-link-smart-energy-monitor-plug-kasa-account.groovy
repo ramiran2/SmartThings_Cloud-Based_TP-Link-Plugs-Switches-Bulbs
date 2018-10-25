@@ -135,6 +135,7 @@ def updated() {
 	state.emeterText = "emeter"
 	state.getTimeText = "time"
 	unschedule()
+	checkStateClear()
 	//	Update Refresh Rate Preference
 	if (refreshRate) {
 		setRefreshRate(refreshRate)
