@@ -47,9 +47,13 @@ preferences {
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "kasaAddDevicesPage")
+	page(name: "hubAddDevicesPage")
 	page(name: "kasaRemoveDevicesPage")
+	page(name: "hubRemoveDevicesPage")
 	page(name: "kasaUserApplicationPreferencesPage")
+	page(name: "hubUserApplicationPreferencesPage")
 	page(name: "kasaUserDevicePreferencesPage")
+	page(name: "hubUserDevicePreferencesPage")
 	page(name: "kasaUserSelectionTokenPage")
 	page(name: "developerPage")
 	page(name: "developerTestingPage")
@@ -64,9 +68,10 @@ def setInitialStates() {
 	if (!state.devices) {state.devices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
-	settingRemove("userSelectedDevicesRemove")
-	settingRemove("userSelectedDevicesAdd")
-	settingRemove("userSelectedDevicesUpdate")
+	settingUpdate("userSelectedReload", "false", "bool")
+	settingRemove("userSelectedDevicesRemoveKasa")
+	settingRemove("userSelectedDevicesAddKasa")
+	settingRemove("userSelectedDevicesToUpdateKasa")
 	settingRemove("userSelectedOptionThree")
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingRemove("userName")
@@ -89,7 +94,6 @@ def setInitialStates() {
 			settingUpdate("userSelectedLauncher", "true", "bool")
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
-		settingUpdate("userSelectedReload", "false", "bool")
 		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
 	}
 }
@@ -142,7 +146,7 @@ def setRecommendedOptions() {
 
 def startPage() {
 	setInitialStates()
-	if (userSelectedAssistant) {
+	if (userSelectedAssistant && !userSelectedManagerMode) {
 		setRecommendedOptions()
 	}
 	kasaWelcomePage()
@@ -153,7 +157,7 @@ def kasaWelcomePage() {
 	def strLatestDriverVersion = textDriverVersion()
 	def kasaWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "kasaWelcomePage", title: "Welcome Page", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaWelcomePage", title: "Introduction Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -192,6 +196,47 @@ def kasaWelcomePage() {
 				href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
 			href "kasaUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+		}
+		section("Uninstall: ") {
+			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
+		}
+		if (userSelectedDeveloper) {
+			section("Developer: ") {
+				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
+			}
+		}
+		section("Help and Feedback: ") {
+			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
+			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
+		}
+		section("Changelog and About: ") {
+			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
+			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
+		}
+		section("${textCopyright()}")
+	}
+}
+
+//	----- WELCOME PAGE -----
+def hubWelcomePage() {
+	def strLatestDriverVersion = textDriverVersion()
+	def hubWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
+	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
+	return dynamicPage (name: "hubWelcomePage", title: "Introduction Page", install: false, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubWelcomePageText, image: getAppImg("information.png")
+			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
+		}
+		section("Device Manager: ") {
+			href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+		}
+		section("Settings: ") {
+			href "hubUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "hubUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
 		section("Uninstall: ") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
@@ -261,7 +306,7 @@ def kasaUserSelectionAuthenticationPage() {
 				settingRemove("userName")
 				settingRemove("userPassword")
 				state.TpLinkToken = null
-				href "kasaWelcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+				href "kasaWelcomePage", title: "Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -427,7 +472,26 @@ def kasaAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+		}
+		section("${textCopyright()}")
+	}
+}
+
+//	----- ADD DEVICES PAGE -----
+def hubAddDevicesPage() {
+	def errorMsgDev = "None"
+	def hubAddDevicesPageText = "None"
+	return dynamicPage (name: "hubAddDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubAddDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
+		}
+		section("Device Controller: ") {
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -471,7 +535,26 @@ def kasaRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+		}
+		section("${textCopyright()}")
+	}
+}
+
+//	----- REMOVE DEVICES PAGE -----
+def hubRemoveDevicesPage() {
+	def errorMsgDev = "None"
+	def hubRemoveDevicesPageText = "Devices that have been installed "
+	return dynamicPage (name: "hubRemoveDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubRemoveDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
+		}
+		section("Device Controller: ") {
+			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -506,33 +589,77 @@ def kasaUserApplicationPreferencesPage() {
 			paragraph title: "Information: ", kasaUserApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration: ") {
-			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
-			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
-			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: true, image: getAppImg("browsermode.png"))
+			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
+			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
+			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
+			if (!userSelectedLauncher) {
+				input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: false, image: getAppImg("ease.png"))
+			}
+			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: false, image: getAppImg("browsermode.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			if (userSelectedAppIcons && userSelectedAssistant && userSelectedReload || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
 				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			}
 			if (userSelectedDeveloper) {
-				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
-				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
+				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
+				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
 				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
-				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
+				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 			}
 			if (userSelectedTestingPage && userSelectedReload || hiddenRecordInput == 1) {
 				hiddenRecordInput = 1
-				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: true, image: getAppImg("passwordverification.png"))
+				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: false, image: getAppImg("passwordverification.png"))
 			}
-			if (userSelectedReload && state.TpLinkToken != null) {
+			if (userSelectedReload) {
 				checkError()
 				setInitialStates()
 			} else {
 				settingUpdate("userSelectedReload", "false", "bool")
 			}
-			if (userSelectedAssistant) {
-				setRecommendedOptions()
+		}
+		section("${textCopyright()}")
+	}
+}
+
+//	----- USER APPLICATION PREFERENCES PAGE -----
+def hubUserApplicationPreferencesPage() {
+	def hiddenRecordInput = 0
+	def hiddenDeveloperInput = 0
+	if (userSelectedDeveloper) {
+		hiddenDeveloperInput = 1
+	} else {
+		hiddenDeveloperInput = 0
+	}
+	if ("${restrictedRecordPasswordPrompt}" =~ null) {
+		hiddenRecordInput = 0
+	} else {
+		hiddenRecordInput = 1
+	}
+	def hubUserApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
+		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
+	return dynamicPage (name: "hubUserApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubUserApplicationPreferencesPageText, image: getAppImg("information.png")
+		}
+		section("Application Configuration: ") {
+			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
+			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
+			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
+			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: false, image: getAppImg("browsermode.png"))
+			if (userSelectedAppIcons && userSelectedBrowserMode && userSelectedNotification || hiddenDeveloperInput == 1) {
+				hiddenDeveloperInput = 1
+				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+			}
+			if (userSelectedDeveloper) {
+				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+			}
+			if (userSelectedTestingPage && !userSelectedNotification || hiddenRecordInput == 1) {
+				hiddenRecordInput = 1
+				input ("restrictedRecordPasswordPrompt", type: "password", title: "This is a restricted record, Please input your password", description: "Hint: xKillerMaverick", required: false, submitOnChange: false, image: getAppImg("passwordverification.png"))
 			}
 		}
 		section("${textCopyright()}")
@@ -566,7 +693,28 @@ def kasaUserDevicePreferencesPage() {
 			paragraph title: "Information: ", kasaUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
+		}
+		section("${textCopyright()}")
+	}
+}
+
+//	----- USER DEVICE PREFERENCES PAGE -----
+def hubUserDevicePreferencesPage() {
+	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
+		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
+		"After that you may procide to save by clicking the save button."
+	return dynamicPage (name: "hubUserDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubUserDevicePreferencesPageText, image: getAppImg("information.png")
+		}
+		section("Device Configuration: ") {
+			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
@@ -676,9 +824,10 @@ def developerPage() {
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "kasaWelcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "kasaWelcomePage", title: "Cloud Controller Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "hubWelcomePage", title: "Hub Controller Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
-			href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
+			href "hubUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
@@ -686,10 +835,14 @@ def developerPage() {
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-			href "kasaUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
-			href "kasaUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "kasaAddDevicesPage", title: "Cloud Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "hubAddDevicesPage", title: "Hub Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "kasaRemoveDevicesPage", title: "Cloud Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			href "hubRemoveDevicesPage", title: "Hub Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			href "kasaUserApplicationPreferencesPage", title: "Cloud Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "hubUserApplicationPreferencesPage", title: "Hub Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "kasaUserDevicePreferencesPage", title: "Cloud Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "hubUserDevicePreferencesPage", title: "Hub Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			href "kasaUserSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			if (userSelectedTestingPage) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
@@ -780,23 +933,24 @@ def developerTestingPage() {
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesAdd", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
-			input ("userSelectedDevicesRemove", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration: ") {
-			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
-			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
-			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: true, image: getAppImg("ease.png"))
-			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: true, image: getAppImg("browsermode.png"))
+			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
+			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
+			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
+			input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: false, image: getAppImg("ease.png"))
+			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: false, image: getAppImg("browsermode.png"))
 			input ("userSelectedReload", "bool", title: "Do you want to refresh your current state?", submitOnChange: true, image: getAppImg("sync.png"))
 			input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
-			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: true, image: getAppImg("launcher.png"))
-			input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: true, image: getAppImg("quickcontrol.png"))
+			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
+			input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
 			input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
-			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: true, image: getAppImg("drivernamespace.png"))
+			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
@@ -1067,7 +1221,7 @@ def checkForUpdates() {
 }
 
 def updatePreferences() {
-	userSelectedDevicesUpdate.each {
+	userSelectedDevicesToUpdateKasa.each {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
@@ -1118,7 +1272,7 @@ def getDevices() {
 }
 
 def removeDevices() {
-	userSelectedDevicesRemove.each { dni ->
+	userSelectedDevicesRemoveKasa.each { dni ->
 		try{
 			def isChild = getChildDevice(dni)
 			if (isChild) {
@@ -1214,7 +1368,7 @@ def addDevices() {
 	}
 	def hub = location.hubs[0]
 	def hubId = hub.id
-	userSelectedDevicesAdd.each { dni ->
+	userSelectedDevicesAddKasa.each { dni ->
 		try {
 			def isChild = getChildDevice(dni)
 			if (!isChild) {
@@ -1392,13 +1546,13 @@ def initialize() {
 	runEvery3Hours(cleanStorage)
 	runEvery3Hours(checkForUpdates)
 	schedule("0 30 2 ? * WED", getToken)
-	if (userSelectedDevicesAdd) {
+	if (userSelectedDevicesAddKasa) {
 		addDevices()
 	}
-	if (userSelectedDevicesRemove) {
+	if (userSelectedDevicesRemoveKasa) {
 		removeDevices()
 	}
-	if (userSelectedDevicesUpdate) {
+	if (userSelectedDevicesToUpdateKasa) {
 		updatePreferences()
 	}
 }
