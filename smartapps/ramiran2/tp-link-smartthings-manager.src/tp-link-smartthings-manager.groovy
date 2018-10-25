@@ -1,5 +1,5 @@
 /*
-TP-Link SmartThings Manager, 2018 Version 4
+TP-Link SmartThings Manager and TP-Link Cloud Connect, 2018 Version 4
 
 	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
@@ -20,6 +20,21 @@ Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Kasa Devices;
 primarily various users on GitHub.com.*/
 
+//	===== Developer Namespace ================================================================
+//	def devNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
+	def devNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
+//	======== Repository Name =================================================================
+//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }		//	Davegut: Repository Name
+	def gitName()	{ return "TP-Link-SmartThings" }										//	Ramiran2: Repository Name
+//	======== Application Name ================================================================
+//	def appLabel()	{ return "TP-Link Cloud Connect" }										//	Davegut: Application Name
+	def appLabel()	{ return "TP-Link SmartThings Manager" }								//	Ramiran2: Application Name
+//	======== Application Information =========================================================
+	def appVersion()	{ return "4.1.0" }													//	Application Version
+	def appVerDate()	{ return "10-24-2018" }												//	Application Date
+	def appAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Application Author
+//	==========================================================================================
+
 definition(
 	name: "${appLabel()}",
 	namespace: "${appNamespace()}",
@@ -31,9 +46,6 @@ definition(
 	iconX3Url: "${getAppImg("kasa.png", on)}",
 	singleInstance: true
 )
-
-def appVersion() { return "4.0.0" }
-def appVerDate() { return "10-23-2018" }
 
 preferences {
 	page(name: "welcomePage")
@@ -1435,53 +1447,42 @@ def removeChildDevice(alias, deviceNetworkId) {
 	}
 }
 
-//	def appNamespace()	{ return "davegut" }
-	def appNamespace()	{ return "ramiran2" }
-//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
-	def gitName()	{ return "TP-Link-SmartThings" }
-//	def appLabel()	{ return "TP-Link Cloud Connect" }
-	def appLabel()	{ return "TP-Link SmartThings Manager" }
-def gitBranch()	{ return betaMarker() ? "beta" : "master" }
-def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
-def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
-def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
-def strBrowserMode()	{ return (userSelectedBrowserMode) ? "embedded" : "external" }
-def driverNamespace()	{ return (userSelectedDriverNamespace) ? "DaveGut" : "ramiran2" }
-def gitRepo()		{ return "${appNamespace()}/${gitName()}" }
-def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
-def betaMarker()	{ return false }
-def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
-def sendingCommandFailed()	{ return "Ready to Send Command to SmartThings Application" }
-def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
-def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
-def pageSelectorText()	{ return "Please tap below to continue" }
-def pageSelectorNullText()	{ return "Please select a option to continue" }
-def pageSelectorErrorText()	{ return "Please continue with caution, we have detected a error" }
-def appInfoDesc()	{
-	def str = ""
-	str += "${appLabel()}"
-	str += "\n" + "• ${textVersion()}"
-	str += "\n" + "• ${textModified()}"
-	return str
-}
-def appAuthor() { return "Dave Gutheinz, Anthony Ramirez" }
-def textVersion()	{ return "Version: ${appVersion()}" }
-def textModified()	{ return "Updated: ${appVerDate()}" }
-def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
-def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
-def textSmartAppVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
-def textDriverVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/driverversion.txt", contentType: "text/plain; charset=UTF-8"], "driverversion") }
-def textDonateLinkAntR()	{ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
-def linkGitHubDavG()	{ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
-def linkGitHubAntR()	{ return "https://github.com/ramiran2/TP-Link-SmartThings" }
-def linkGitHubAntS()	{ return "https://github.com/tonesto7/nest-manager" }
-def linkYoutubeEE1()	{ return "https://www.youtube.com/watch?v=87JPlNk5ves&list=PL0S-Da7zGmE9PRn_YIitvUZEHYQglJw" }
-def linkYoutubeEE2()	{ return "https://www.youtube.com/watch?v=0eYTZrucx_o" }
-def linkYoutubeEE3()	{ return "https://www.youtube.com/watch?v=4_5kpOeiZyg&index=3&list=PL0S-Da7zGmE-i5MQdHORm6a" }
-def linkDiscord()	{ return "https://discord.gg/JDXeV23" }
-def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=3379843591790358" }
-def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
-def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
-def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
-def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
-def textDesc()	{ return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
+//	======== Other Application Values ==========================================================================================================================================================================
+	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
+	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
+	def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
+	def strBrowserMode()	{ return (userSelectedBrowserMode) ? "embedded" : "external" }
+	def driverNamespace()	{ return (userSelectedDriverNamespace) ? "DaveGut" : "ramiran2" }
+	def gitRepo()		{ return "${appNamespace()}/${gitName()}" }
+	def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
+	def betaMarker()	{ return false }
+	def sendingCommandSuccess()	{ return "Command Sent to SmartThings Application" }
+	def sendingCommandFailed()	{ return "Ready to Send Command to SmartThings Application" }
+	def tokenInfoOnline()	{ return "Online and Ready to Control Devices" }
+	def tokenInfoOffline()	{ return "Offline, Please Fix to Restore Control on Devices" }
+	def pageSelectorText()	{ return "Please tap below to continue" }
+	def pageSelectorNullText()	{ return "Please select a option to continue" }
+	def pageSelectorErrorText()	{ return "Please continue with caution, we have detected a error" }
+	def textVersion()	{ return "Version: ${appVersion()}" }
+	def textModified()	{ return "Updated: ${appVerDate()}" }
+	def appVerInfo()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/changelog.txt", contentType: "text/plain; charset=UTF-8"], "changelog") }
+	def textLicense()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/license.txt", contentType: "text/plain; charset=UTF-8"], "license") }
+	def textSmartAppVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/appversion.txt", contentType: "text/plain; charset=UTF-8"], "appversion") }
+	def textDriverVersion()	{ return getWebData([uri: "https://raw.githubusercontent.com/${gitPath()}/data/driverversion.txt", contentType: "text/plain; charset=UTF-8"], "driverversion") }
+	def textDonateLinkAntR()	{ return "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2CJBWCJEGVJA" }
+	def linkGitHubDavG()	{ return "https://github.com/DaveGut/SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
+	def linkGitHubAntR()	{ return "https://github.com/ramiran2/TP-Link-SmartThings" }
+	def linkGitHubAntS()	{ return "https://github.com/tonesto7/nest-manager" }
+	def linkYoutubeEE1()	{ return "https://www.youtube.com/watch?v=87JPlNk5ves&list=PL0S-Da7zGmE9PRn_YIitvUZEHYQglJw" }
+	def linkYoutubeEE2()	{ return "https://www.youtube.com/watch?v=0eYTZrucx_o" }
+	def linkYoutubeEE3()	{ return "https://www.youtube.com/watch?v=4_5kpOeiZyg&index=3&list=PL0S-Da7zGmE-i5MQdHORm6a" }
+	def linkDiscord()	{ return "https://discord.gg/JDXeV23" }
+	def linkXbox()	{ return "https://account.xbox.com/en-us/clubs/profile?clubid=3379843591790358" }
+	def linkWaypoint()	{ return "https://www.halowaypoint.com/en-us/spartan-companies/xkiller%20clan" }
+	def linkSteam()	{ return "https://steamcommunity.com/groups/xKillerClan" }
+	def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
+	def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
+	def textDesc()	{ return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
+	def appInfoDesc()	{ def str = "" str += "${appLabel()}" str += "\n" + "• ${textVersion()}" str += "\n" + "• ${textModified()}" return str }
+//	============================================================================================================================================================================================================
