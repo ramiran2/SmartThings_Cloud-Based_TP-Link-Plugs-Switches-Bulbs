@@ -132,6 +132,7 @@ metadata {
 		}
 		input ("transitionTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getAppImg("transition.png"))
 		input ("refreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getAppImg("refresh.png"))
+		input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
 	}
 }
 

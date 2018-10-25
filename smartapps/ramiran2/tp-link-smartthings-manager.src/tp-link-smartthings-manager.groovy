@@ -553,13 +553,9 @@ def userDevicePreferencesPage() {
 			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	def userAppIcons = false
 	def userDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
-	if (userSelectedAppIcons) {
-		userAppIcons = true
-	}
 	return dynamicPage (name: "userDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -574,9 +570,9 @@ def userDevicePreferencesPage() {
 		}
 		section("Device Configuration: ") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: true, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: true, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
-			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: true, image: getAppImg("noicon.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
+			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -1076,7 +1072,7 @@ def updatePreferences() {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
-		child.setIconStatus(userAppIcons)
+		child.setIconStatus(userSelectedAppIcons)
 		log.info "Kasa device ${child} preferences updated"
 		if (userSelectedNotification) {
 			sendPush("Successfully updated TP-Link $deviceModel with alias ${device.value.alias}")
