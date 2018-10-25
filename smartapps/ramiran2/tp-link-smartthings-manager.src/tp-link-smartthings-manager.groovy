@@ -553,9 +553,13 @@ def userDevicePreferencesPage() {
 			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
+	def userAppIcons = false
 	def userDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
+	if (userSelectedAppIcons) {
+		userAppIcons = true
+	}
 	return dynamicPage (name: "userDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -1072,7 +1076,7 @@ def updatePreferences() {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
-		child.setIconStatus(userSelectedAppIcons)
+		child.setIconStatus(userAppIcons)
 		log.info "Kasa device ${child} preferences updated"
 		if (userSelectedNotification) {
 			sendPush("Successfully updated TP-Link $deviceModel with alias ${device.value.alias}")
