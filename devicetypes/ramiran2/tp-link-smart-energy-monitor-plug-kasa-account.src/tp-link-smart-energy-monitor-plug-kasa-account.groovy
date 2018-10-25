@@ -105,11 +105,11 @@ metadata {
 	}
 	preferences {
 		if (installType() == "Node Applet" || installType() == "Hub") {
-			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true, image: getDevImg("samsunghub.png"))
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true, image: getDevImg("router.png"))
+			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
 		}
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
-		input ("resetAllData", "bool", title: "Reset All Stored Event Data", displayDuringSetup: false, image: getDevImg("history.png"))
+		input ("resetAllData", "bool", title: "Reset All Stored Event Data", image: getDevImg("history.png"))
 	}
 }
 

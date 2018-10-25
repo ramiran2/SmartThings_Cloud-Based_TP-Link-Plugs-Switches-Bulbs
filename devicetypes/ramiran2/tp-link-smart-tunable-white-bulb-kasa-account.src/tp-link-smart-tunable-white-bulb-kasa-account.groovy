@@ -119,12 +119,12 @@ metadata {
 	}
 	preferences {
 		if (installType() == "Node Applet" || installType() == "Hub") {
-			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true, image: getDevImg("samsunghub.png"))
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true, image: getDevImg("router.png"))
+			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
 		}
 		input ("transitionTime", "enum", title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getDevImg("transition.png"))
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
-		input ("resetAllData", "bool", title: "Reset All Stored Event Data", displayDuringSetup: false, image: getDevImg("history.png"))
+		input ("resetAllData", "bool", title: "Reset All Stored Event Data", image: getDevImg("history.png"))
 	}
 }
 
