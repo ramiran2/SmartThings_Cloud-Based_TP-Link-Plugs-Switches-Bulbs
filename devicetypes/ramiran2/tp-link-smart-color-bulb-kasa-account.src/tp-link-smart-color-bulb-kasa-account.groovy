@@ -412,17 +412,14 @@ def setRefreshRate(refreshRate) {
 }
 
 def setIconStatus(newAppIcons) {
-	userSelectedAppIcons = newAppIcons
-	if (userSelectedAppIcons == null) {
-		userSelectedAppIcons = false
-	}
+	userAppIcons = newAppIcons
 }
 
 //	======== GitHub Values =====================================================================================================================================================================================
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
 	def gitName()	{ return "TP-Link-SmartThings" }
 	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
-	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || !userAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
 	def gitRepo()		{ return "${devNamespace()}/${gitName()}" }
 	def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
 	def betaMarker()	{ return false }
