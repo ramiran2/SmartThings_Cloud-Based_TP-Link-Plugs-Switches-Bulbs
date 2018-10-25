@@ -97,7 +97,7 @@ def setInitialStates() {
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedReload", "false", "bool")
-		settingUpdate("userSelectedDriverNamespace", "false", "bool")	\\	If true the DaveGut is set as default
+		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
 	}
 }
 
