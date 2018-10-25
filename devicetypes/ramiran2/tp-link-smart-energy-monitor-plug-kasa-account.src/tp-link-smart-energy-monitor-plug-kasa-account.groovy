@@ -507,7 +507,8 @@ def setRefreshRate(refreshRate) {
 	}
 }
 
-def getStateSizePerc() { return (int) ((stateSize/100000)*100).toDouble().round(0) }
+def getStateSize()	{ return state?.toString().length() }
+def getStateSizePerc()	{ return (int) ((stateSize/100000)*100).toDouble().round(0) }
 
 void checkStateClear() {
 	def before = getStateSizePerc()
