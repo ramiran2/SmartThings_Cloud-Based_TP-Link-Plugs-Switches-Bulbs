@@ -1353,6 +1353,13 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 	return cmdResponse
 }
 
+def appInfoDesc()	{ 
+	def str = ""
+	str += "${appLabel()}"
+	str += "\n" + "• ${textVersion()}"
+	str += "\n" + "• ${textModified()}"
+	return str
+}
 
 def uninstManagerApp() {
 	try {
@@ -1484,5 +1491,4 @@ def removeChildDevice(alias, deviceNetworkId) {
 	def linkFacebook()	{ return "https://www.facebook.com/groups/xKillerClan/" }
 	def textCopyright()	{ return "Copyright© 2018 - Dave Gutheinz, Anthony Ramirez" }
 	def textDesc()	{ return "A Service Manager for the TP-Link Kasa Devices connecting through the TP-Link Servers to SmartThings." }
-	def appInfoDesc()	{ def str = "" str += "${appLabel()}" str += "\n" + "• ${textVersion()}" str += "\n" + "• ${textModified()}" return str }
 //	============================================================================================================================================================================================================
