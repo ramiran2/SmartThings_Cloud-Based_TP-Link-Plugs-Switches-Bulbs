@@ -1,5 +1,5 @@
-/*	
-TP Link Bulbs Device Handler, 2018 Version 3
+/*
+TP-Link Energy Monitor Plug Device Handler, 2018, Version 3
 
 	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
@@ -9,113 +9,75 @@ License. You may obtain a copy of the License at:
 
 	http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, 
-software distributed under the License is distributed on an 
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
-either express or implied. See the License for the specific 
-language governing permissions and limitations under the 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific
+language governing permissions and limitations under the
 License.
 
-Discalimer: This Service Manager and the associated Device 
-Handlers are in no way sanctioned or supported by TP-Link. 
-All development is based upon open-source data on the 
+Discalimer: This Service Manager and the associated Device
+Handlers are in no way sanctioned or supported by TP-Link.
+All development is based upon open-source data on the
 TP-Link devices; primarily various users on GitHub.com.
 
-	===== Bulb Identifier. DO NOT EDIT ====================*/
-	//def deviceType = "Soft White Bulb"	//	Soft White
-	//def deviceType = "Tunable White Bulb"	//	Color Temp
-	def deviceType = "Color Bulb"			//	Color
-//	===== Hub or Cloud Installation ==========================
-	def installType = "Kasa Account"
-	//def installType = "Node Applet"
-//	==========================================================
-
-def devVer() { return "3.3.0" }
-def devTyp() { return "Color Bulb" }
+	===== Device Type Identifier - Do Not Change These Values ================================*/
+	def deviceType()	{ return "Energy Monitor Plug" }									//	Energy Monitor Plug
+//	===== TP-Link Account or Local Server Installation =======================================
+//	def installType()	{ return "Cloud" }													//	Davegut: Cloud
+//	def installType()	{ return "Hub" }													//	Davegut: Hub
+	def installType()	{ return "Kasa Account" }											//	Ramiran2: Kasa Account
+//	def installType()	{ return "Node Applet" }											//	Ramiran2: Node Applet
+//	======== Developer Namespace =============================================================
+//	def devNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
+	def devNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
+//	======== Device Name =====================================================================
+//	def devName()	{ return "(${installType()}) TP-Link ${deviceType()}" }					//	Davegut: Device Name
+	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }			//	Ramiran2: Device Name
+//	======== Other System Values =============================================================
+	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
+	def devVer()	{ return "3.4.0" }														//	Device Handler Version
+//	==========================================================================================
 
 metadata {
-	definition (name: "TP-Link Smart ${deviceType} Energy Monitor - ${installType}",
-				namespace: "ramiran2",
-				author: "Dave Gutheinz, Anthony Ramirez",
-				deviceType: "${deviceType}",
-				energyMonitor: "Energy Monitor",
-				ocfDeviceType: "oic.d.light",
+	definition (name: "",
+				namespace: "${devName()}",
+				author: "${devAuthor()}",
+				ocfDeviceType: "oic.d.smartplug",
 				mnmn: "SmartThings",
-				vid: "generic-rgbw-color-bulb",
-				installType: "${installType}") {
+				vid: "generic-switch-power-energy") {
 		capability "Switch"
-		capability "Switch Level"
 		capability "refresh"
-		capability "polling"
-		capability "Sensor"
-		capability "Actuator"
 		capability "Health Check"
-		if (deviceType =~ "Tunable White Bulb" || "Color Bulb") {
-			capability "Color Temperature"
-			command "setModeNormal"
-			command "setModeCircadian"
-			attribute "bulbMode", "string"
-		}
-		if (deviceType =~ "Color Bulb") {
-			capability "Color Control"
-		}
 		capability "Power Meter"
 		command "getPower"
 		capability "Energy Meter"
 		command "getEnergyStats"
-		attribute "devVer", "string"
-		attribute "devTyp", "string"
-		attribute "lightTransTime", "string"
-		attribute "refreshRate", "string"
 		attribute "monthTotalE", "string"
 		attribute "monthAvgE", "string"
 		attribute "weekTotalE", "string"
 		attribute "weekAvgE", "string"
+		attribute "devVer", "string"
+		attribute "devTyp", "string"
 	}
 	tiles(scale: 2) {
 		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.Lighting.light13", backgroundColor:"#00a0dc",
+				attributeState "on", label:'${name}', action:"switch.off", icon:"st.Appliances.appliances17", backgroundColor:"#00a0dc",
 				nextState:"waiting"
-				attributeState "off", label:'${name}', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#ffffff",
+				attributeState "off", label:'${name}', action:"switch.on", icon:"st.Appliances.appliances17", backgroundColor:"#ffffff",
 				nextState:"waiting"
-				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#15EE10",
+				attributeState "waiting", label:'${name}', action:"switch.on", icon:"st.Appliances.appliances17", backgroundColor:"#15EE10",
 				nextState:"waiting"
-				attributeState "Unavailable", label: 'Unavailable', action:"switch.on", icon:"st.Lighting.light13", backgroundColor:"#e86d13",
+				attributeState "Unavailable", label:'Unavailable', action:"switch.on", icon:"st.Appliances.appliances17", backgroundColor:"#e86d13",
 				nextState:"waiting"
 			}
 			tileAttribute ("deviceError", key: "SECONDARY_CONTROL") {
 				attributeState "deviceError", label: '${currentValue}'
 			}
-			tileAttribute ("device.level", key: "SLIDER_CONTROL") {
-				attributeState "level", label: "Brightness: ${currentValue}", action:"switch level.setLevel"
-			}
-			if (deviceType =~ "Color Bulb") {
-				tileAttribute ("device.color", key: "COLOR_CONTROL") {
-					attributeState "color", action:"setColor"
-				}
-			}
 		}
 		standardTile("refresh", "capability.refresh", width: 2, height: 1, decoration: "flat") {
 			state "default", label:"Refresh", action:"refresh.refresh"
-		}
-		if (deviceType =~ "Tunable White Bulb") {
-			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
-			range:"(2700..6500)") {
-				state "colorTemperature", action:"color temperature.setColorTemperature"
-			}
-		} else if (deviceType =~ "Color Bulb") {
-			controlTile("colorTempSliderControl", "device.colorTemperature", "slider", width: 2, height: 1, inactiveLabel: false,
-			range:"(2500..9000)") {
-				state "colorTemperature", action:"color temperature.setColorTemperature"
-			}
-		}
-		valueTile("colorTemp", "default", inactiveLabel: false, decoration: "flat", height: 1, width: 2) {
-			state "default", label: 'Color\n\rTemperature'
-		}
-		standardTile("bulbMode", "bulbMode", width: 2, height: 1, decoration: "flat") {
-			state "normal", label:'Circadian\n\rOFF', action:"setModeCircadian", nextState: "circadian"
-			state "circadian", label:'Circadian\n\rOn', action:"setModeNormal", nextState: "normal"
 		}
 		valueTile("currentPower", "device.power", decoration: "flat", height: 1, width: 2) {
 			state "power", label: 'Current Power \n\r ${currentValue} W'
@@ -135,21 +97,11 @@ metadata {
 		valueTile("weekAverage", "device.weekAvgE", decoration: "flat", height: 1, width: 2) {
 			state "weekAvgE", label: '7 Day Avg\n\r ${currentValue} KWH'
 		}
-		valueTile("2x1Blank", "default", decoration: "flat", height: 1, width: 2) {
-			state "default", label: ''
-		}
-		valueTile("2x4Blank", "default", decoration: "flat", height: 2, width: 4) {
-			state "default", label: ''
-		}
 		valueTile("4x1Blank", "default", decoration: "flat", height: 1, width: 4) {
 			state "default", label: ''
 		}
 		main("switch")
-		if (deviceType =~ "Soft White Bulb") {
-			details("switch", "refresh", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
-		} else {
-			details("switch", "ColorTemp", "bulbMode", "refresh", "colorTempSliderControl", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
-		}
+		details("switch", "refresh", "4x1Blank", "currentPower", "weekTotal", "monthTotal", "energyToday", "weekAverage", "monthAverage")
 	}
 	def rates = [:]
 	rates << ["1" : "Refresh every minute (Not Recommended)"]
@@ -158,70 +110,44 @@ metadata {
 	rates << ["15" : "Refresh every 15 minutes"]
 	rates << ["30" : "Refresh every 30 minutes (Recommended)"]
 	preferences {
-		if (installType =~ "Node Applet") {
+		if (installType() == "Node Applet" || installType() == "Hub") {
 			input("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
 			input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
 		}
-		input name: "lightTransTime", type: "number", title: "Lighting Transition Time (seconds)", options: rates, description: "0 to 60 seconds", required: false
-		input name: "refreshRate", type: "enum", title: "Refresh Rate", options: rates, description: "Select Refresh Rate", required: false
+		input name: "refreshRate", type: "enum", title: "Device Refresh Rate", metadata: [values:rates], description: "Select Refresh Rate", required: false
 	}
 }
 
 //	===== Update when installed or setting changed =====
-/*	Health Check Implementation
-	1.	Each time a command is sent, the DeviceWatch-Status
-		is set to on- or off-line.
-	2.	Refresh is run every 15 minutes to provide a min
-		cueing of this.
-	3.	Is valid for either hub or cloud based device.*/
 def initialize() {
-	log.trace "Initialized..."
-	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
+	log.info "Initialized ${device.label}..."
 	sendEvent(name: "devVer", value: devVer(), displayed: false)
-	sendEvent(name: "devTyp", value: devTyp(), displayed: false)
+	sendEvent(name: "devTyp", value: deviceType(), displayed: false)
+	sendEvent(name: "DeviceWatch-Enroll", value: groovy.json.JsonOutput.toJson(["protocol":"cloud", "scheme":"untracked"]), displayed: false)
 }
 
 def ping() {
-	log.trace "Ping..."
 	refresh()
 }
 
 def installed() {
-	log.trace "Installed..."
-	update()
+	updated()
 }
 
 def updated() {
-	log.trace "Updated..."
-	runIn(2, update)
-}
-
-/*	__________________________________________________________
-	Updated refresh rates and light trans time to call routine
-	at bottom of page
-	__________________________________________________________
-*/
-def update() {
-	log.trace "Update..."
-	initialize()
-	state.deviceType = metadata.definition.deviceType
-	state.installType = metadata.definition.installType
-	state.swVersion = devVer()
+	log.info "Updated ${device.label}..."
 	state.emon = metadata.definition.energyMonitor
-	state.emeterText = "smartlife.iot.common.emeter"
-	state.getTimeText = "smartlife.iot.common.timesetting"
+	state.emeterText = "emeter"
+	state.getTimeText = "time"
 	unschedule()
+	//	Update Refresh Rate Preference
 	if (refreshRate) {
 		setRefreshRate(refreshRate)
 	} else {
 		setRefreshRate(30)
 	}
-	if (lightTransTime >= 0 && lightTransTime <= 60) {
-		def adjustedTime = lightTransTime*1000
-		setLightTransTime(adjustedTime)
-	} else {
-		setLightTransTime(5000)
-	}
+	sendEvent(name: "devVer", value: devVer(), displayed: false)
+	sendEvent(name: "devTyp", value: deviceType(), displayed: false)
 	schedule("0 05 0 * * ?", setCurrentDate)
 	schedule("0 10 0 * * ?", getEnergyStats)
 	setCurrentDate()
@@ -230,131 +156,68 @@ def update() {
 }
 
 void uninstalled() {
-	log.trace "Uninstalled..."
-	if (state.installType =~ "Kasa Account") {
+	if (installType() == "Kasa Account" || installType() == "Cloud") {
 		def alias = device.label
 		log.debug "Removing device ${alias} with DNI = ${device.deviceNetworkId}"
 		parent.removeChildDevice(alias, device.deviceNetworkId)
 	}
 }
 
-//	===== Basic Bulb Control/Status =====
+//	===== Basic Plug Control/Status =====
 def on() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
-	runIn(2, getPower)
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 1}}}', "deviceCommand", "commandResponse")
+	runIn(2, refresh)
 }
 
 def off() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0,"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"set_relay_state":{"state": 0}}}', "deviceCommand", "commandResponse")
+	runIn(2, refresh)
+}
+
+def getSystemInfo() {
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 	runIn(2, getPower)
-}
-
-def setLevel(percentage) {
-	percentage = percentage as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"brightness":${percentage},"transition_period":${state.transTime}}}}""", "deviceCommand", "commandResponse")
-	runIn(2, getPower)
-}
-
-def setColorTemperature(kelvin) {
-	kelvin = kelvin as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp": ${kelvin},"hue":0,"saturation":0}}}""", "deviceCommand", "commandResponse")
-	runIn(2, getPower)
-}
-
-def setModeNormal() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"normal"}}}""", "deviceCommand", "commandResponse")
-}
-
-def setModeCircadian() {
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"mode":"circadian"}}}""", "deviceCommand", "commandResponse")
-	runIn(2, getPower)
-}
-
-def setColor(Map color) {
-	def hue = color.hue * 3.6 as int
-	def saturation = color.saturation as int
-	sendCmdtoServer("""{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"on_off":1,"color_temp":0,"hue":${hue},"saturation":${saturation}}}}""", "deviceCommand", "commandResponse")
-	runIn(2, getPower)
-}
-
-def poll() {
-	log.trace "Polling parent..."
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
 }
 
 def refresh(){
-	sendEvent(name: "devVer", value: devVer(), displayed: false)
-	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "commandResponse")
+	sendCmdtoServer('{"system":{"get_sysinfo":{}}}', "deviceCommand", "refreshResponse")
 	runIn(2, getPower)
 	runIn(7, getConsumption)
 }
 
-def commandResponse(cmdResponse){
-	def status
-	def respType = cmdResponse.toString().substring(1,10)
-	if (respType =~ "smartlife") {
-		status = cmdResponse["smartlife.iot.smartbulb.lightingservice"]["transition_light_state"]
+def refreshResponse(cmdResponse){
+	def status = cmdResponse.system.get_sysinfo.relay_state
+	if (status == 1) {
+		status = "on"
 	} else {
-		status = cmdResponse.system.get_sysinfo.light_state
+		status = "off"
 	}
-	def onOff = status.on_off
-	if (onOff == 1) {
-		onOff = "on"
-	} else {
-		onOff = "off"
-		status = status.dft_on_state
-	}
-	def level = status.brightness
-	def mode = status.mode
-	def color_temp = status.color_temp
-	def hue = status.hue
-	def saturation = status.saturation
-	log.info "$device.name $device.label: Power: ${onOff} / Brightness: ${level}% / Mode: ${mode} / Color Temp: ${color_temp}K / Hue: ${hue} / Saturation: ${saturation}"
-	sendEvent(name: "switch", value: onOff)
-	sendEvent(name: "level", value: level)
-	if (state.deviceType =~ "Tunable White Bulb" || "Color Bulb") {
-		sendEvent(name: "bulbMode", value: mode)
-		sendEvent(name: "colorTemperature", value: color_temp)
-	}
-	if (state.deviceType =~ "Color Bulb") {
-		sendEvent(name: "hue", value: hue)
-		sendEvent(name: "saturation", value: saturation)
-		sendEvent(name: "color", value: colorUtil.hslToHex(hue/3.6 as int, saturation as int))
-	}
+	log.info "${device.name} ${device.label}: Power: ${status}"
+	sendEvent(name: "switch", value: status)
 }
 
 //	===== Get Current Energy Data =====
 def getPower(){
-	if (state.emon =~ "Energy Monitor") {
-		sendCmdtoServer("""{"${state.emeterText}":{"get_realtime":{}}}""", "deviceCommand", "energyMeterResponse")
-	}
+	sendCmdtoServer("""{"${state.emeterText}":{"get_realtime":{}}}""", "deviceCommand", "energyMeterResponse")
 }
 
 def energyMeterResponse(cmdResponse) {
-	if (state.emon == "Standard") {
-		return
-	} else if (cmdResponse[state.emeterText].err_code == -1) {
-		log.error "${device.name} ${device.label}: does not support Energy Monitor. Energy Monitor disabled."
-		state.emon = "Standard"
-		unschedule(getEnergyStats)
+	def realtime = cmdResponse["emeter"]["get_realtime"]
+	if (realtime.power == null) {
+		state.powerScale = "power_mw"
+		state.energyScale = "energy_wh"
 	} else {
-		def realtime = cmdResponse[state.emeterText]["get_realtime"]
-		if (realtime.power =~ null) {
-			state.powerScale = "power_mw"
-			state.energyScale = "energy_wh"
-		} else {
-			state.powerScale = "power"
-			state.energyScale = "energy"
-		}
-		def powerConsumption = realtime."${state.powerScale}"
-		if (state.powerScale =~ "power_mw") {
+		state.powerScale = "power"
+		state.energyScale = "energy"
+	}
+	def powerConsumption = realtime."${state.powerScale}"
+		if (state.powerScale == "power_mw") {
 			powerConsumption = Math.round(powerConsumption/10) / 100
 		} else {
-			powerConsumption = Math.round(100*powerConsumption) / 100
+		powerConsumption = Math.round(100*powerConsumption) / 100
 		}
-		sendEvent(name: "power", value: powerConsumption)
-		log.info "$device.name $device.label: Updated CurrentPower to $powerConsumption"
-	}
+	sendEvent(name: "power", value: powerConsumption)
+	log.info "$device.name $device.label: Updated CurrentPower to $powerConsumption"
 }
 
 //	===== Get Today's Consumption =====
@@ -365,14 +228,14 @@ def getConsumption(){
 def useTodayResponse(cmdResponse) {
 	def wattHrToday
 	def wattHrData
-	def dayList = cmdResponse[state.emeterText]["get_daystat"].day_list
+	def dayList = cmdResponse["emeter"]["get_daystat"].day_list
 	for (int i = 0; i < dayList.size(); i++) {
 		wattHrData = dayList[i]
 		if(wattHrData.day == state.dayToday) {
 			wattHrToday = wattHrData."${state.energyScale}"
 		}
 	}
-	if (state.powerScale =~ "power") {
+	if (state.powerScale == "power") {
 		wattHrToday = Math.round(1000*wattHrToday)
 	}
 	sendEvent(name: "energy", value: wattHrToday)
@@ -381,10 +244,6 @@ def useTodayResponse(cmdResponse) {
 
 //	===== Get Weekly and Monthly Stats =====
 def getEnergyStats() {
-	if (state.emon != "Energy Monitor") {
-		log.info "${device.name} ${device.label}: does not support Energy Monitor."
-		return
-	}
 	state.monTotEnergy = 0
 	state.monTotDays = 0
 	state.wkTotEnergy = 0
@@ -406,11 +265,11 @@ def getPrevMonth() {
 		prevMonth = prevMonth + 1
 		runIn(4, getJan)
 	}
-	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${prevMonth}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
+	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${prevMonth}, "year": ${state.yearStart}}}}""", "emeterCmd", "UseJanWatts")
 }
 
 def getJan() {
-//	Gets January data on March 1 and 2. Only accessed if current month = 3
+//	Gets January data on March 1 and 2. Only access if current month = 3
 //	and start month = 1
 	sendCmdtoServer("""{"${state.emeterText}":{"get_daystat":{"month": ${state.monthStart}, "year": ${state.yearStart}}}}""", "emeterCmd", "engrStatsResponse")
 }
@@ -449,7 +308,7 @@ def engrStatsResponse(cmdResponse) {
 				wkTotDays -= 1
 			}
 		}
-	} else if (state.handleFeb =~ "yes" && dataMonth == 2) {
+	} else if (state.handleFeb == "yes" && dataMonth == 2) {
 		startDay = 1
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
@@ -462,7 +321,7 @@ def engrStatsResponse(cmdResponse) {
 				wkTotDays += 1
 			}
 		}
-	} else if (state.handleFeb =~ "yes" && dataMonth == 1) {
+	} else if (state.handleFeb == "yes" && dataMonth == 1) {
 		for (int i = 0; i < dayList.size(); i++) {
 			def energyData = dayList[i]
 			if (energyData.day >= startDay) {
@@ -492,11 +351,11 @@ def engrStatsResponse(cmdResponse) {
 	if (monTotDays == 0) {
 		//	Aviod divide by zero on 1st of month
 		monTotDays = 1
- wkTotDays = 1 
+		wkTotDays = 1
 	}
-	def monAvgEnergy = monTotEnergy/monTotDays
+	def monAvgEnergy =monTotEnergy/monTotDays
 	def wkAvgEnergy = wkTotEnergy/wkTotDays
-	if (state.powerScale =~ "power_mw") {
+	if (state.powerScale == "power_mw") {
 		monAvgEnergy = Math.round(monAvgEnergy/10)/100
 		wkAvgEnergy = Math.round(wkAvgEnergy/10)/100
 		monTotEnergy = Math.round(monTotEnergy/10)/100
@@ -515,11 +374,11 @@ def engrStatsResponse(cmdResponse) {
 
 //	===== Obtain Week and Month Data =====
 def setCurrentDate() {
-	sendCmdtoServer('{"smartlife.iot.common.timesetting":{"get_time":null}}', "deviceCommand", "currentDateResponse")
+	sendCmdtoServer('{"time":{"get_time":null}}', "deviceCommand", "currentDateResponse")
 }
 
 def currentDateResponse(cmdResponse) {
-	def currDate = cmdResponse["smartlife.iot.common.timesetting"]["get_time"]
+	def currDate = cmdResponse["time"]["get_time"]
 	state.dayToday = currDate.mday.toInteger()
 	state.monthToday = currDate.month.toInteger()
 	state.yearToday = currDate.year.toInteger()
@@ -532,10 +391,10 @@ def currentDateResponse(cmdResponse) {
 	state.weekStart = wkStartDate[Calendar.DAY_OF_MONTH].toInteger()
 }
 
-//	===== Send the Command to the Cloud or Bridge =====
+//	===== Send the Command =====
 private sendCmdtoServer(command, hubCommand, action) {
 	try {
-		if (state.installType =~ "Kasa Account") {
+		if (installType() == "Kasa Account" || installType() == "Cloud") {
 			sendCmdtoCloud(command, hubCommand, action)
 		} else {
 			sendCmdtoHub(command, hubCommand, action)
@@ -550,10 +409,10 @@ private sendCmdtoCloud(command, hubCommand, action){
 	def deviceId = getDataValue("deviceId")
 	def cmdResponse = parent.sendDeviceCmd(appServerUrl, deviceId, command)
 	String cmdResp = cmdResponse.toString()
-	if (cmdResp.substring(0,5) =~ "ERROR"){
+	if (cmdResp.substring(0,5) == "ERROR"){
 		def errMsg = cmdResp.substring(7,cmdResp.length())
 		log.error "${device.name} ${device.label}: ${errMsg}"
-		sendEvent(name: "switch", value: "Unavailable", descriptionText: errMsg)
+		sendEvent(name: "switch", value: "commsError", descriptionText: errMsg)
 		sendEvent(name: "deviceError", value: errMsg)
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		action = ""
@@ -565,25 +424,21 @@ private sendCmdtoCloud(command, hubCommand, action){
 }
 
 private sendCmdtoHub(command, hubCommand, action){
-	def headers = [:] 
+	def headers = [:]
 	headers.put("HOST", "$gatewayIP:8082")	//	Same as on Hub.
 	headers.put("tplink-iot-ip", deviceIP)
 	headers.put("tplink-command", command)
 	headers.put("action", action)
 	headers.put("command", hubCommand)
-	sendHubCommand(new physicalgraph.device.HubAction([
-		headers: headers],
-		device.deviceNetworkId,
-		[callback: hubResponseParse]
-	))
+	sendHubCommand(new physicalgraph.device.HubAction([headers: headers], device.deviceNetworkId, [callback: hubResponseParse]))
 }
 
 def hubResponseParse(response) {
 	def action = response.headers["action"]
 	def cmdResponse = parseJson(response.headers["cmd-response"])
-	if (cmdResponse =~ "TcpTimeout") {
+	if (cmdResponse == "TcpTimeout") {
 		log.error "$device.name $device.label: Communications Error"
-		sendEvent(name: "switch", value: "offline", descriptionText: "Error - Offline in hubResponseParse")
+		sendEvent(name: "switch", value: "offline", descriptionText: "ERROR at hubResponseParse TCP Timeout")
 		sendEvent(name: "deviceError", value: "TCP Timeout in Hub")
 		sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 	} else {
@@ -596,7 +451,10 @@ def hubResponseParse(response) {
 def actionDirector(action, cmdResponse) {
 	switch(action) {
 		case "commandResponse":
-			commandResponse(cmdResponse)
+			refresh()
+			break
+		case "refreshResponse":
+			refreshResponse(cmdResponse)
 			break
 		case "energyMeterResponse":
 			energyMeterResponse(cmdResponse)
@@ -611,7 +469,7 @@ def actionDirector(action, cmdResponse) {
 			engrStatsResponse(cmdResponse)
 			break
 		default:
-			log.info "Interface Error. See SmartApp and Device error message."
+			log.debug "Interface Error.	See SmartApp and Device error message."
 	}
 }
 
@@ -621,18 +479,8 @@ def syncAppServerUrl(newAppServerUrl) {
 	log.info "Updated appServerUrl for ${device.name} ${device.label}"
 }
 
-/*	__________________________________________________________
-	Added two routines to set refresh rate and transition time.
- These are accessibe from the parent Service Manager.
-	__________________________________________________________
-*/
 def setLightTransTime(lightTransTime) {
-	if (lightTransTime >= 0 && lightTransTime <= 60) {
-		state.transTime = 1000 * lightTransTime
-	} else {
-		state.transTime = 5000
-	}
-	log.info "Light Transition Time for ${device.name} ${device.label} set to ${state.transTime} miliseconds"
+	return
 }
 
 def setRefreshRate(refreshRate) {
