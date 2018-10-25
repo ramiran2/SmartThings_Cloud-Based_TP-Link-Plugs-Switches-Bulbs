@@ -38,6 +38,7 @@ primarily various users on GitHub.com.*/
 definition (name: "${appLabel()}", namespace: "${appNamespace()}", author: "${appAuthor()}", description: "${textDesc()}", category: "Convenience", iconUrl: "${getAppImg("logo.png", on)}", iconX2Url: "${getAppImg("logo.png", on)}", iconX3Url: "${getAppImg("logo.png", on)}", singleInstance: true)
 
 preferences {
+	page(name: "startPage")
 	page(name: "welcomePage")
 	page(name: "userSelectionAuthenticationPage")
 	page(name: "userAuthenticationPreferencesPage")
@@ -137,15 +138,19 @@ def setRecommendedOptions() {
 	}
 }
 
-//	----- WELCOME PAGE -----
-def welcomePage() {
+def startPage() {
 	setInitialStates()
-	def strLatestDriverVersion = textDriverVersion()
-	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
-	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
 	if (userSelectedAssistant) {
 		setRecommendedOptions()
 	}
+	welcomePage()
+}
+
+//	----- WELCOME PAGE -----
+def welcomePage() {
+	def strLatestDriverVersion = textDriverVersion()
+	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
+	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
 	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -667,6 +672,9 @@ def developerPage() {
 			paragraph title: "New Devices: ", "${newDevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector: ") {
+			if (userSelectedTestingPage) {
+				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+			}
 			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
