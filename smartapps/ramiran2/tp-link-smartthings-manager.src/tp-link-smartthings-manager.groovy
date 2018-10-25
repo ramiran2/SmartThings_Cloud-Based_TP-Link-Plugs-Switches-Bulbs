@@ -31,7 +31,7 @@ primarily various users on GitHub.com.*/
 	def appLabel()	{ return "TP-Link SmartThings Manager" }								//	Ramiran2: Application Name
 //	======== Application Information =========================================================
 	def appVersion()	{ return "4.1.0" }													//	Application Version
-	def appVerDate()	{ return "10-24-2018" }												//	Application Date
+	def appVerDate()	{ return "10-25-2018" }												//	Application Date
 	def appAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Application Author
 //	==========================================================================================
 
@@ -231,9 +231,9 @@ def welcomePage() {
 def userSelectionAuthenticationPage() {
 	def userSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. " + "\n\rAvailable actions: \n\r" +
-		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n\r" +
-		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n\r" +
+		"action you want to complete. " + "\nAvailable actions: \n" +
+		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n" +
+		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n" +
 		"Delete Account: Deletes your credentials to login into your TP-Link Kasa Account."
 	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
@@ -329,15 +329,15 @@ def computerSelectionAuthenticationPage() {
 
 //	----- USER SELECTION PAGE -----
 def userSelectionPage() {
-	def userSelectionPageText = "Available actions: \n\r" +
-		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n\r" +
-		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n\r" +
-		"Update Token: You will be able to request for a new token or delete your current token from the application. \n\r" +
+	def userSelectionPageText = "Available actions: \n" +
+		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n" +
+		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n" +
+		"Update Token: You will be able to request for a new token or delete your current token from the application. \n" +
 		"Initial Installation: You will be asked to login into TP-Link Account and you may be asked to adds devices if you have not done so already."
 	def errorMsgCom = "None"
 	if (state.currentError != null) {
-		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
-			"\n\rPlease resolve the error and try again."
+		errorMsgCom = "Error communicating with cloud: \n" + "${state.currentError} " +
+			"\nPlease resolve the error and try again."
 	}
 	return dynamicPage (name: "userSelectionPage", title: "Launcher Page", nextPage: "computerSelectionPage", install: false, uninstall: false) {
 		section("") {
@@ -424,7 +424,7 @@ def addDevicesPage() {
 	def addDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
-		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
+		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Save to add the devices to your SmartThings account."
 	return dynamicPage (name: "addDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
 		section("") {
@@ -468,7 +468,7 @@ def removeDevicesPage() {
 	def removeDevicesPageText = "Devices that have been installed " +
 		"will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
-		"SmartThings.\n\r" + "Press Done when you have selected the devices you " +
+		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to remove, then Press Save to remove the devices to your SmartThings account."
 	return dynamicPage (name: "removeDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
 		section("") {
@@ -504,7 +504,7 @@ def userApplicationPreferencesPage() {
 	} else {
 		hiddenRecordInput = 1
 	}
-	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n\r" +
+	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
 	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
 		section("") {
@@ -565,8 +565,8 @@ def userDevicePreferencesPage() {
 			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	def userDevicePreferencesPageText = "Welcome to the Device Preferences page. \n\r" +
-		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n\r" +
+	def userDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
+		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
 	return dynamicPage (name: "userDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
 		section("") {
@@ -591,10 +591,10 @@ def userDevicePreferencesPage() {
 
 //	----- TOKEN MANAGER PAGE -----
 def userSelectionTokenPage() {
-	def userSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" + 
-		"\n\rAvailable actions:\n\r" +
-		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n\r" +
-		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n\r" +
+	def userSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" +
+		"\nAvailable actions:\n" +
+		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
+		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
 		"Recheck Token: This will attempt to check if the token is valid as well as check for errors."
 		def errorMsgTok = "None"
 		if (state.TpLinkToken == null) {
@@ -742,8 +742,8 @@ def developerTestingPage() {
 		}
 	}
 	if (state.currentError != null) {
-		errorMsgCom = "Error communicating with cloud:\n\r" + "${state.currentError}" +
-			"\n\rPlease resolve the error and try again."
+		errorMsgCom = "Error communicating with cloud:\n" + "${state.currentError}" +
+			"\nPlease resolve the error and try again."
 	}
 	if (devices == [:]) {
 		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
@@ -818,7 +818,7 @@ def developerTestingPage() {
 
 //	----- HIDDEN PAGE -----
 def hiddenPage() {
-	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had" 
+	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had"
 	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah,xKillerSierra, Weirdowack"
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
 	dynamicPage (name: "hiddenPage", title: "xKiller Clan Page", install: false, uninstall: false) {
@@ -923,7 +923,7 @@ def changeLogPage() {
 							paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
 						} else {
 							intUpdateCheckOne = 1
-						} 
+						}
 						if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
 							paragraph driverUpdateNeeded, image: getAppImg("issue.png")
 						} else {
@@ -1372,7 +1372,7 @@ def sendDeviceCmd(appServerUrl, deviceId, command) {
 	return cmdResponse
 }
 
-def appInfoDesc()	{ 
+def appInfoDesc()	{
 	def str = ""
 	str += "${appLabel()}"
 	str += "\n" + "• ${textVersion()}"
