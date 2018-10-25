@@ -101,7 +101,7 @@ c. Added app version (@ramiran2)
 a. Updated for new release of Device Handlers (@DaveGut)
 
 ##### TP-Link Smart Plug #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Improved Logic (@ramiran2)
@@ -139,7 +139,7 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Energy Monitor Plug #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Improved Logic (@ramiran2)
@@ -187,7 +187,7 @@ c. Update remaining code. (@DaveGut)
 a. Update setCurrentDate to eliminate error for some users. (@DaveGut)
 
 ##### TP-Link Smart Tunable White Bulb #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Removed Light bulb energy monitor device handlers (@DaveGut)
@@ -223,7 +223,7 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@ramiran2)
 
 ##### TP-Link Smart Soft White Bulb #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Removed Light bulb energy monitor device handlers (@DaveGut)
@@ -259,7 +259,7 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Color Bulb #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Removed Light bulb energy monitor device handlers (@DaveGut)
@@ -295,7 +295,7 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Dimming Switch #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Improved Logic (@ramiran2)
@@ -330,7 +330,7 @@ a. Common file content for all bulb implementations, using separate files by mod
 b. User file-internal selection of Energy Monitor function enabling. (@DaveGut)
 
 ##### TP-Link Smart Switch #####
-2018-10-24 - Update to Version 3.4.0
+2018-10-25 - Update to Version 3.4.0
 a. Replace and or Removed deprecated code (@DaveGut)
 b. Added new varrables for developers to control with ease (@ramiran2)
 c. Improved Logic (@ramiran2)
