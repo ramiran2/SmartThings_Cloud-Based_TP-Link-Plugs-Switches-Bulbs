@@ -954,7 +954,7 @@ def changeLogPage() {
 
 //	----- UNINSTALL PAGE -----
 def uninstallPage() {
-	def uninstallPageText = "This will uninstall the App, All Child Devices. \nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
+	def uninstallPageText = "This will uninstall the All Child Devices including this Application with all it's user data. \nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 	dynamicPage (name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -963,13 +963,14 @@ def uninstallPage() {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		section("${textCopyright()}")
-		remove("Uninstall this application", "Warning!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis will remove All Devices including this application")
+		remove("Uninstall this application", "Warning!!!", "Last Chance to Stop! \nThis action is not reversible \n\nThis will remove All Devices including this Application with all it's user data")
 	}
 }
 
 def checkForUpdates() {
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
+	def intMessage = 0
 	def strDevVersion = atomicState?.devManVer ?: [:]
 	strDevVersion["devVer"] = strLatestDriverVersion ?: ""
 	atomicState?.devManVer = strDevVersion
@@ -1058,12 +1059,18 @@ def checkForUpdates() {
 		atomicState?.devVerLnk = atomicState?.devDSHVer
 	}
 	if ("${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+		intMessage = 3
 	} else {
 		if (userSelectedNotification) {
 			sendPush("${appLabel()} Device Handlers need to be updated")
 		}
 	}
 	if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" ) {
+		if (intMessage == 3) {
+			intMessage = 2
+		} else {
+			intMessage = 1
+		}
 	} else {
 		if (userSelectedNotification) {
 			sendPush("${appLabel()} needs to be updated")
