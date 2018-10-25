@@ -21,8 +21,8 @@ development is based upon open-source data on the TP-Link Kasa Devices;
 primarily various users on GitHub.com.*/
 
 //	===== Developer Namespace ================================================================
-//	def devNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
-	def devNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
+//	def appNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
+	def appNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
 //	======== Repository Name =================================================================
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }		//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }										//	Ramiran2: Repository Name
