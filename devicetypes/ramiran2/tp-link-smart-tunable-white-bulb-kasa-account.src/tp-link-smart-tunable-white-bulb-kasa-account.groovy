@@ -23,7 +23,7 @@ TP-Link devices; primarily various users on GitHub.com.
 
 	===== Device Type Identifier - Do Not Change These Values ================================*/
 //	def deviceType()	{ return "Soft White Bulb" }										//	Soft White
-	def deviceType()	{ return "Tunable White Bulb" }										//	Color Temp
+	def deviceType()	{ return "Tunable White Bulb" }										//	Tunable White
 //	def deviceType()	{ return "Color Bulb" }												//	Color
 //	===== TP-Link Account or Local Server Installation =======================================
 //	def installType()	{ return "Cloud" }													//	Davegut: Cloud
@@ -39,7 +39,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	======== Other System Values =============================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
 	def devVer()	{ return "3.4.0" }														//	Device Handler Version
-	def ocfType()	{ return "oic.d.light" }												//	Open Connectivity Foundation Device Type: Light Bulb
+	def ocfValue()	{ return "oic.d.light" }												//	Open Connectivity Foundation Device Type: Light Bulb
 	def vidValue()	{ return "generic-rgbw-color-bulb" }									//	Vendor ID: RGBW Color Light Bulb
 //	==========================================================================================
 
@@ -47,7 +47,7 @@ metadata {
 	definition (name: "${devName()}",
 				namespace: "${devNamespace()}",
 				author: "${devAuthor()}",
-				ocfDeviceType: "${ocfType()}",
+				ocfDeviceType: "${ocfValue()}",
 				mnmn: "SmartThings",
 				vid: "${vidValue()}") {
 		capability "Switch"

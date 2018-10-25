@@ -41,8 +41,8 @@ TP-Link devices; primarily various users on GitHub.com.
 //	======== Other System Values =========================================================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }															//	Device Handler Author
 	def devVer()	{ return "3.4.0" }																					//	Device Handler Version
-//	def ocfType()	{ return "oic.d.smartplug" }																		//	Open Connectivity Foundation Device Type: Smart Plug
-	def ocfType()	{ return "oic.d.switch" }																			//	Open Connectivity Foundation Device Type: Switch
+//	def ocfValue()	{ return "oic.d.smartplug" }																		//	Open Connectivity Foundation Device Type: Smart Plug
+	def ocfValue()	{ return "oic.d.switch" }																			//	Open Connectivity Foundation Device Type: Switch
 	def vidValue()	{ return "generic-switch-power" }																	//	Vendor ID: Switch
 //	def vidValue()	{ return "generic-dimmer-power" }																	//	Vendor ID: Dimmer
 //	======================================================================================================================
@@ -51,7 +51,7 @@ metadata {
 	definition (name: "${devName()}",
 				namespace: "${devNamespace()}",
 				author: "${devAuthor()}",
-				ocfDeviceType: "${ocfType()}",
+				ocfDeviceType: "${ocfValue()}",
 				mnmn: "SmartThings",
 				vid: "${vidValue()}") {
 		capability "Switch"
