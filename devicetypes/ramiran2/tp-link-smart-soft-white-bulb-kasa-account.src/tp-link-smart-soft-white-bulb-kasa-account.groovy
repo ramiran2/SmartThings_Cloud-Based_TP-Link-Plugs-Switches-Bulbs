@@ -21,11 +21,11 @@ Handlers are in no way sanctioned or supported by TP-Link.
 All development is based upon open-source data on the
 TP-Link devices; primarily various users on GitHub.com.
 
-	===== Device Type Identifier - Do Not Change These Values ================================*/
+	======== Device Type Identifier - Do Not Change These Values =============================*/
 	def deviceType()	{ return "Soft White Bulb" }										//	Soft White
 //	def deviceType()	{ return "Tunable White Bulb" }										//	Tunable White
 //	def deviceType()	{ return "Color Bulb" }												//	Color
-//	===== TP-Link Account or Local Server Installation =======================================
+//	======== TP-Link Account or Local Server Installation ====================================
 //	def installType()	{ return "Cloud" }													//	Davegut: Cloud
 //	def installType()	{ return "Hub" }													//	Davegut: Hub
 	def installType()	{ return "Kasa Account" }											//	Ramiran2: Kasa Account
@@ -33,6 +33,9 @@ TP-Link devices; primarily various users on GitHub.com.
 //	======== Developer Namespace =============================================================
 //	def devNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
 	def devNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
+//	======== Repository Name =================================================================
+//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }		//	Davegut: Repository Name
+	def gitName()	{ return "TP-Link-SmartThings" }										//	Ramiran2: Repository Name
 //	======== Device Name =====================================================================
 //	def devName()	{ return "(${installType()}) TP-Link ${deviceType()}" }					//	Davegut: Device Name
 	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }			//	Ramiran2: Device Name
@@ -44,12 +47,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	==========================================================================================
 
 metadata {
-	definition (name: "${devName()}",
-				namespace: "${devNamespace()}",
-				author: "${devAuthor()}",
-				ocfDeviceType: "${ocfValue()}",
-				mnmn: "SmartThings",
-				vid: "${vidValue()}") {
+	definition (name: "${devName()}", namespace: "${devNamespace()}", author: "${devAuthor()}", ocfDeviceType: "${ocfValue()}", mnmn: "SmartThings", vid: "${vidValue()}") {
 		capability "Switch"
 		capability "Switch Level"
 		capability "refresh"
@@ -119,19 +117,14 @@ metadata {
 			details("switch", "colorTemp", "bulbMode", "refresh", "colorTempSliderControl")
 		}
 	}
-	def rates = [:]
-	rates << ["1" : "Refresh every minute"]
-	rates << ["5" : "Refresh every 5 minutes"]
-	rates << ["10" : "Refresh every 10 minutes"]
-	rates << ["15" : "Refresh every 15 minutes"]
-	rates << ["30" : "Refresh every 30 minutes"]
 	preferences {
 		if (installType() == "Node Applet" || installType() == "Hub") {
-			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true)
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
+			input ("deviceIP", "text", title: "Device IP", required: true, displayDuringSetup: true, image: getDevImg("samsunghub.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true, image: getDevImg("router.png"))
 		}
-		input ("transitionTime", "enum", required: false, multiple: false, submitOnChange: true, title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"])
-		input ("refreshRate", "enum", required: false, multiple: false, submitOnChange: true, title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"])
+		input ("transitionTime", "enum", title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getDevImg("transition.png"))
+		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
+		input ("resetAllData", "bool", title: "Reset All Stored Event Data", displayDuringSetup: false, image: getDevImg("history.png"))
 	}
 }
 
@@ -410,19 +403,25 @@ def setRefreshRate(refreshRate) {
 	}
 }
 
-def setIconStatus(newAppIcons) {
-	userSelectedAppIcons = newAppIcons
-	if (userSelectedAppIcons == null) {
-		userSelectedAppIcons = false
+def getStateSizePerc() { return (int) ((stateSize/100000)*100).toDouble().round(0) }
+
+void checkStateClear() {
+	def before = getStateSizePerc()
+	if(!state?.resetAllData && resetAllData) {
+		def data = getState()?.findAll
+		data.each { item ->
+			state.remove(item?.key.toString())
+		}
+		state.resetAllData = true
+		log.info "Device State Data: before: $before  after: ${getStateSizePerc()}"
+	} else if(state?.resetAllData && !resetAllData) {
+		state.resetAllData = false
 	}
 }
 
 //	======== GitHub Values =====================================================================================================================================================================================
-//	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }
-	def gitName()	{ return "TP-Link-SmartThings" }
-	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
-	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def getDevImg(imgName)	{ return "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" }
+	def gitBranch()	{ return "master" }
 	def gitRepo()		{ return "${devNamespace()}/${gitName()}" }
 	def gitPath()		{ return "${gitRepo()}/${gitBranch()}"}
-	def betaMarker()	{ return false }
 //	============================================================================================================================================================================================================

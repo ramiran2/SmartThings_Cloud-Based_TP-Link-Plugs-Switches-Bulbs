@@ -20,7 +20,7 @@ Handlers are in no way sanctioned or supported by TP-Link. All
 development is based upon open-source data on the TP-Link Kasa Devices;
 primarily various users on GitHub.com.*/
 
-//	===== Developer Namespace ================================================================
+//	======== Developer Namespace =============================================================
 //	def appNamespace()	{ return "davegut" }												//	Davegut: Developer Namespace
 	def appNamespace()	{ return "ramiran2" }												//	Ramiran2: Developer Namespace
 //	======== Repository Name =================================================================
@@ -35,17 +35,7 @@ primarily various users on GitHub.com.*/
 	def appAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Application Author
 //	==========================================================================================
 
-definition(
-	name: "${appLabel()}",
-	namespace: "${appNamespace()}",
-	author: "${appAuthor()}",
-	description: "${textDesc()}",
-	category: "Convenience",
-	iconUrl: "${getAppImg("logo.png", on)}",
-	iconX2Url: "${getAppImg("logo.png", on)}",
-	iconX3Url: "${getAppImg("logo.png", on)}",
-	singleInstance: true
-)
+definition (name: "${appLabel()}", namespace: "${appNamespace()}", author: "${appAuthor()}", description: "${textDesc()}", category: "Convenience", iconUrl: "${getAppImg("logo.png", on)}", iconX2Url: "${getAppImg("logo.png", on)}", iconX3Url: "${getAppImg("logo.png", on)}", singleInstance: true)
 
 preferences {
 	page(name: "welcomePage")
@@ -1072,7 +1062,6 @@ def updatePreferences() {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
 		child.setRefreshRate(userRefreshRate)
-		child.setIconStatus(userSelectedAppIcons)
 		log.info "Kasa device ${child} preferences updated"
 		if (userSelectedNotification) {
 			sendPush("Successfully updated TP-Link $deviceModel with alias ${device.value.alias}")
