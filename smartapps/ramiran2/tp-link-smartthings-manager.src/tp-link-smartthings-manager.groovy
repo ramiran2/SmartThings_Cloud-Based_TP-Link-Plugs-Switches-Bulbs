@@ -41,9 +41,9 @@ definition(
 	author: "${appAuthor()}",
 	description: "${textDesc()}",
 	category: "Convenience",
-	iconUrl: "${getAppImg("kasa.png", on)}",
-	iconX2Url: "${getAppImg("kasa.png", on)}",
-	iconX3Url: "${getAppImg("kasa.png", on)}",
+	iconUrl: "${getAppImg("logo.png", on)}",
+	iconX2Url: "${getAppImg("logo.png", on)}",
+	iconX3Url: "${getAppImg("logo.png", on)}",
 	singleInstance: true
 )
 
@@ -901,36 +901,46 @@ def changeLogPage() {
 	checkForUpdates()
 	def intUpdateCheckOne = 0
 	def intUpdateCheckTwo = 0
+	def childDevices = app.getChildDevices(true)
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def updateNeeded = "Both the Smart Application and Device Handlers need to be updated"
 	def upToDate = "Both the Smart Application and Device Handlers are up to date"
 	def driverUpdateNeeded = "Your Device Handlers need to be updated"
 	def smartAppUpdateNeeded = "Your Smart Application needs to be updated"
 	def updateFailed = "We are unable to check for updates"
+	def updateNeedsDevices = "We are unable to check for updates, please check if you have any devices installed"
 	dynamicPage (name: "changeLogPage", title: "Changelog Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Check for Updates:") {
-			if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" == "${atomicState?.devVerLnk}") {
-				paragraph upToDate, image: getAppImg("success.png")
-			} else {
-				if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
-					paragraph updateNeeded, image: getAppImg("error.png")
+			if (childDevices) {
+				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+					paragraph upToDate, image: getAppImg("success.png")
 				} else {
-					if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
-						paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
+					if ("${strLatestSmartAppVersion}" != "${appVersion()}" && "${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
+						paragraph updateNeeded, image: getAppImg("error.png")
 					} else {
-						intUpdateCheckOne = 1
-					} 
-					if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
-						paragraph driverUpdateNeeded, image: getAppImg("issue.png")
-					} else {
-						intUpdateCheckTwo = 1
+						if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
+							paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
+						} else {
+							intUpdateCheckOne = 1
+						} 
+						if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
+							paragraph driverUpdateNeeded, image: getAppImg("issue.png")
+						} else {
+							intUpdateCheckTwo = 1
+						}
+						if (intUpdateCheckOne == 1 && intUpdateCheckTwo == 1) {
+							paragraph updateFailed, image: getAppImg("error.png")
+						}
 					}
-					if (intUpdateCheckOne == 1 && intUpdateCheckTwo == 1) {
-						paragraph updateFailed, image: getAppImg("error.png")
-					}
+				}
+			} else {
+				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}") {
+					paragraph upToDate, image: getAppImg("success.png")
+				} else {
+					paragraph updateNeedsDevices, image: getAppImg("issue.png")
 				}
 			}
 		}
