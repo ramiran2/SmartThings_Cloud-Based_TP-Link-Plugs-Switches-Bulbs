@@ -41,7 +41,7 @@ TP-Link devices; primarily various users on GitHub.com.
 
 metadata {
 	definition (name: "${devName()}",
-				namespace: "${devName()}",
+				namespace: "${devNamespace()}",
 				author: "${devAuthor()}",
 				ocfDeviceType: "oic.d.smartplug",
 				mnmn: "SmartThings",
