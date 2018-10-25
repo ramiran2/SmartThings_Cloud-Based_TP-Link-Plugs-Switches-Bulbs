@@ -30,7 +30,7 @@ primarily various users on GitHub.com.*/
 //	def appLabel()	{ return "TP-Link Cloud Connect" }										//	Davegut: Application Name
 	def appLabel()	{ return "TP-Link SmartThings Manager" }								//	Ramiran2: Application Name
 //	======== Application Information =========================================================
-	def appVersion()	{ return "4.1.0" }													//	Application Version
+	def appVersion()	{ return "4.2.0" }													//	Application Version
 	def appVerDate()	{ return "10-25-2018" }												//	Application Date
 	def appAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Application Author
 //	==========================================================================================
@@ -39,17 +39,18 @@ definition (name: "${appLabel()}", namespace: "${appNamespace()}", author: "${ap
 
 preferences {
 	page(name: "startPage")
-	page(name: "welcomePage")
-	page(name: "userSelectionAuthenticationPage")
-	page(name: "userAuthenticationPreferencesPage")
-	page(name: "computerSelectionAuthenticationPage")
-	page(name: "userSelectionPage")
-	page(name: "computerSelectionPage")
-	page(name: "addDevicesPage")
-	page(name: "removeDevicesPage")
-	page(name: "userApplicationPreferencesPage")
-	page(name: "userDevicePreferencesPage")
-	page(name: "userSelectionTokenPage")
+	page(name: "kasaWelcomePage")
+	page(name: "hubWelcomePage")
+	page(name: "kasaUserSelectionAuthenticationPage")
+	page(name: "kasaUserAuthenticationPreferencesPage")
+	page(name: "kasaComputerSelectionAuthenticationPage")
+	page(name: "kasaUserSelectionPage")
+	page(name: "kasaComputerSelectionPage")
+	page(name: "kasaAddDevicesPage")
+	page(name: "kasaRemoveDevicesPage")
+	page(name: "kasaUserApplicationPreferencesPage")
+	page(name: "kasaUserDevicePreferencesPage")
+	page(name: "kasaUserSelectionTokenPage")
 	page(name: "developerPage")
 	page(name: "developerTestingPage")
 	page(name: "hiddenPage")
@@ -144,15 +145,15 @@ def startPage() {
 	if (userSelectedAssistant) {
 		setRecommendedOptions()
 	}
-	welcomePage()
+	kasaWelcomePage()
 }
 
 //	----- WELCOME PAGE -----
-def welcomePage() {
+def kasaWelcomePage() {
 	def strLatestDriverVersion = textDriverVersion()
-	def welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
+	def kasaWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "welcomePage", title: "Welcome Page", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaWelcomePage", title: "Welcome Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -162,7 +163,7 @@ def welcomePage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", welcomePageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaWelcomePageText, image: getAppImg("information.png")
 			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
 		}
 		if (!userSelectedLauncher) {
@@ -173,24 +174,24 @@ def welcomePage() {
 					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 				}
 				if ("${userName}" =~ null || "${userPassword}" =~ null) {
-					href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
+					href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 				} else {
-					href "userSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
+					href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
 				}
 			}
 		}
 		if (userSelectedQuickControl) {
 			section("Device Manager: ") {
-				href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+				href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings: ") {
 			if (userSelectedQuickControl) {
-				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-				href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
+				href "kasaUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+				href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
-			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "kasaUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
 		section("Uninstall: ") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
@@ -213,14 +214,14 @@ def welcomePage() {
 }
 
 //	----- USER SELECTION AUTHENTICATION PAGE -----
-def userSelectionAuthenticationPage() {
-	def userSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
+def kasaUserSelectionAuthenticationPage() {
+	def kasaUserSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\nAvailable actions: \n" +
 		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n" +
 		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n" +
 		"Delete Account: Deletes your credentials to login into your TP-Link Kasa Account."
-	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Page", nextPage: "computerSelectionAuthenticationPage", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "Login Page", nextPage: "kasaComputerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -230,7 +231,7 @@ def userSelectionAuthenticationPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", userSelectionAuthenticationPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserSelectionAuthenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration: ") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
@@ -251,16 +252,16 @@ def userSelectionAuthenticationPage() {
 			}
 			if (userSelectedOptionTwo =~ "Activate Account") {
 				getToken()
-				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
+				href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionTwo =~ "Update Account") {
-				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
+				href "kasaUserSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
 			}
 			if (userSelectedOptionTwo =~ "Delete Account") {
 				settingRemove("userName")
 				settingRemove("userPassword")
 				state.TpLinkToken = null
-				href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+				href "kasaWelcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -268,11 +269,11 @@ def userSelectionAuthenticationPage() {
 }
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
-def userAuthenticationPreferencesPage() {
-	def userAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " +
+def kasaUserAuthenticationPreferencesPage() {
+	def kasaUserAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
-	return dynamicPage (name: "userSelectionAuthenticationPage", title: "Login Settings Page", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "Login Settings Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -282,7 +283,7 @@ def userAuthenticationPreferencesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", userAuthenticationPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserAuthenticationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration: ") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
@@ -293,29 +294,29 @@ def userAuthenticationPreferencesPage() {
 }
 
 //	----- COMPUTER SELECTION AUTHENTICATION PAGE -----
-def computerSelectionAuthenticationPage() {
+def kasaComputerSelectionAuthenticationPage() {
 	switch (userSelectedOptionTwo) {
 		case "Update Account" :
-			return userSelectionTokenPage()
+			return kasaUserSelectionTokenPage()
 			break
 		case "Activate Account" :
-			return addDevicesPage()
+			return kasaAddDevicesPage()
 			break
 		case "Delete Account" :
-			return welcomePage()
+			return kasaWelcomePage()
 			break
 		default:
 			if ("${userName}" =~ null || "${userPassword}" =~ null) {
-				return welcomePage()
+				return kasaWelcomePage()
 			} else {
-				return userSelectionPage()
+				return kasaUserSelectionPage()
 			}
     }
 }
 
 //	----- USER SELECTION PAGE -----
-def userSelectionPage() {
-	def userSelectionPageText = "Available actions: \n" +
+def kasaUserSelectionPage() {
+	def kasaUserSelectionPageText = "Available actions: \n" +
 		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n" +
 		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n" +
 		"Update Token: You will be able to request for a new token or delete your current token from the application. \n" +
@@ -325,7 +326,7 @@ def userSelectionPage() {
 		errorMsgCom = "Error communicating with cloud: \n" + "${state.currentError} " +
 			"\nPlease resolve the error and try again."
 	}
-	return dynamicPage (name: "userSelectionPage", title: "Launcher Page", nextPage: "computerSelectionPage", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaUserSelectionPage", title: "Launcher Page", nextPage: "kasaComputerSelectionPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -335,7 +336,7 @@ def userSelectionPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", userSelectionPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserSelectionPageText, image: getAppImg("information.png")
 			paragraph title: "Communication Error: ", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration: ") {
@@ -352,16 +353,16 @@ def userSelectionPage() {
 				paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 			}
 			if (userSelectedOptionOne =~ "Initial Installation") {
-				href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
+				href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
 			}
 			if (userSelectedOptionOne =~ "Add Devices") {
-				href "addDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
+				href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to continue", image: getAppImg("adddevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Remove Devices") {
-				href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
+				href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to continue", image: getAppImg("removedevicespage.png")
 			}
 			if (userSelectedOptionOne =~ "Update Token") {
-				href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
+				href "kasaUserSelectionTokenPage", title: "Token Manager Page", description: "Tap to continue", image: getAppImg("userselectiontokenpage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -369,27 +370,27 @@ def userSelectionPage() {
 }
 
 //	----- COMPUTER SELECTION PAGE -----
-def computerSelectionPage() {
+def kasaComputerSelectionPage() {
     switch (userSelectedOptionOne) {
 		case "Initial Installation" :
-			return userSelectionAuthenticationPage()
+			return kasaUserSelectionAuthenticationPage()
 			break
 		case "Add Devices" :
-			return addDevicesPage()
+			return kasaAddDevicesPage()
 			break
 		case "Remove Devices" :
-			return removeDevicesPage()
+			return kasaRemoveDevicesPage()
 			break
 		case "Update Token" :
-			return userSelectionTokenPage()
+			return kasaUserSelectionTokenPage()
 			break
 		default:
-			return welcomePage()
+			return kasaWelcomePage()
     }
 }
 
 //	----- ADD DEVICES PAGE -----
-def addDevicesPage() {
+def kasaAddDevicesPage() {
 	getDevices()
 	def devices = state.devices
 	def errorMsgDev = "None"
@@ -407,12 +408,12 @@ def addDevicesPage() {
 	if (newDevices == [:]) {
 		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
-	def addDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
+	def kasaAddDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
 		"WiFi control only' will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Save to add the devices to your SmartThings account."
-	return dynamicPage (name: "addDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaAddDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -422,7 +423,7 @@ def addDevicesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", addDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaAddDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
@@ -433,7 +434,7 @@ def addDevicesPage() {
 }
 
 //	----- REMOVE DEVICES PAGE -----
-def removeDevicesPage() {
+def kasaRemoveDevicesPage() {
 	getDevices()
 	def devices = state.devices
 	def errorMsgDev = "None"
@@ -451,12 +452,12 @@ def removeDevicesPage() {
 	if (oldDevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the SmartThings app at this time."
 	}
-	def removeDevicesPageText = "Devices that have been installed " +
+	def kasaRemoveDevicesPageText = "Devices that have been installed " +
 		"will appear below. Tap below to see the list of " +
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to remove, then Press Save to remove the devices to your SmartThings account."
-	return dynamicPage (name: "removeDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaRemoveDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -466,7 +467,7 @@ def removeDevicesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", removeDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaRemoveDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
@@ -477,7 +478,7 @@ def removeDevicesPage() {
 }
 
 //	----- USER APPLICATION PREFERENCES PAGE -----
-def userApplicationPreferencesPage() {
+def kasaUserApplicationPreferencesPage() {
 	def hiddenRecordInput = 0
 	def hiddenDeveloperInput = 0
 	if (userSelectedDeveloper) {
@@ -490,9 +491,9 @@ def userApplicationPreferencesPage() {
 	} else {
 		hiddenRecordInput = 1
 	}
-	def userApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
+	def kasaUserApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
-	return dynamicPage (name: "userApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaUserApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -502,7 +503,7 @@ def userApplicationPreferencesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", userApplicationPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Application Configuration: ") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: true, image: getAppImg("notification.png"))
@@ -539,7 +540,7 @@ def userApplicationPreferencesPage() {
 }
 
 //	----- USER DEVICE PREFERENCES PAGE -----
-def userDevicePreferencesPage() {
+def kasaUserDevicePreferencesPage() {
 	getDevices()
 	def devices = state.devices
 	def oldDevices = [:]
@@ -549,10 +550,10 @@ def userDevicePreferencesPage() {
 			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	def userDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
+	def kasaUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
-	return dynamicPage (name: "userDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaUserDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -562,7 +563,7 @@ def userDevicePreferencesPage() {
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", userDevicePreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration: ") {
 			input ("userSelectedDevicesUpdate", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
@@ -574,8 +575,8 @@ def userDevicePreferencesPage() {
 }
 
 //	----- TOKEN MANAGER PAGE -----
-def userSelectionTokenPage() {
-	def userSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" +
+def kasaUserSelectionTokenPage() {
+	def kasaUserSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" +
 		"\nAvailable actions:\n" +
 		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
 		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
@@ -587,12 +588,12 @@ def userSelectionTokenPage() {
 		if (state.currentError != null) {
 			errorMsgTok = "You may not be able to control your devices until you update your credentials."
 		}
-	dynamicPage (name: "userSelectionTokenPage", title: "Token Manager Page", install: false, uninstall: false) {
+	dynamicPage (name: "kasaUserSelectionTokenPage", title: "Token Manager Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
 		section("Information and Diagnostics: ", hideable: true, hidden: true) {
-			paragraph title: "Information: ", userSelectionTokenPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserSelectionTokenPageText, image: getAppImg("information.png")
 			paragraph title: "Account Error: ", errorMsgTok, image: getAppImg("error.png")
 		}
 		section("Account Status: ") {
@@ -675,21 +676,21 @@ def developerPage() {
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "welcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
-			href "userSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
-			href "userAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
+			href "kasaWelcomePage", title: "Welcome Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
+			href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			if (userSelectedTestingPage) {
-				href "computerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "userSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
+			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
-				href "computerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "addDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "removeDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
-			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-			href "userSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
+			href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			href "kasaUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "kasaUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "kasaUserSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			if (userSelectedTestingPage) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
 				href "developerTestingPage", title: "Developer Testing Page", description: "Tap to view", image: getAppImg("testingpage.png")
@@ -1219,19 +1220,7 @@ def addDevices() {
 			if (!isChild) {
 				def device = state.devices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
-				addChildDevice(
-					"${driverNamespace()}",
-					tpLinkModel["${deviceModel}"],
-					device.value.deviceMac,
-					hubId, [
-						"label" : device.value.alias,
-							"name" : device.value.deviceModel,
-						"data" : [
-							"deviceId" : device.value.deviceId,
-							"appServerUrl" : device.value.appServerUrl,
-						]
-					]
-				)
+				addChildDevice("${driverNamespace()}", tpLinkModel["${deviceModel}"], device.value.deviceMac,hubId, ["label" : device.value.alias, "name" : device.value.deviceModel,"data" : ["deviceId" : device.value.deviceId, "appServerUrl" : device.value.appServerUrl]])
 				log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
 				if (userSelectedNotification) {
 					sendPush("Successfully installed TP-Link $deviceModel with alias ${device.value.alias}")

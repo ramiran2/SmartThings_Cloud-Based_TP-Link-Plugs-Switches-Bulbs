@@ -43,7 +43,7 @@ TP-Link devices; primarily various users on GitHub.com.
 	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }										//	Ramiran2: Device Name
 //	======== Other System Values =========================================================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }															//	Device Handler Author
-	def devVer()	{ return "3.4.0" }																					//	Device Handler Version
+	def devVer()	{ return "3.5.0" }																					//	Device Handler Version
 //	def ocfValue()	{ return "oic.d.smartplug" }																		//	Open Connectivity Foundation Device Type: Smart Plug
 	def ocfValue()	{ return "oic.d.switch" }																			//	Open Connectivity Foundation Device Type: Switch
 //	def vidValue()	{ return "generic-switch-power" }																	//	Vendor ID: Switch

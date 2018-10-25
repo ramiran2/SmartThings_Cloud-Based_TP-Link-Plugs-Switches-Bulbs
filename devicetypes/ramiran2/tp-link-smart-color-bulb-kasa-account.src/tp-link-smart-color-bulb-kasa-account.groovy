@@ -41,7 +41,7 @@ TP-Link devices; primarily various users on GitHub.com.
 	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }			//	Ramiran2: Device Name
 //	======== Other System Values =============================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
-	def devVer()	{ return "3.4.0" }														//	Device Handler Version
+	def devVer()	{ return "3.5.0" }														//	Device Handler Version
 	def ocfValue()	{ return "oic.d.light" }												//	Open Connectivity Foundation Device Type: Light Bulb
 	def vidValue()	{ return "generic-rgbw-color-bulb" }									//	Vendor ID: RGBW Color Light Bulb
 //	==========================================================================================
