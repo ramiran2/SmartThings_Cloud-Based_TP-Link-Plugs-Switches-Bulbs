@@ -703,6 +703,7 @@ def kasaUserDevicePreferencesPage() {
 
 //	----- USER DEVICE PREFERENCES PAGE -----
 def hubUserDevicePreferencesPage() {
+	def childDevices = app.getChildDevices(true)
 	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
@@ -714,7 +715,7 @@ def hubUserDevicePreferencesPage() {
 			paragraph title: "Information: ", hubUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${childDevices.size() ?: 0} found)", metadata: [values: childDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
