@@ -146,10 +146,10 @@ def setRecommendedOptions() {
 		settingUpdate("userSelectedOptionTwo", "Update Account", "enum")
 	}
 	if (state.TpLinkToken != null) {
-		if (newDevices != [:]) {
+		if (childDevices) {
 			settingUpdate("userSelectedOptionOne", "Add Devices", "enum")
 		}
-		if (childDevices) {
+		if (!childDevices) {
 			settingUpdate("userSelectedOptionOne", "Remove Devices", "enum")
 		}
 	} else {
@@ -190,7 +190,7 @@ def kasaWelcomePage() {
 	def strLatestDriverVersion = textDriverVersion()
 	def kasaWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "kasaWelcomePage", title: "Introduction Page", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaWelcomePage", title: "Introduction Page - Cloud Mode", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -253,9 +253,9 @@ def kasaWelcomePage() {
 //	----- WELCOME PAGE -----
 def hubWelcomePage() {
 	def strLatestDriverVersion = textDriverVersion()
-	def hubWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
+	def hubWelcomePageText = "This SA installs and manages TP-Link bulbs, plugs, and switches DHs as well as " + "the associated Bridge.  You will encounter other pages in the following order. " + "NEXT goes to Bridge Discovery (no bridge detected) or Device Discovery. " + "Bridge Discovery - Does the initial discover and user selection of the Bridge " + "between SmartThings and the TP-Link Devices.  Entered only on initial " + " installation.  DONE installs the selected bridge and exits the program." + "Device Discovery - Discovers and installs the TP-Link Devices.  Also used for " + "updating IP addresses and for discovering added devices.  DONE installs the " + "selected devices then exits the program."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "hubWelcomePage", title: "Introduction Page", install: false, uninstall: false) {
+	return dynamicPage (name: "hubWelcomePage", title: "Introduction Page - Hub Mode", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -263,12 +263,30 @@ def hubWelcomePage() {
 			paragraph title: "Information: ", hubWelcomePageText, image: getAppImg("information.png")
 			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
 		}
-		section("Device Manager: ") {
-			href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "hubRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+		if (!userSelectedLauncher) {
+			section("Page Selector: ") {
+				if (state.currentError != null) {
+					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
+				} else {
+					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+				}
+				if ("${userName}" =~ null || "${userPassword}" =~ null) {
+					href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
+				} else {
+					href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
+				}
+			}
+		}
+		if (userSelectedQuickControl) {
+			section("Device Manager: ") {
+				href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "hubRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			}
 		}
 		section("Settings: ") {
-			href "hubUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			if (userSelectedQuickControl) {
+				href "hubUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			}
 			href "hubUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
 		section("Uninstall: ") {
@@ -392,6 +410,39 @@ def kasaComputerSelectionAuthenticationPage() {
     }
 }
 
+// ----- Page: Hub (Bridge) Discovery ------------------------------
+def hubBridgeDiscoveryPage() {
+	def bridgeIP = state.bridgeIP
+	state.initFrom = "bridges"
+	if (bridgeIP != "new") {
+		return deviceDiscovery()
+	}
+	def options = [:]
+	def verBridges = state.bridges.findAll{ it.value.verified == true }
+	verBridges.each {
+		def value = "$it.value.bridgeIP : $it.value.nodeApp"
+		def key = it.value.bridgeMac
+		options["${key}"] = value
+	}
+	ssdpSubscribe()
+	ssdpDiscover()
+	verifyBridges()
+	def text2 = "Please wait while we discover your TP-Link Bridge. Discovery can take "+
+				"several minutes\n\r" +
+				"If no bridges are discovered after several minutes, press DONE.  This " +
+				"will install the app.  Then re-run the application."
+	return dynamicPage(
+		name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: true, uninstall: false){
+		section(text2) {
+			input "selectedBridges", "enum", 
+			required: false, 
+			title: "Select Bridges (${options.size() ?: 0} found)", 
+			multiple: true, 
+			options: options
+		}
+	}
+}
+
 //	----- USER SELECTION PAGE -----
 def kasaUserSelectionPage() {
 	def kasaUserSelectionPageText = "Available actions: \n" +
@@ -469,21 +520,13 @@ def kasaComputerSelectionPage() {
 
 //	----- ADD DEVICES PAGE -----
 def kasaAddDevicesPage() {
-	getDevices()
-	def devices = state.kasadevices
+	checkForDevicesKasa()
 	def errorMsgDev = "None"
-	def newDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
-	if (devices == [:]) {
+	if (state.kasadevices == [:]) {
 		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
-	if (newDevices == [:]) {
+	if (state.newkasadevices == [:]) {
 		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
 	def kasaAddDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
@@ -505,7 +548,7 @@ def kasaAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -525,7 +568,7 @@ def hubAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -533,21 +576,13 @@ def hubAddDevicesPage() {
 
 //	----- REMOVE DEVICES PAGE -----
 def kasaRemoveDevicesPage() {
-	getDevices()
-	def devices = state.kasadevices
 	def errorMsgDev = "None"
-	def oldDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
-	if (devices == [:]) {
+	checkForDevicesKasa()
+	if (state.kasadevices == [:]) {
 		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
-	if (oldDevices == [:]) {
+	if (state.oldkasadevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the SmartThings app at this time."
 	}
 	def kasaRemoveDevicesPageText = "Devices that have been installed " +
@@ -569,7 +604,7 @@ def kasaRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -589,7 +624,7 @@ def hubRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -690,7 +725,10 @@ def hubUserApplicationPreferencesPage() {
 				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			}
 			if (userSelectedDeveloper) {
+				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
+				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
 				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 			}
 			if (userSelectedTestingPage && !userSelectedNotification || hiddenRecordInput == 1) {
 				hiddenRecordInput = 1
@@ -703,15 +741,7 @@ def hubUserApplicationPreferencesPage() {
 
 //	----- USER DEVICE PREFERENCES PAGE -----
 def kasaUserDevicePreferencesPage() {
-	getDevices()
-	def devices = state.kasadevices
-	def oldDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
+	checkForDevicesKasa()
 	def kasaUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
@@ -728,7 +758,7 @@ def kasaUserDevicePreferencesPage() {
 			paragraph title: "Information: ", kasaUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
@@ -750,7 +780,7 @@ def hubUserDevicePreferencesPage() {
 			paragraph title: "Information: ", hubUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("deviceIPAddress", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
 			input ("gatewayIPAddress", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
@@ -818,21 +848,9 @@ def kasaUserSelectionTokenPage() {
 
 //	----- DEVELOPER PAGE -----
 def developerPage() {
-	getDevices()
 	cleanStorage()
 	checkForUpdates()
-	def devices = state.kasadevices
-	def newDevices = [:]
-	def oldDevices = [:]
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
+	checkForDevicesKasa()
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	def strLatestSmartAppVersion = textSmartAppVersion()
@@ -855,8 +873,8 @@ def developerPage() {
 			paragraph title: "Device Handlers Namespace: ", "${driverNamespace()}", image: getAppImg("devices.png")
 			paragraph title: "Username: ", "${userName}", image: getAppImg("email.png")
 			paragraph title: "Password: ", "${userPassword}", image: getAppImg("password.png")
-			paragraph title: "Managed Devices: ", "${oldDevices}", image: getAppImg("devices.png")
-			paragraph title: "New Devices: ", "${newDevices}", image: getAppImg("devices.png")
+			paragraph title: "Managed Devices: ", "${state.oldkasadevices}", image: getAppImg("devices.png")
+			paragraph title: "New Devices: ", "${state.newkasadevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector: ") {
 			if (userSelectedTestingPage) {
@@ -899,41 +917,29 @@ def developerPage() {
 
 //	----- DEVELOPER TESTING PAGE -----
 def developerTestingPage() {
-	getDevices()
-	def devices = state.kasadevices
-	def newDevices = [:]
-	def oldDevices = [:]
+	checkForDevicesKasa()
 	def errorMsgCom = "None"
 	def errorMsgDev = "None"
 	def errorMsgNew = "None"
 	def errorMsgOld = "None"
 	def errorMsgTok = "None"
-		if (state.TpLinkToken == null) {
-			errorMsgTok = "You will be unable to control your devices until you get a new token."
-		}
-	devices.each {
-		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
+	if (state.TpLinkToken == null) {
+		errorMsgTok = "You will be unable to control your devices until you get a new token."
 	}
 	if (state.currentError != null) {
 		errorMsgCom = "Error communicating with cloud:\n" + "${state.currentError}" +
 			"\nPlease resolve the error and try again."
 	}
-	if (devices == [:]) {
+	if (state.kasadevices == [:]) {
 		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
 		"that all devices are in 'Local Control Only'. Correct them then " +
 		"rerun the application."
 	}
-	if (newDevices == [:]) {
+	if (state.newkasadevices == [:]) {
 		errorMsgNew = "No new devices to add. Are you sure they are in Remote " +
 		"Control Mode?"
 	}
-	if (oldDevices == [:]) {
+	if (state.oldkasadevices == [:]) {
 		errorMsgOld = "No current devices to remove from SmartThings."
 	}
 	return dynamicPage (name: "developerTestingPage", title: "Developer Testing Page", install: false, uninstall: false) {
@@ -971,8 +977,8 @@ def developerTestingPage() {
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller: ") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${newDevices.size() ?: 0} found)", metadata: [values:newDevices], image: getAppImg("adddevices.png"))
-			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${oldDevices.size() ?: 0} found)", metadata: [values:oldDevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration: ") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
@@ -988,7 +994,7 @@ def developerTestingPage() {
 			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 		}
 		section("Device Configuration: ") {
-			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${oldDevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
@@ -1161,8 +1167,8 @@ def checkForDevicesKasa() {
 			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	state.olddevices = oldDevices
-	state.newdevices = newDevices
+	state.oldkasadevices = oldDevices
+	state.newkasadevices = newDevices
 }
 
 def checkForDevicesHub() {
