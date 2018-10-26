@@ -44,6 +44,7 @@ preferences {
 	page(name: "kasaUserSelectionAuthenticationPage")
 	page(name: "kasaUserAuthenticationPreferencesPage")
 	page(name: "kasaComputerSelectionAuthenticationPage")
+	page(name: "hubBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "kasaAddDevicesPage")
@@ -63,9 +64,9 @@ preferences {
 	page(name: "uninstallPage")
 }
 
-def setInitialStates() {
+def setInitialStatesKasa() {
 	if (!state.TpLinkToken) {state.TpLinkToken = null}
-	if (!state.devices) {state.devices = [:]}
+	if (!state.kasadevices) {state.kasadevices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
 	settingUpdate("userSelectedReload", "false", "bool")
@@ -95,6 +96,33 @@ def setInitialStates() {
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
+	}
+}
+
+// ----- UPNP Search Target Definition -----------------------------
+def getSearchTarget() {
+	def searchTarget = "upnp:rootdevice"
+}
+
+def setInitialStatesHub() {
+	log.info "Initial application state data collected."
+	if (!state.bridgeIP) {
+		state.bridgeIP = "new"
+	}
+	if (!state.bridgeDNI) {
+		state.bridgeDNI = "new"
+	}
+	if (!state.bridges) {
+		state.bridges = [:]
+	}
+	if (!state.hubdevices) {
+		state.hubdevices = [:]
+	}
+	if (!state.initFrom) {
+		state.initFrom = ""
+	}
+	if (!state.bridgePort) {
+		state.bridgePort = 8082
 	}
 }
 
@@ -145,11 +173,16 @@ def setRecommendedOptions() {
 }
 
 def startPage() {
-	setInitialStates()
-	if (userSelectedAssistant && !userSelectedManagerMode) {
-		setRecommendedOptions()
+	settingUpdate("userSelectedManagerMode", "false", "bool")	\\	Cloud or Hub
+	if (!userSelectedManagerMode) {
+		setInitialStatesKasa()
+		if (userSelectedAssistant && !userSelectedManagerMode) {
+			setRecommendedOptions()
+		}
+		kasaWelcomePage()
+	} else {
+		setInitialStatesHub()
 	}
-	kasaWelcomePage()
 }
 
 //	----- WELCOME PAGE -----
@@ -437,7 +470,7 @@ def kasaComputerSelectionPage() {
 //	----- ADD DEVICES PAGE -----
 def kasaAddDevicesPage() {
 	getDevices()
-	def devices = state.devices
+	def devices = state.kasadevices
 	def errorMsgDev = "None"
 	def newDevices = [:]
 	devices.each {
@@ -501,7 +534,7 @@ def hubAddDevicesPage() {
 //	----- REMOVE DEVICES PAGE -----
 def kasaRemoveDevicesPage() {
 	getDevices()
-	def devices = state.devices
+	def devices = state.kasadevices
 	def errorMsgDev = "None"
 	def oldDevices = [:]
 	devices.each {
@@ -615,7 +648,7 @@ def kasaUserApplicationPreferencesPage() {
 			}
 			if (userSelectedReload) {
 				checkError()
-				setInitialStates()
+				setInitialStatesKasa()
 			} else {
 				settingUpdate("userSelectedReload", "false", "bool")
 			}
@@ -671,7 +704,7 @@ def hubUserApplicationPreferencesPage() {
 //	----- USER DEVICE PREFERENCES PAGE -----
 def kasaUserDevicePreferencesPage() {
 	getDevices()
-	def devices = state.devices
+	def devices = state.kasadevices
 	def oldDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
@@ -788,7 +821,7 @@ def developerPage() {
 	getDevices()
 	cleanStorage()
 	checkForUpdates()
-	def devices = state.devices
+	def devices = state.kasadevices
 	def newDevices = [:]
 	def oldDevices = [:]
 	devices.each {
@@ -867,7 +900,7 @@ def developerPage() {
 //	----- DEVELOPER TESTING PAGE -----
 def developerTestingPage() {
 	getDevices()
-	def devices = state.devices
+	def devices = state.kasadevices
 	def newDevices = [:]
 	def oldDevices = [:]
 	def errorMsgCom = "None"
@@ -1114,6 +1147,36 @@ def uninstallPage() {
 	}
 }
 
+def checkForDevicesKasa() {
+	getDevices()
+	def devices = state.kasadevices
+	def newDevices = [:]
+	def oldDevices = [:]
+	devices.each {
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+	}
+	state.olddevices = oldDevices
+	state.newdevices = newDevices
+}
+
+def checkForDevicesHub() {
+	state.initFrom = "devices"
+	def options = [:]
+	def devices = state.hubdevices
+	devices.each {
+		def value = "$it.value.deviceIP : $it.value.deviceAlias"
+		def key = it.value.deviceMac
+		options["${key}"] = value
+	}
+	discoverDevices()
+}
+
 def checkForUpdates() {
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
@@ -1258,8 +1321,8 @@ void settingRemove(name) {
 
 def getDevices() {
 	def currentDevices = getDeviceData()
-	state.devices = [:]
-	def devices = state.devices
+	state.kasadevices = [:]
+	def devices = state.kasadevices
 	currentDevices.each {
 		def device = [:]
 		device["deviceMac"] = it.deviceMac
@@ -1314,7 +1377,80 @@ def getWebData(params, desc, text=true) {
 	}
 }
 
-def addDevices() {
+// ----- Add TP-Link Devices to STs --------------------------------
+def addDevicesHub() {
+	def tpLinkModel = [:]
+	if (userSelectedDriverNamespace) {
+		//	Plug-Switch Devices (no energy monitor capability)
+		tpLinkModel << ["HS100" : "(Hub) TP-Link Plug"]									//	HS100
+		tpLinkModel << ["HS103" : "(Hub) TP-Link Plug"]									//	HS103
+		tpLinkModel << ["HS105" : "(Hub) TP-Link Plug"]									//	HS105
+		tpLinkModel << ["HS200" : "(Hub) TP-Link Switch"]									//	HS200
+		tpLinkModel << ["HS210" : "(Hub) TP-Link Switch"]									//	HS210
+		tpLinkModel << ["KP100" : "(Hub) TP-Link Plug"]									//	KP100
+		//	Dimming Switch Devices
+		tpLinkModel << ["HS220" : "(Hub) TP-Link Dimming Switch"]							//	HS220
+		//	Energy Monitor Plugs
+		tpLinkModel << ["HS110" : "(Hub) TP-Link Energy Monitor Plug"]					//	HS110
+		tpLinkModel << ["HS115" : "(Hub) TP-Link Energy Monitor Plug"]					//	HS110
+			//	Soft White Bulbs
+		tpLinkModel << ["KB100" : "(Hub) TP-Link Soft White Bulb"]						//	KB100
+		tpLinkModel << ["LB100" : "(Hub) TP-Link Soft White Bulb"]						//	LB100
+		tpLinkModel << ["LB110" : "(Hub) TP-Link Soft White Bulb"]						//	LB110
+		tpLinkModel << ["KL110" : "(Hub) TP-Link Soft White Bulb"]						//	KL110
+		tpLinkModel << ["LB200" : "(Hub) TP-Link Soft White Bulb"]						//	LB200
+		//	Tunable White Bulbs
+		tpLinkModel << ["LB120" : "(Hub) TP-Link Tunable White Bulb"]						//	LB120
+		tpLinkModel << ["KL120" : "(Hub) TP-Link Tunable White Bulb"]						//	KL120
+		//	Color Bulbs
+		tpLinkModel << ["KB130" : "(Hub) TP-Link Color Bulb"]								//	KB130
+		tpLinkModel << ["LB130" : "(Hub) TP-Link Color Bulb"]								//	LB130
+		tpLinkModel << ["KL130" : "(Hub) TP-Link Color Bulb"]								//	KL130
+		tpLinkModel << ["LB230" : "(Hub) TP-Link Color Bulb"]								//	LB230
+	} else {
+		//	Plug-Switch Devices (no energy monitor capability)
+		tpLinkModel << ["HS100" : "TP-Link Smart Plug - Node Applet"]						//	HS100
+		tpLinkModel << ["HS103" : "TP-Link Smart Plug - Node Applet"]						//	HS103
+		tpLinkModel << ["HS105" : "TP-Link Smart Plug - Node Applet"]						//	HS105
+		tpLinkModel << ["HS200" : "TP-Link Smart Switch - Node Applet"]					//	HS200
+		tpLinkModel << ["HS210" : "TP-Link Smart Switch - Node Applet"]					//	HS210
+		tpLinkModel << ["KP100" : "TP-Link Smart Plug - Node Applet"]						//	KP100
+		//	Dimming Switch Devices
+		tpLinkModel << ["HS220" : "TP-Link Smart Dimming Switch - Node Applet"]			//	HS220
+		//	Energy Monitor Plugs
+		tpLinkModel << ["HS110" : "TP-Link Smart Energy Monitor Plug - Node Applet"]		//	HS110
+		tpLinkModel << ["HS115" : "TP-Link Smart Energy Monitor Plug - Node Applet"]		//	HS110
+			//	Soft White Bulbs
+		tpLinkModel << ["KB100" : "TP-Link Smart Soft White Bulb - Node Applet"]			//	KB100
+		tpLinkModel << ["LB100" : "TP-Link Smart Soft White Bulb - Node Applet"]			//	LB100
+		tpLinkModel << ["LB110" : "TP-Link Smart Soft White Bulb - Node Applet"]			//	LB110
+		tpLinkModel << ["KL110" : "TP-Link Smart Soft White Bulb - Node Applet"]			//	KL110
+		tpLinkModel << ["LB200" : "TP-Link Smart Soft White Bulb - Node Applet"]			//	LB200
+		//	Tunable White Bulbs
+		tpLinkModel << ["LB120" : "TP-Link Smart Tunable White Bulb - Node Applet"]		//	LB120
+		tpLinkModel << ["KL120" : "TP-Link Smart Tunable White Bulb - Node Applet"]		//	KL120
+		//	Color Bulbs
+		tpLinkModel << ["KB130" : "TP-Link Smart Color Bulb - Node Applet"]				//	KB130
+		tpLinkModel << ["LB130" : "TP-Link Smart Color Bulb - Node Applet"]				//	LB130
+		tpLinkModel << ["KL130" : "TP-Link Smart Color Bulb - Node Applet"]				//	KL130
+		tpLinkModel << ["LB230" : "TP-Link Smart Color Bulb - Node Applet"]				//	LB230
+	}
+	userSelectedDevicesAddHub.each { dni ->
+		try {
+		def isChild = getChildDevice(dni)
+			if (!isChild) {
+				def device = state.hubdevices.find { it.value.deviceMac == dni }
+				def deviceModel = device.value.deviceModel.substring(0,5)
+				addChildDevice("${driverNamespace()}", tpLinkModel["${deviceModel}"], device.value.deviceMac, device?.value.hub, ["label": device.value.deviceAlias, "name": "TP-Link ${device.value.deviceModel}", "data": ["bridgeIP": state.bridgeIP, "bridgePort": state.bridgePort, "deviceIP": device.value.deviceIP, "deviceModel": device.value.deviceModel]])
+			log.info "Installed TP-Link $deviceModel with alias ${device.value.deviceAlias}"
+			}
+		} catch (e) {
+			log.debug "Error Adding ${deviceModel}: ${e}"
+		}
+	}
+}
+
+def addDevicesKasa() {
 	def tpLinkModel = [:]
 	if (userSelectedDriverNamespace) {
 		//	Plug-Switch Devices (no energy monitor capability)
@@ -1377,7 +1513,7 @@ def addDevices() {
 		try {
 			def isChild = getChildDevice(dni)
 			if (!isChild) {
-				def device = state.devices.find { it.value.deviceMac == dni }
+				def device = state.kasadevices.find { it.value.deviceMac == dni }
 				def deviceModel = device.value.deviceModel.substring(0,5)
 				addChildDevice("${driverNamespace()}", tpLinkModel["${deviceModel}"], device.value.deviceMac,hubId, ["label" : device.value.alias, "name" : device.value.deviceModel,"data" : ["deviceId" : device.value.deviceId, "appServerUrl" : device.value.appServerUrl]])
 				log.info "Installed TP-Link $deviceModel with alias ${device.value.alias}"
@@ -1545,25 +1681,175 @@ def updated() {
 }
 
 def initialize() {
-	unsubscribe()
-	unschedule()
-	runEvery5Minutes(checkError)
 	runEvery3Hours(cleanStorage)
 	runEvery3Hours(checkForUpdates)
-	schedule("0 30 2 ? * WED", getToken)
-	if (userSelectedDevicesAddKasa) {
-		addDevices()
-	}
-	if (userSelectedDevicesRemoveKasa) {
-		removeDevices()
-	}
-	if (userSelectedDevicesToUpdateKasa) {
-		updatePreferences()
+	unsubscribe()
+	unschedule()
+	if (!userSelectedManagerMode) {
+		runEvery5Minutes(checkError)
+		schedule("0 30 2 ? * WED", getToken)
+		if (userSelectedDevicesAddKasa) {
+			addDevicesKasa()
+		}
+		if (userSelectedDevicesRemoveKasa) {
+			removeDevices()
+		}
+		if (userSelectedDevicesToUpdateKasa) {
+			updatePreferences()
+		}
+	} else {
+		runEvery5Minutes(discoverDevices)
+		ssdpSubscribe()
+		if (state.initFrom == "bridges") {
+			if (selectedBridges) {
+				addBridges()
+			}
+		} else if (state.initFrom == "devices") {
+			if (selectedDevices) {
+				addDevicesKasa()
+			}
+			state.initFrom = ""
+		}
 	}
 }
 
 def uninstalled() {
 	uninstManagerApp()
+}
+
+// ----- Child-called IP Refresh Function  -------------------------
+def checkDeviceIPs() {
+	ssdpDiscover()
+	runIn(30, discoverDevices)
+}
+
+// ----- Hub Discovery ---------------------------------------------
+void ssdpSubscribe() {
+	def target = getSearchTarget()
+	subscribe(location, "ssdpTerm.$target", ssdpHandler)
+}
+void ssdpDiscover() {
+	def target = getSearchTarget()
+	sendHubCommand(new physicalgraph.device.HubAction("lan discovery $target", physicalgraph.device.Protocol.LAN))
+}
+def ssdpHandler(evt) {
+	def bridgeDNI = state.bridgeDNI
+	def description = evt.description
+	def hub = evt?.hubId
+	def parsedEvent = parseLanMessage(description)
+	def ip = convertHexToIP(parsedEvent.networkAddress)
+	String mac = parsedEvent.mac.toString()
+	def bridges = state.bridges
+	if (bridges."${mac}") {
+		def d = bridges."${mac}"
+		if (d.bridgeIP != ip) {
+			d.bridgeIP = ip
+			if (bridgeDNI == mac) {
+				state.bridgeIP = ip
+				def allDevices = getChildDevices()
+			   	allDevices.each {
+					it.syncBridgeIP(ip)
+					log.info "The Hub IP Address was updated to $d.bridgeIP"
+					discoverDevices()
+				}
+			}
+		}
+	} else {
+		log.info "Adding potential Hub with MAC: $mac and IP: $ip"
+		def bridgeDevice = [:]
+		bridgeDevice["bridgeMac"] = mac
+		bridgeDevice["bridgeIP"] = ip
+		bridgeDevice["hub"] = hub
+		bridges << ["${mac}": bridgeDevice]
+	}
+}
+
+// ----- Verify Discovered Devices as Hub --------------------------
+void verifyBridges() {
+	def bridges = state.bridges.findAll { it?.value?.verified != true }
+	def bridgePort = state.bridgePort
+	bridges.each {
+		def bridgeIP = it.value.bridgeIP
+		def host = "${bridgeIP}:${bridgePort}"
+		def headers = [:]
+		headers.put("HOST", host)
+		headers.put("command", "verifyBridge")
+		sendHubCommand(new physicalgraph.device.HubAction([headers: headers], it.value.mac, [callback: "bridgeDescriptionHandler"]))
+	}
+}
+void bridgeDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
+	def bridgeMac = hubResponse.headers["bridgeMac"]
+	def nodeApp = hubResponse.headers["nodeApp"]
+	def bridgePort = state.bridgePort
+	def foundBridge = state.bridges.find { it?.key?.contains("${bridgeMac}") }
+	if (foundBridge) {
+		foundBridge.value << [verified: true, nodeApp: nodeApp, bridgePort: bridgePort]
+		log.info "Verified potential Hub with MAC: $bridgeMac"
+	}
+}
+
+// ----- Add Hub Device to ST --------------------------------------
+def addBridges() {
+	selectedBridges.each { dni ->
+		def selectedBridge = state.bridges.find { it.value.bridgeMac == dni }
+		def d
+		if (selectedBridge) {
+			d = getChildDevices()?.find {
+				it.deviceNetworkId == selectedBridge.value.bridgeMac
+			}
+		}
+		if (!d) {
+			state.bridgeIP = selectedBridge.value.bridgeIP
+			state.bridgeDNI = selectedBridge.value.bridgeMac
+			addChildDevice("${driverNamespace()}", "TP-Link Bridge", selectedBridge.value.bridgeMac, selectedBridge?.value.hub, ["label": "TP-Link SmartThings Bridge", "name": "PC Bridge for TP-Link Devices", "data": ["bridgeIP": state.bridgeIP, "bridgePort": state.bridgePort, "connectStatus": "ok"]])
+			selectedBridge.value << [installed: true]
+			log.info "Installed TP-Link Hub with MAC: ${state.bridgeDNI} and IP: ${state.bridgeIP}"
+		}
+	}
+}
+
+// ----- TP-Link Device Discovery ----------------------------------
+void discoverDevices() {
+	def headers = [:]
+	def bridgePort = state.bridgePort
+	def bridgeIP = state.bridgeIP
+	headers.put("HOST", "$bridgeIP:$bridgePort")
+	headers.put("command", "pollForDevices")
+	sendHubCommand(new physicalgraph.device.HubAction(
+		[headers: headers],
+ 		state.bridgeDNI,
+ 		[callback: parseDiscoveredDevices]
+	))
+}
+void parseDiscoveredDevices(response) {
+	def cmdResponse = response.headers["cmd-response"]
+	def foundDevices = parseJson(cmdResponse)
+	if (foundDevices == ":") {
+		log.error "Found Devices Failed.  Rerun!"
+	}
+	def devices = state.hubdevices
+	foundDevices.each {
+		String foundDeviceMac = it.value.deviceMac
+		if (devices."${foundDeviceMac}") {
+			def device = devices."${foundDeviceMac}"
+			if (it.value.deviceIP != device.deviceIP ) {
+				device.deviceIP = it.value.deviceIP
+				alias = it.value.alias
+				def child = getChildDevice(foundDeviceMac)
+				if (child) {
+					child.syncDeviceIP(it.value.deviceIP)
+					child.syncBridgeIP(state.bridgeIP)
+					log.info "Updated IP address $alias to $device.IP"
+				}
+			}
+		} else {
+			def hub = response.hubId
+			def foundDevice = foundDevices."${foundDeviceMac}"
+			foundDevice << ["hub": hub]
+		   	devices << ["${foundDeviceMac}": foundDevice]
+			log.info "Added potential device with MAC $foundDeviceMac"
+		}
+	}
 }
 
 //	----- PERIODIC CLOUD MX TASKS -----
@@ -1606,6 +1892,14 @@ def removeChildDevice(alias, deviceNetworkId) {
 	} catch (Exception e) {
 		sendEvent(name: "DeviceDelete", value: "Failed to delete ${alias}")
 	}
+}
+
+// ----- Utility Functions -----------------------------------------
+private Integer convertHexToInt(hex) {
+	Integer.parseInt(hex,16)
+}
+private String convertHexToIP(hex) {
+	[convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
 }
 
 //	======== Other Application Values ==========================================================================================================================================================================
