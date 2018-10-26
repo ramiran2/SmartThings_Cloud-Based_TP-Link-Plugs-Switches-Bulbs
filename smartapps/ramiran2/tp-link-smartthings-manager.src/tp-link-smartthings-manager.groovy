@@ -173,7 +173,7 @@ def setRecommendedOptions() {
 }
 
 def startPage() {
-	settingUpdate("userSelectedManagerMode", "false", "bool")	\\	Cloud or Hub
+	settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud or Hub
 	if (!userSelectedManagerMode) {
 		setInitialStatesKasa()
 		if (userSelectedAssistant && !userSelectedManagerMode) {
