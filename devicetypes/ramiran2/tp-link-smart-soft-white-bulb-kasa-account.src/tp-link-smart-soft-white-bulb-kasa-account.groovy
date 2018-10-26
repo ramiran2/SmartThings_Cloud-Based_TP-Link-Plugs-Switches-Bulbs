@@ -247,7 +247,6 @@ def refreshResponse(cmdResponse){
 	def onOff = status.on_off
 	if (installType() == "Node Applet") {
 		if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
-			sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
 			sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 		} else {
 			if (onOff == 1) {
@@ -316,6 +315,7 @@ private sendCmdtoServer(command, hubCommand, action) {
 		} else {
 			if ("${deviceIP}" =~ null && "${gatewayIP}" =~ null) {
 				sendEvent(name: "switch", value: "unavailable", descriptionText: "Please input Device IP / Gateway IP")
+				sendEvent(name: "deviceError", value: "Please input Device IP / Gateway IP")
 				sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false, isStateChange: true)
 			} else {
 				sendCmdtoHub(command, hubCommand, action)
