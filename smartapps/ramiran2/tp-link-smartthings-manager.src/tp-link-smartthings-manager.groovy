@@ -417,6 +417,7 @@ def kasaInstallationAuthenticationPage() {
 
 // ----- Page: Hub (Bridge) Discovery ------------------------------
 def hubBridgeDiscoveryPage() {
+	checkForBridgeHub()
 	ssdpSubscribe()
 	ssdpDiscover()
 	verifyBridges()
@@ -429,11 +430,7 @@ def hubBridgeDiscoveryPage() {
 			paragraph title: "Information: ", hubBridgeDiscoveryPageText, image: getAppImg("information.png")
 		}
 		section("Bridge Controller:") {
-			input "selectedBridges", "enum", 
-			required: false, 
-			title: "Select Bridges (${options.size() ?: 0} found)", 
-			multiple: true, 
-			options: options
+			input ("userSelectedBridgeAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Bridges to Add (${state.strfoundbridge.size() ?: 0} found)", metadata: [values: state.strfoundbridge], image: getAppImg("adddevices.png"))
 		}
 	}
 }
@@ -1221,12 +1218,12 @@ def checkForDevicesHub() {
 
 def checkForBridgeHub() {
 	def bridgeIP = state.bridgeIP
-	def oldHubBridge = [:]
+	def strFoundBridge = [:]
 	def verBridges = state.bridges.findAll{ it.value.verified == true }
 	verBridges.each {
-		oldHubBridge["${it.value.bridgeMac}"] = "${it.value.bridgeIP} : ${it.value.nodeApp}"
+		strFoundBridge["${it.value.bridgeMac}"] = "${it.value.bridgeIP} : ${it.value.nodeApp}"
 	}
-	state.oldhubbridge = oldHubBridge
+	state.strfoundbridge = strFoundBridge
 }
 
 def checkForUpdates() {
@@ -1752,7 +1749,7 @@ def initialize() {
 	} else {
 		runEvery5Minutes(discoverDevices)
 		ssdpSubscribe()
-		if (selectedBridges) {
+		if (userSelectedBridgeAddHub) {
 			addBridges()
 		}
 		if (selectedDevices) {
@@ -1839,7 +1836,7 @@ void bridgeDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
 
 // ----- Add Hub Device to ST --------------------------------------
 def addBridges() {
-	selectedBridges.each { dni ->
+	userSelectedBridgeAddHub.each { dni ->
 		def selectedBridge = state.bridges.find { it.value.bridgeMac == dni }
 		def d
 		if (selectedBridge) {
