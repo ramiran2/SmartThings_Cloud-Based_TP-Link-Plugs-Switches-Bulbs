@@ -749,7 +749,7 @@ def hubUserApplicationPreferencesPage() {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
-			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png")
+			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
 			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: false, image: getAppImg("browsermode.png"))
 			if (userSelectedAppIcons && userSelectedBrowserMode && userSelectedNotification || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
