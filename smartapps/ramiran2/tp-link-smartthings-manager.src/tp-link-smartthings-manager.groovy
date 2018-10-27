@@ -44,10 +44,12 @@ preferences {
 	page(name: "kasaUserSelectionAuthenticationPage")
 	page(name: "kasaUserAuthenticationPreferencesPage")
 	page(name: "kasaComputerSelectionAuthenticationPage")
+	page(name: "kasaInstallationAuthenticationPage")
 	page(name: "hubBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "kasaAddDevicesPage")
+	page(name: "kasaInstallationAddDevicesPage")
 	page(name: "hubAddDevicesPage")
 	page(name: "kasaRemoveDevicesPage")
 	page(name: "hubRemoveDevicesPage")
@@ -99,30 +101,21 @@ def setInitialStatesKasa() {
 	}
 }
 
-// ----- UPNP Search Target Definition -----------------------------
-def getSearchTarget() {
-	def searchTarget = "upnp:rootdevice"
-}
-
 def setInitialStatesHub() {
-	log.info "Initial application state data collected."
-	if (!state.bridgeIP) {
-		state.bridgeIP = "new"
-	}
-	if (!state.bridgeDNI) {
-		state.bridgeDNI = "new"
-	}
-	if (!state.bridges) {
-		state.bridges = [:]
-	}
-	if (!state.hubdevices) {
-		state.hubdevices = [:]
-	}
-	if (!state.initFrom) {
-		state.initFrom = ""
-	}
-	if (!state.bridgePort) {
-		state.bridgePort = 8082
+	if (!state.bridgeIP) {state.bridgeIP = "new"}
+	if (!state.bridgeDNI) {state.bridgeDNI = "new"}
+	if (!state.bridges) {state.bridges = [:]}
+	if (!state.hubdevices) {state.hubdevices = [:]}
+	if (!state.bridgePort) {state.bridgePort = 8082}
+	if (!userSelectedDeveloper) {
+		if (state.bridgeIP = "new") {
+			settingUpdate("userSelectedLauncher", "false", "bool")
+			settingUpdate("userSelectedQuickControl", "false", "bool")
+		} else {
+			settingUpdate("userSelectedLauncher", "true", "bool")
+			settingUpdate("userSelectedQuickControl", "true", "bool")
+		}
+		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
 	}
 }
 
@@ -179,7 +172,11 @@ def startPage() {
 		if (userSelectedAssistant && !userSelectedManagerMode) {
 			setRecommendedOptions()
 		}
-		kasaWelcomePage()
+		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+			kasaInstallationAuthenticationPage()
+		} else {
+			kasaWelcomePage()
+		}
 	} else {
 		setInitialStatesHub()
 	}
@@ -204,7 +201,7 @@ def kasaWelcomePage() {
 			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
 		}
 		if (!userSelectedLauncher) {
-			section("Page Selector: ") {
+			section("Page Selector:") {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 				} else {
@@ -218,31 +215,31 @@ def kasaWelcomePage() {
 			}
 		}
 		if (userSelectedQuickControl) {
-			section("Device Manager: ") {
+			section("Device Manager:") {
 				href "kasaAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "kasaRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
-		section("Settings: ") {
+		section("Settings:") {
 			if (userSelectedQuickControl) {
 				href "kasaUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			}
 			href "kasaUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
-		section("Uninstall: ") {
+		section("Uninstall:") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		if (userSelectedDeveloper) {
-			section("Developer: ") {
+			section("Developer:") {
 				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			}
 		}
-		section("Help and Feedback: ") {
+		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
-		section("Changelog and About: ") {
+		section("Changelog and About:") {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 		}
@@ -264,44 +261,36 @@ def hubWelcomePage() {
 			paragraph title: "Driver Version: ", driverVersionText, image: getAppImg("devices.png")
 		}
 		if (!userSelectedLauncher) {
-			section("Page Selector: ") {
-				if (state.currentError != null) {
-					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
-				} else {
-					paragraph pageSelectorText(), image: getAppImg("pageselected.png")
-				}
-				if ("${userName}" =~ null || "${userPassword}" =~ null) {
-					href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to continue", image: getAppImg("userselectionauthenticationpage.png")
-				} else {
-					href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to continue", image: getAppImg("userselectionpage.png")
-				}
+			section("Page Selector:") {
+				paragraph pageSelectorText(), image: getAppImg("pageselected.png")
+				href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
 			}
 		}
 		if (userSelectedQuickControl) {
-			section("Device Manager: ") {
+			section("Device Manager:") {
 				href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 				href "hubRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
-		section("Settings: ") {
+		section("Settings:") {
 			if (userSelectedQuickControl) {
 				href "hubUserDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			}
 			href "hubUserApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 		}
-		section("Uninstall: ") {
+		section("Uninstall:") {
 			href "uninstallPage", title: "Uninstall Page", description: "Tap to view", image: getAppImg("uninstallpage.png")
 		}
 		if (userSelectedDeveloper) {
-			section("Developer: ") {
+			section("Developer:") {
 				href "developerPage", title: "Developer Page", description: "Tap to view", image: getAppImg("developerpage.png")
 			}
 		}
-		section("Help and Feedback: ") {
+		section("Help and Feedback:") {
 			href url: getWikiPageUrl(), style: "${strBrowserMode()}", title: "View the Projects Wiki", description: "Tap to open in browser", state: "complete", image: getAppImg("help.png")
 			href url: getIssuePageUrl(), style: "${strBrowserMode()}", title: "Report | View Issues", description: "Tap to open in browser", state: "complete", image: getAppImg("issue.png")
 		}
-		section("Changelog and About: ") {
+		section("Changelog and About:") {
 			href "changeLogPage", title: "Changelog Page", description: "Tap to view", image: getAppImg("changelogpage.png")
 			href "aboutPage", title: "About Page", description: "Tap to view", image: getAppImg("aboutpage.png")
 		}
@@ -329,14 +318,14 @@ def kasaUserSelectionAuthenticationPage() {
 			}
 			paragraph title: "Information: ", kasaUserSelectionAuthenticationPageText, image: getAppImg("information.png")
 		}
-		section("Account Configuration: ") {
+		section("Account Configuration:") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
-		section("User Configuration: ") {
+		section("User Configuration:") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 		}
-		section("Page Selector: ") {
+		section("Page Selector:") {
 			if (userSelectedOptionTwo != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -381,7 +370,7 @@ def kasaUserAuthenticationPreferencesPage() {
 			}
 			paragraph title: "Information: ", kasaUserAuthenticationPreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Account Configuration: ") {
+		section("Account Configuration:") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
@@ -410,30 +399,40 @@ def kasaComputerSelectionAuthenticationPage() {
     }
 }
 
+//	----- USER AUTHENTICATION PREFERENCES PAGE -----
+def kasaInstallationAuthenticationPage() {
+	def kasaInstallationAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
+		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
+		"action you want to complete."
+	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Setup Page - Account Login", nextPage: "kasaInstallationAddDevicesPage", install: false, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", kasaUserAuthenticationPreferencesPageText, image: getAppImg("information.png")
+		}
+		section("Account Configuration:") {
+			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
+			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
+		}
+		section("${textCopyright()}")
+	}
+}
+
 // ----- Page: Hub (Bridge) Discovery ------------------------------
 def hubBridgeDiscoveryPage() {
-	def bridgeIP = state.bridgeIP
-	state.initFrom = "bridges"
-	if (bridgeIP != "new") {
-		return deviceDiscovery()
-	}
-	def options = [:]
-	def verBridges = state.bridges.findAll{ it.value.verified == true }
-	verBridges.each {
-		def value = "$it.value.bridgeIP : $it.value.nodeApp"
-		def key = it.value.bridgeMac
-		options["${key}"] = value
-	}
 	ssdpSubscribe()
 	ssdpDiscover()
 	verifyBridges()
-	def text2 = "Please wait while we discover your TP-Link Bridge. Discovery can take "+
-				"several minutes\n\r" +
-				"If no bridges are discovered after several minutes, press DONE.  This " +
-				"will install the app.  Then re-run the application."
-	return dynamicPage(
-		name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: true, uninstall: false){
-		section(text2) {
+	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n\r" + "If no bridges are discovered after several minutes, press DONE.  This " + "will install the app.  Then re-run the application."
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: true, uninstall: false){
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubBridgeDiscoveryPageText, image: getAppImg("information.png")
+		}
+		section("Bridge Controller:") {
 			input "selectedBridges", "enum", 
 			required: false, 
 			title: "Select Bridges (${options.size() ?: 0} found)", 
@@ -468,10 +467,10 @@ def kasaUserSelectionPage() {
 			paragraph title: "Information: ", kasaUserSelectionPageText, image: getAppImg("information.png")
 			paragraph title: "Communication Error: ", errorMsgCom, image: getAppImg("error.png")
 		}
-		section("User Configuration: ") {
+		section("User Configuration:") {
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
-		section("Page Selector: ") {
+		section("Page Selector:") {
 			if (userSelectedOptionOne != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -547,7 +546,42 @@ def kasaAddDevicesPage() {
 			paragraph title: "Information: ", kasaAddDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller: ") {
+		section("Device Controller:") {
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+		}
+		section("${textCopyright()}")
+	}
+}
+
+def kasaInstallationAddDevicesPage() {
+	checkForDevicesKasa()
+	def errorMsgDev = "None"
+	if (state.kasadevices == [:]) {
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
+		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
+	}
+	if (state.newkasadevices == [:]) {
+		errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
+	}
+	def kasaInstallationAddDevicesPageText = "Devices that have not been previously installed and are not in 'Local " +
+		"WiFi control only' will appear below. Tap below to see the list of " +
+		"TP-Link Kasa Devices available select the ones you want to connect to " +
+		"SmartThings.\n" + "Press Done when you have selected the devices you " +
+		"wish to add, then press Save to add the devices to your SmartThings account."
+	return dynamicPage (name: "kasaInstallationAddDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			if (state.TpLinkToken != null) {
+				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
+			} else {
+				paragraph tokenInfoOffline(), image: getAppImg("error.png")
+			}
+			paragraph title: "Information: ", kasaAddDevicesPageText, image: getAppImg("information.png")
+			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
+		}
+		section("Device Controller:") {
 			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
@@ -567,7 +601,7 @@ def hubAddDevicesPage() {
 			paragraph title: "Information: ", hubAddDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller: ") {
+		section("Device Controller:") {
 			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
@@ -603,7 +637,7 @@ def kasaRemoveDevicesPage() {
 			paragraph title: "Information: ", kasaRemoveDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller: ") {
+		section("Device Controller:") {
 			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
@@ -623,7 +657,7 @@ def hubRemoveDevicesPage() {
 			paragraph title: "Information: ", hubRemoveDevicesPageText, image: getAppImg("information.png")
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
-		section("Device Controller: ") {
+		section("Device Controller:") {
 			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
@@ -658,7 +692,7 @@ def kasaUserApplicationPreferencesPage() {
 			}
 			paragraph title: "Information: ", kasaUserApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Application Configuration: ") {
+		section("Application Configuration:") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
@@ -715,7 +749,7 @@ def hubUserApplicationPreferencesPage() {
 		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			paragraph title: "Information: ", hubUserApplicationPreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Application Configuration: ") {
+		section("Application Configuration:") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
@@ -757,7 +791,7 @@ def kasaUserDevicePreferencesPage() {
 			}
 			paragraph title: "Information: ", kasaUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Device Configuration: ") {
+		section("Device Configuration:") {
 			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
@@ -779,7 +813,7 @@ def hubUserDevicePreferencesPage() {
 		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			paragraph title: "Information: ", hubUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
-		section("Device Configuration: ") {
+		section("Device Configuration:") {
 			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("deviceIPAddress", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
 			input ("gatewayIPAddress", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
@@ -812,17 +846,17 @@ def kasaUserSelectionTokenPage() {
 			paragraph title: "Information: ", kasaUserSelectionTokenPageText, image: getAppImg("information.png")
 			paragraph title: "Account Error: ", errorMsgTok, image: getAppImg("error.png")
 		}
-		section("Account Status: ") {
+		section("Account Status:") {
 			if (state.TpLinkToken != null) {
 				paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
 		}
-		section("User Configuration: ") {
+		section("User Configuration:") {
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
-		section("Command Status: ") {
+		section("Command Status:") {
 			if (userSelectedOptionThree != null) {
 				if (state.currentError != null) {
 					paragraph pageSelectorErrorText(), image: getAppImg("error.png")
@@ -876,7 +910,7 @@ def developerPage() {
 			paragraph title: "Managed Devices: ", "${state.oldkasadevices}", image: getAppImg("devices.png")
 			paragraph title: "New Devices: ", "${state.newkasadevices}", image: getAppImg("devices.png")
 		}
-		section("Page Selector: ") {
+		section("Page Selector:") {
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
@@ -887,6 +921,7 @@ def developerPage() {
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
+			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
 			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
@@ -956,31 +991,31 @@ def developerTestingPage() {
 			paragraph title: "Current Error: ", "${state.currentError}", image: getAppImg("error.png")
 			paragraph title: "Error Messages: ", "${errMsg}", image: getAppImg("error.png")
 		}
-		section("Information and Diagnostics: ") {
+		section("Information and Diagnostics:") {
 			paragraph tokenInfoOnline(), image: getAppImg("tokenactive.png")
 			paragraph tokenInfoOffline(), image: getAppImg("error.png")
 		}
-		section("Page Selector: ") {
+		section("Page Selector:") {
 			paragraph pageSelectorErrorText(), image: getAppImg("error.png")
 			paragraph sendingCommandSuccess(), image: getAppImg("sent.png")
 			paragraph sendingCommandFailed(), image: getAppImg("issue.png")
 			paragraph pageSelectorText(), image: getAppImg("pageselected.png")
 			paragraph pageSelectorNullText(), image: getAppImg("pickapage.png")
 		}
-		section("Account Configuration: ") {
+		section("Account Configuration:") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false,image: getAppImg("email.png"))
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
-		section("User Configuration: ") {
+		section("User Configuration:") {
 			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
-		section("Device Controller: ") {
+		section("Device Controller:") {
 			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
 			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
-		section("Application Configuration: ") {
+		section("Application Configuration:") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
@@ -993,7 +1028,7 @@ def developerTestingPage() {
 			input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 		}
-		section("Device Configuration: ") {
+		section("Device Configuration:") {
 			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
@@ -1011,11 +1046,11 @@ def hiddenPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Members: ") {
+		section("Members:") {
 			paragraph xkMembersInfo, image: getAppImg("xkillerclanv2.png")
 			paragraph xkMembers, image: getAppImg("family.png")
 		}
-		section("Games: ") {
+		section("Games:") {
 			paragraph xkGameInfo, image: getAppImg("xkillerclanv1.png")
 			paragraph "Halo 2 For Windows Vista - RIP late 2015", image: getAppImg("halo2.png")
 			paragraph "Battlefield 3", image: getAppImg("battlefield3.png")
@@ -1032,12 +1067,12 @@ def hiddenPage() {
 			paragraph "Vainglory - Guild: XKILLER, Team: xKiller Clan", image: getAppImg("vainglory.png")
 			paragraph "Minecraft Bedrock Edition - Realm: 0EOy4uYzhxQ", image: getAppImg("minecraft.png")
 		}
-		section("Easter Eggs: ") {
+		section("Easter Eggs:") {
 			href url: linkYoutubeEE1(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #1", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE2(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #2", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 			href url: linkYoutubeEE3(), style: "${strBrowserMode()}", required: false, title: "Youtube Link #3", description: "Tap to open in browser", state: "complete", image: getAppImg("youtube.png")
 		}
-		section("Contact: ") {
+		section("Contact:") {
 			href url: linkDiscord(), style: "${strBrowserMode()}", required: false, title: "Discord", description: "Tap to open in browser", state: "complete", image: getAppImg("discord.png")
 			href url: linkWaypoint(), style: "${strBrowserMode()}", required: false, title: "Halo Waypoint", description: "Tap to open in browser", state: "complete", image: getAppImg("waypoint.png")
 			href url: linkXbox(), style: "${strBrowserMode()}", required: false, title: "Xbox", description: "Tap to open in browser", state: "complete", image: getAppImg("xbox.png")
@@ -1054,11 +1089,11 @@ def aboutPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
 		}
-		section("Donations: ") {
+		section("Donations:") {
 			paragraph title: "Donations (@DaveGut)", "Donate to a charity", state: "complete", image: getAppImg("heart.png")
 			href url: textDonateLinkAntR(), style: "${strBrowserMode()}", required: false, title: "Donations (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("paypal.png")
 		}
-		section("Credits: ") {
+		section("Credits:") {
 			paragraph title: "Creator: ", "Dave G. (@DaveGut)", state: "complete", image: getAppImg("dave.png")
 			paragraph title: "Co-Author: ", "Anthony R. (@ramiran2)", state: "complete", image: getAppImg("bigmac.png")
 			if ("${restrictedRecordPasswordPrompt}" =~ "Mac5089") {
@@ -1066,15 +1101,15 @@ def aboutPage() {
 			}
 			paragraph title: "Collaborator: ", "Anthony S. (@tonesto7)", state: "complete", image: getAppImg("tonesto7.png")
 		}
-		section("Application Changes Details: ") {
+		section("Application Changes Details:") {
 			href "changeLogPage", title: "View App Revision History", description: "Tap to view", image: getAppImg("changelogpage.png")
 		}
-		section("GitHub: ") {
+		section("GitHub:") {
 			href url: linkGitHubDavG(), style: "${strBrowserMode()}", required: false, title: "Dave G. (@DaveGut)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: linkGitHubAntR(), style: "${strBrowserMode()}", required: false, title: "Anthony R. (@ramiran2)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 			href url: linkGitHubAntS(), style: "${strBrowserMode()}", required: false, title: "Anthony S. (@tonesto7)", description: "Tap to open in browser", state: "complete", image: getAppImg("github.png")
 		}
-		section("Licensing Information: ") {
+		section("Licensing Information:") {
 			paragraph "${textLicense()}"
 		}
 		section("${textCopyright()}")
@@ -1099,7 +1134,7 @@ def changeLogPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Check for Updates: ") {
+		section("Check for Updates:") {
 			if (childDevices) {
 				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
 					paragraph upToDate, image: getAppImg("success.png")
@@ -1130,7 +1165,7 @@ def changeLogPage() {
 				}
 			}
 		}
-		section("Changelog: ") {
+		section("Changelog:") {
 			paragraph title: "What's New in this Release...", "", state: "complete", image: getAppImg("new.png")
 			paragraph appVerInfo()
 		}
@@ -1145,7 +1180,7 @@ def uninstallPage() {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
-		section("Information: ") {
+		section("Information:") {
 			paragraph title: "", uninstallPageText, image: getAppImg("information.png")
 		}
 		section("${textCopyright()}")
@@ -1156,31 +1191,46 @@ def uninstallPage() {
 def checkForDevicesKasa() {
 	getDevices()
 	def devices = state.kasadevices
-	def newDevices = [:]
-	def oldDevices = [:]
+	def newKasaDevices = [:]
+	def oldKasaDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
 		if (isChild) {
-			oldDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			oldKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 		if (!isChild) {
-			newDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
-	state.oldkasadevices = oldDevices
-	state.newkasadevices = newDevices
+	state.oldkasadevices = oldKasaDevices
+	state.newkasadevices = newKasaDevices
 }
 
 def checkForDevicesHub() {
-	state.initFrom = "devices"
-	def options = [:]
 	def devices = state.hubdevices
+	def newHubDevices = [:]
+	def oldHubDevices = [:]
 	devices.each {
-		def value = "$it.value.deviceIP : $it.value.deviceAlias"
-		def key = it.value.deviceMac
-		options["${key}"] = value
+		def isChild = getChildDevice(it.value.deviceMac)
+		if (isChild) {
+			oldHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+		}
 	}
-	discoverDevices()
+	state.oldhubdevices = oldHubDevices
+	state.newhubdevices = newHubDevices
+}
+
+def checkForBridgeHub() {
+	def bridgeIP = state.bridgeIP
+	def oldHubBridge = [:]
+	def verBridges = state.bridges.findAll{ it.value.verified == true }
+	verBridges.each {
+		oldHubBridge["${it.value.bridgeMac}"] = "${it.value.bridgeIP} : ${it.value.nodeApp}"
+	}
+	state.oldhubbridge = oldHubBridge
 }
 
 def checkForUpdates() {
@@ -1706,15 +1756,12 @@ def initialize() {
 	} else {
 		runEvery5Minutes(discoverDevices)
 		ssdpSubscribe()
-		if (state.initFrom == "bridges") {
 			if (selectedBridges) {
 				addBridges()
 			}
-		} else if (state.initFrom == "devices") {
 			if (selectedDevices) {
 				addDevicesKasa()
 			}
-			state.initFrom = ""
 		}
 	}
 }
@@ -1906,6 +1953,11 @@ private Integer convertHexToInt(hex) {
 }
 private String convertHexToIP(hex) {
 	[convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
+}
+
+// ----- UPNP Search Target Definition -----------------------------
+def getSearchTarget() {
+	def searchTarget = "upnp:rootdevice"
 }
 
 //	======== Other Application Values ==========================================================================================================================================================================
