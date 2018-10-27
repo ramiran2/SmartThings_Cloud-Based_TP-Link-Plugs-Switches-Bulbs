@@ -145,7 +145,7 @@ def welcomePage()	{
 					href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				} else {
-					href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+					href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				}
 			}
@@ -229,7 +229,7 @@ def kasaUserSelectionAuthenticationPage()	{
 				settingRemove("userName")
 				settingRemove("userPassword")
 				state.TpLinkToken = null
-				href "welcomePage", title: "Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
+				href "welcomePage", title: "Dashboard - Cloud Controller", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -583,9 +583,7 @@ def userDevicePreferencesPage()	{
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
 def kasaUserAuthenticationPreferencesPage()	{
-	def kasaUserAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " +
-		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete."
+	def kasaUserAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " + "enter your Username and Password for TP-Link (same as Kasa app) and the " + "action you want to complete."
 	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "Login Settings Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -696,26 +694,25 @@ def developerPage()	{
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "welcomePage", title: "Cloud Controller Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
-			href "welcomePage", title: "Hub Controller Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "welcomePage", title: "Dashboard - Cloud/Hub Controller", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
-			href "hubUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
+			href "kasaInstallationAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
+			href "kasaInstallationTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
+			href "hubInstallationBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
 			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "userAddDevicesPage", title: "Cloud Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "userAddDevicesPage", title: "Hub Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "userAddDevicesPage", title: "Cloud Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "hubAddDevicesPage", title: "Hub Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 			href "userRemoveDevicesPage", title: "Cloud Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-			href "userRemoveDevicesPage", title: "Hub Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-			href "userApplicationPreferencesPage", title: "Cloud Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
-			href "userApplicationPreferencesPage", title: "Hub Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
-			href "userDevicePreferencesPage", title: "Cloud Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-			href "userDevicePreferencesPage", title: "Hub Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
+			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
+			href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			href "kasaUserSelectionTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			if (userSelectedTestingPage) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
