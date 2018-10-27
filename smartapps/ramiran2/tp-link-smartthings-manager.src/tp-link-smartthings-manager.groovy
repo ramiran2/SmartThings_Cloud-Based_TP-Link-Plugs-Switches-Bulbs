@@ -246,7 +246,7 @@ def kasaWelcomePage() {
 //	----- WELCOME PAGE -----
 def hubWelcomePage() {
 	def strLatestDriverVersion = textDriverVersion()
-	def hubWelcomePageText = "This SA installs and manages TP-Link bulbs, plugs, and switches DHs as well as " + "the associated Bridge.  You will encounter other pages in the following order. " + "NEXT goes to Bridge Discovery (no bridge detected) or Device Discovery. " + "Bridge Discovery - Does the initial discover and user selection of the Bridge " + "between SmartThings and the TP-Link Devices.  Entered only on initial " + " installation.  DONE installs the selected bridge and exits the program." + "Device Discovery - Discovers and installs the TP-Link Devices.  Also used for " + "updating IP addresses and for discovering added devices.  DONE installs the " + "selected devices then exits the program."
+	def hubWelcomePageText = "This SA installs and manages TP-Link bulbs, plugs, and switches DHs as well as " + "the associated Bridge. You will encounter other pages in the following order. " + "NEXT goes to Bridge Discovery (no bridge detected) or Device Discovery. " + "Bridge Discovery - Does the initial discover and user selection of the Bridge " + "between SmartThings and the TP-Link Devices. Entered only on initial " + " installation. DONE installs the selected bridge and exits the program." + "Device Discovery - Discovers and installs the TP-Link Devices. Also used for " + "updating IP addresses and for discovering added devices. DONE installs the " + "selected devices then exits the program."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
 	return dynamicPage (name: "hubWelcomePage", title: "Introduction Page - Hub Mode", install: false, uninstall: false) {
 		section("") {
@@ -392,7 +392,7 @@ def kasaComputerSelectionAuthenticationPage() {
 			} else {
 				return kasaUserSelectionPage()
 			}
-    }
+  }
 }
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
@@ -421,8 +421,8 @@ def hubBridgeDiscoveryPage() {
 	ssdpSubscribe()
 	ssdpDiscover()
 	verifyBridges()
-	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n\r" + "If no bridges are discovered after several minutes, press DONE.  This " + "will install the app.  Then re-run the application."
-	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: true, uninstall: false){
+	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: false, uninstall: false){
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -492,7 +492,7 @@ def kasaUserSelectionPage() {
 
 //	----- COMPUTER SELECTION PAGE -----
 def kasaComputerSelectionPage() {
-    switch (userSelectedOptionOne) {
+  switch (userSelectedOptionOne) {
 		case "Initial Installation" :
 			return kasaUserSelectionAuthenticationPage()
 			break
@@ -507,7 +507,7 @@ def kasaComputerSelectionPage() {
 			break
 		default:
 			return kasaWelcomePage()
-    }
+  }
 }
 
 //	----- ADD DEVICES PAGE -----
@@ -526,7 +526,7 @@ def kasaAddDevicesPage() {
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to add, then press Save to add the devices to your SmartThings account."
-	return dynamicPage (name: "kasaAddDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaAddDevicesPage", title: "Device Installer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -583,10 +583,11 @@ def kasaInstallationAddDevicesPage() {
 
 //	----- ADD DEVICES PAGE -----
 def hubAddDevicesPage() {
-	def oldDevices = ["null" : "To added at a later date"]
+	checkForDevicesHub()
+	discoverDevices()
 	def errorMsgDev = "None"
-	def hubAddDevicesPageText = "None"
-	return dynamicPage (name: "hubAddDevicesPage", title: "Device Installer Page", install: true, uninstall: false) {
+	def hubAddDevicesPageText = "Discovering TP-Link Devices on your LAN. This may take several minutes. " + "You can follow the process by looking at the count of devices below. " + "When you are ready to select devices to install, touch the area below."
+	return dynamicPage (name: "hubAddDevicesPage", title: "Device Installer Page", refreshInterval: 5, install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -595,7 +596,7 @@ def hubAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newhubdevices.size() ?: 0} found)", metadata: [values: state.newhubdevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -617,7 +618,7 @@ def kasaRemoveDevicesPage() {
 		"TP-Link Kasa Devices available select the ones you want to connect to " +
 		"SmartThings.\n" + "Press Done when you have selected the devices you " +
 		"wish to remove, then Press Save to remove the devices to your SmartThings account."
-	return dynamicPage (name: "kasaRemoveDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaRemoveDevicesPage", title: "Device Uninstaller Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -639,10 +640,9 @@ def kasaRemoveDevicesPage() {
 
 //	----- REMOVE DEVICES PAGE -----
 def hubRemoveDevicesPage() {
-	def oldDevices = ["null" : "To added at a later date"]
 	def errorMsgDev = "None"
 	def hubRemoveDevicesPageText = "Devices that have been installed "
-	return dynamicPage (name: "hubRemoveDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
+	return dynamicPage (name: "hubRemoveDevicesPage", title: "Device Uninstaller Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -673,7 +673,7 @@ def kasaUserApplicationPreferencesPage() {
 	}
 	def kasaUserApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
-	return dynamicPage (name: "kasaUserApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaUserApplicationPreferencesPage", title: "Application Settings Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -735,7 +735,7 @@ def hubUserApplicationPreferencesPage() {
 	}
 	def hubUserApplicationPreferencesPageText = "Welcome to the application settings page. \n" +
 		"Recommended options: Will allow your device to pick a option for you that you are likely to pick."
-	return dynamicPage (name: "hubUserApplicationPreferencesPage", title: "Application Settings Page", install: true, uninstall: false) {
+	return dynamicPage (name: "hubUserApplicationPreferencesPage", title: "Application Settings Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -772,7 +772,7 @@ def kasaUserDevicePreferencesPage() {
 	def kasaUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
-	return dynamicPage (name: "kasaUserDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
+	return dynamicPage (name: "kasaUserDevicePreferencesPage", title: "Device Preferences Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -795,11 +795,10 @@ def kasaUserDevicePreferencesPage() {
 
 //	----- USER DEVICE PREFERENCES PAGE -----
 def hubUserDevicePreferencesPage() {
-	def oldDevices = ["null" : "To added at a later date"]
 	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
-	return dynamicPage (name: "hubUserDevicePreferencesPage", title: "Device Preferences Page", install: true, uninstall: false) {
+	return dynamicPage (name: "hubUserDevicePreferencesPage", title: "Device Preferences Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -1752,7 +1751,7 @@ def initialize() {
 		if (userSelectedBridgeAddHub) {
 			addBridges()
 		}
-		if (selectedDevices) {
+		if (userSelectedDevicesAddHub) {
 			addDevicesKasa()
 		}
 	}
@@ -1763,7 +1762,7 @@ def uninstalled() {
 	uninstManagerApp()
 }
 
-// ----- Child-called IP Refresh Function  -------------------------
+// ----- Child-called IP Refresh Function -------------------------
 def checkDeviceIPs() {
 	ssdpDiscover()
 	runIn(30, discoverDevices)
@@ -1793,7 +1792,7 @@ def ssdpHandler(evt) {
 			if (bridgeDNI == mac) {
 				state.bridgeIP = ip
 				def allDevices = getChildDevices()
-			   	allDevices.each {
+			  	allDevices.each {
 					it.syncBridgeIP(ip)
 					log.info "The Hub IP Address was updated to $d.bridgeIP"
 					discoverDevices()
@@ -1871,7 +1870,7 @@ void parseDiscoveredDevices(response) {
 	def cmdResponse = response.headers["cmd-response"]
 	def foundDevices = parseJson(cmdResponse)
 	if (foundDevices == ":") {
-		log.error "Found Devices Failed.  Rerun!"
+		log.error "Found Devices Failed. Rerun!"
 	}
 	def devices = state.hubdevices
 	foundDevices.each {
@@ -1892,7 +1891,7 @@ void parseDiscoveredDevices(response) {
 			def hub = response.hubId
 			def foundDevice = foundDevices."${foundDeviceMac}"
 			foundDevice << ["hub": hub]
-		   	devices << ["${foundDeviceMac}": foundDevice]
+		  	devices << ["${foundDeviceMac}": foundDevice]
 			log.info "Added potential device with MAC $foundDeviceMac"
 		}
 	}
