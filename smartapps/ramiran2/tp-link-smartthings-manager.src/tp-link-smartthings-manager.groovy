@@ -46,11 +46,13 @@ preferences {
 	page(name: "kasaComputerSelectionAuthenticationPage")
 	page(name: "kasaInstallationAuthenticationPage")
 	page(name: "hubBridgeDiscoveryPage")
+	page(name: "hubInstallationBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "kasaAddDevicesPage")
 	page(name: "kasaInstallationAddDevicesPage")
 	page(name: "hubAddDevicesPage")
+	page(name: "hubInstallationAddDevicesPage")
 	page(name: "kasaRemoveDevicesPage")
 	page(name: "hubRemoveDevicesPage")
 	page(name: "kasaUserApplicationPreferencesPage")
@@ -66,7 +68,7 @@ preferences {
 	page(name: "uninstallPage")
 }
 
-def setInitialStatesKasa() {
+def setInitialStatesKasa()	{
 	if (!state.TpLinkToken) {state.TpLinkToken = null}
 	if (!state.kasadevices) {state.kasadevices = [:]}
 	if (!state.currentError) {state.currentError = null}
@@ -87,6 +89,7 @@ def setInitialStatesKasa() {
 		settingRemove("userSelectedOptionThree")
 	}
 	if (!userSelectedDeveloper) {
+		settingUpdate("userSelectedLauncher", "true", "bool")
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
 			state.TpLinkToken = null
 			state.currentError = null
@@ -99,13 +102,17 @@ def setInitialStatesKasa() {
 	}
 }
 
-def setInitialStatesHub() {
+def setInitialStatesHub()	{
 	if (!state.bridgeIP) {state.bridgeIP = "new"}
 	if (!state.bridgeDNI) {state.bridgeDNI = "new"}
 	if (!state.bridges) {state.bridges = [:]}
 	if (!state.hubdevices) {state.hubdevices = [:]}
 	if (!state.bridgePort) {state.bridgePort = 8082}
+	settingRemove("userSelectedDevicesRemoveHub")
+	settingRemove("userSelectedDevicesAddHub")
+	settingRemove("userSelectedDevicesToUpdateHub")
 	if (!userSelectedDeveloper) {
+		settingUpdate("userSelectedLauncher", "true", "bool")
 		if (state.bridgeIP == "new") {
 			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
@@ -115,7 +122,7 @@ def setInitialStatesHub() {
 	}
 }
 
-def cleanStorage() {
+def cleanStorage()	{
 	atomicState?.devManVer = null
 	atomicState?.devTWBVer = null
 	atomicState?.devSWBVer = null
@@ -127,7 +134,7 @@ def cleanStorage() {
 	atomicState?.devVerLnk = null
 }
 
-def setRecommendedOptions() {
+def setRecommendedOptions()	{
 	def childDevices = app.getChildDevices(true)
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingUpdate("userSelectedOptionTwo", "Activate Account", "enum")
@@ -161,11 +168,11 @@ def setRecommendedOptions() {
 	}
 }
 
-def startPage() {
+def startPage()	{
 	settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud or Hub
 	if (!userSelectedManagerMode) {
 		setInitialStatesKasa()
-		if (userSelectedAssistant && !userSelectedManagerMode) {
+		if (userSelectedAssistant) {
 			setRecommendedOptions()
 		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
@@ -179,11 +186,11 @@ def startPage() {
 }
 
 //	----- WELCOME PAGE -----
-def kasaWelcomePage() {
+def kasaWelcomePage()	{
 	def strLatestDriverVersion = textDriverVersion()
 	def kasaWelcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "kasaWelcomePage", title: "Introduction Page - Cloud Mode", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaWelcomePage", title: "Dashboard - Cloud Controller", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -244,11 +251,11 @@ def kasaWelcomePage() {
 }
 
 //	----- WELCOME PAGE -----
-def hubWelcomePage() {
+def hubWelcomePage()	{
 	def strLatestDriverVersion = textDriverVersion()
 	def hubWelcomePageText = "This SA installs and manages TP-Link bulbs, plugs, and switches DHs as well as " + "the associated Bridge. You will encounter other pages in the following order. " + "NEXT goes to Bridge Discovery (no bridge detected) or Device Discovery. " + "Bridge Discovery - Does the initial discover and user selection of the Bridge " + "between SmartThings and the TP-Link Devices. Entered only on initial " + " installation. DONE installs the selected bridge and exits the program." + "Device Discovery - Discovers and installs the TP-Link Devices. Also used for " + "updating IP addresses and for discovering added devices. DONE installs the " + "selected devices then exits the program."
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
-	return dynamicPage (name: "hubWelcomePage", title: "Introduction Page - Hub Mode", install: false, uninstall: false) {
+	return dynamicPage (name: "hubWelcomePage", title: "Dashboard - Hub Controller", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -295,7 +302,7 @@ def hubWelcomePage() {
 }
 
 //	----- USER SELECTION AUTHENTICATION PAGE -----
-def kasaUserSelectionAuthenticationPage() {
+def kasaUserSelectionAuthenticationPage()	{
 	def kasaUserSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete. " + "\nAvailable actions: \n" +
@@ -342,7 +349,7 @@ def kasaUserSelectionAuthenticationPage() {
 				settingRemove("userName")
 				settingRemove("userPassword")
 				state.TpLinkToken = null
-				href "kasaWelcomePage", title: "Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+				href "kasaWelcomePage", title: "Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -350,7 +357,7 @@ def kasaUserSelectionAuthenticationPage() {
 }
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
-def kasaUserAuthenticationPreferencesPage() {
+def kasaUserAuthenticationPreferencesPage()	{
 	def kasaUserAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
@@ -375,7 +382,7 @@ def kasaUserAuthenticationPreferencesPage() {
 }
 
 //	----- COMPUTER SELECTION AUTHENTICATION PAGE -----
-def kasaComputerSelectionAuthenticationPage() {
+def kasaComputerSelectionAuthenticationPage()	{
 	switch (userSelectedOptionTwo) {
 		case "Update Account" :
 			return kasaUserSelectionTokenPage()
@@ -392,15 +399,15 @@ def kasaComputerSelectionAuthenticationPage() {
 			} else {
 				return kasaUserSelectionPage()
 			}
-  }
+	}
 }
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
-def kasaInstallationAuthenticationPage() {
+def kasaInstallationAuthenticationPage()	{
 	def kasaInstallationAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
-	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Setup Page - Account Login", nextPage: "kasaInstallationAddDevicesPage", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", nextPage: "kasaInstallationAddDevicesPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -416,7 +423,7 @@ def kasaInstallationAuthenticationPage() {
 }
 
 // ----- Page: Hub (Bridge) Discovery ------------------------------
-def hubBridgeDiscoveryPage() {
+def hubBridgeDiscoveryPage()	{
 	checkForBridgeHub()
 	ssdpSubscribe()
 	ssdpDiscover()
@@ -436,7 +443,7 @@ def hubBridgeDiscoveryPage() {
 }
 
 //	----- USER SELECTION PAGE -----
-def kasaUserSelectionPage() {
+def kasaUserSelectionPage()	{
 	def kasaUserSelectionPageText = "Available actions: \n" +
 		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n" +
 		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n" +
@@ -491,7 +498,7 @@ def kasaUserSelectionPage() {
 }
 
 //	----- COMPUTER SELECTION PAGE -----
-def kasaComputerSelectionPage() {
+def kasaComputerSelectionPage()	{
   switch (userSelectedOptionOne) {
 		case "Initial Installation" :
 			return kasaUserSelectionAuthenticationPage()
@@ -507,11 +514,11 @@ def kasaComputerSelectionPage() {
 			break
 		default:
 			return kasaWelcomePage()
-  }
+	}
 }
 
 //	----- ADD DEVICES PAGE -----
-def kasaAddDevicesPage() {
+def kasaAddDevicesPage()	{
 	checkForDevicesKasa()
 	def errorMsgDev = "None"
 	if (state.kasadevices == [:]) {
@@ -546,7 +553,7 @@ def kasaAddDevicesPage() {
 	}
 }
 
-def kasaInstallationAddDevicesPage() {
+def kasaInstallationAddDevicesPage()	{
 	checkForDevicesKasa()
 	def errorMsgDev = "None"
 	if (state.kasadevices == [:]) {
@@ -582,7 +589,7 @@ def kasaInstallationAddDevicesPage() {
 }
 
 //	----- ADD DEVICES PAGE -----
-def hubAddDevicesPage() {
+def hubAddDevicesPage()	{
 	checkForDevicesHub()
 	discoverDevices()
 	def errorMsgDev = "None"
@@ -603,7 +610,7 @@ def hubAddDevicesPage() {
 }
 
 //	----- REMOVE DEVICES PAGE -----
-def kasaRemoveDevicesPage() {
+def kasaRemoveDevicesPage()	{
 	def errorMsgDev = "None"
 	checkForDevicesKasa()
 	if (state.kasadevices == [:]) {
@@ -639,7 +646,7 @@ def kasaRemoveDevicesPage() {
 }
 
 //	----- REMOVE DEVICES PAGE -----
-def hubRemoveDevicesPage() {
+def hubRemoveDevicesPage()	{
 	def errorMsgDev = "None"
 	def hubRemoveDevicesPageText = "Devices that have been installed "
 	return dynamicPage (name: "hubRemoveDevicesPage", title: "Device Uninstaller Page", install: false, uninstall: false) {
@@ -651,14 +658,14 @@ def hubRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
 }
 
 //	----- USER APPLICATION PREFERENCES PAGE -----
-def kasaUserApplicationPreferencesPage() {
+def kasaUserApplicationPreferencesPage()	{
 	def hiddenRecordInput = 0
 	def hiddenDeveloperInput = 0
 	if (userSelectedDeveloper) {
@@ -720,7 +727,7 @@ def kasaUserApplicationPreferencesPage() {
 }
 
 //	----- USER APPLICATION PREFERENCES PAGE -----
-def hubUserApplicationPreferencesPage() {
+def hubUserApplicationPreferencesPage()	{
 	def hiddenRecordInput = 0
 	def hiddenDeveloperInput = 0
 	if (userSelectedDeveloper) {
@@ -767,7 +774,7 @@ def hubUserApplicationPreferencesPage() {
 }
 
 //	----- USER DEVICE PREFERENCES PAGE -----
-def kasaUserDevicePreferencesPage() {
+def kasaUserDevicePreferencesPage()	{
 	checkForDevicesKasa()
 	def kasaUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
@@ -794,7 +801,7 @@ def kasaUserDevicePreferencesPage() {
 }
 
 //	----- USER DEVICE PREFERENCES PAGE -----
-def hubUserDevicePreferencesPage() {
+def hubUserDevicePreferencesPage()	{
 	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
 		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
 		"After that you may procide to save by clicking the save button."
@@ -817,7 +824,7 @@ def hubUserDevicePreferencesPage() {
 }
 
 //	----- TOKEN MANAGER PAGE -----
-def kasaUserSelectionTokenPage() {
+def kasaUserSelectionTokenPage()	{
 	def kasaUserSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" +
 		"\nAvailable actions:\n" +
 		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
@@ -873,7 +880,7 @@ def kasaUserSelectionTokenPage() {
 }
 
 //	----- DEVELOPER PAGE -----
-def developerPage() {
+def developerPage()	{
 	cleanStorage()
 	checkForUpdates()
 	checkForDevicesKasa()
@@ -906,8 +913,8 @@ def developerPage() {
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "kasaWelcomePage", title: "Cloud Controller Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
-			href "hubWelcomePage", title: "Hub Controller Introduction Page", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "kasaWelcomePage", title: "Cloud Controller Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "hubWelcomePage", title: "Hub Controller Dashboard", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			href "hubUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			if (userSelectedTestingPage) {
@@ -943,7 +950,7 @@ def developerPage() {
 }
 
 //	----- DEVELOPER TESTING PAGE -----
-def developerTestingPage() {
+def developerTestingPage()	{
 	checkForDevicesKasa()
 	def errorMsgCom = "None"
 	def errorMsgDev = "None"
@@ -1030,7 +1037,7 @@ def developerTestingPage() {
 }
 
 //	----- HIDDEN PAGE -----
-def hiddenPage() {
+def hiddenPage()	{
 	def xkMembersInfo = "Although most of these members have left here is a complete list of all the members we had"
 	def xkMembers = "xKllerBOSSXXX, xKillerDDigital, xKillerIntense, xKillerMaverick, xKillerKittyKat, xKillerPP, xKillerBrute, xKillerBSOD, xKillerFoxy, xKillerTricky, xKillerReaper, xKillerPain, xKillerRobot, xKillerSasha, XKillerAwesomer, xKillerSonic, xKillerChakra, xKillerDoobage, xKillerSeki, xKillerEvo, xKillerSubXero, xKillerCali, xKillerAsh, xKillerTruKillah,xKillerSierra, Weirdowack"
 	def xkGameInfo = "Although we may not play most of these games anymore but as a bunch of friends and some family had fun along the way but i guess some things just don't last"
@@ -1076,7 +1083,7 @@ def hiddenPage() {
 }
 
 //	----- ABOUT PAGE -----
-def aboutPage() {
+def aboutPage()	{
 	dynamicPage (name: "aboutPage", title: "About Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png", true)
@@ -1109,7 +1116,7 @@ def aboutPage() {
 }
 
 //	----- CHANGELOG PAGE -----
-def changeLogPage() {
+def changeLogPage()	{
 	cleanStorage()
 	checkForUpdates()
 	def intUpdateCheckOne = 0
@@ -1166,7 +1173,7 @@ def changeLogPage() {
 }
 
 //	----- UNINSTALL PAGE -----
-def uninstallPage() {
+def uninstallPage()	{
 	def uninstallPageText = "This will uninstall the All Child Devices including this Application with all it's user data. \nPlease make sure that any devices created by this app are removed from any routines/rules/smartapps before tapping Remove."
 	dynamicPage (name: "uninstallPage", title: "Uninstall Page", install: false, uninstall: true) {
 		section("") {
@@ -1180,7 +1187,7 @@ def uninstallPage() {
 	}
 }
 
-def checkForDevicesKasa() {
+def checkForDevicesKasa()	{
 	getDevices()
 	def devices = state.kasadevices
 	def newKasaDevices = [:]
@@ -1198,7 +1205,7 @@ def checkForDevicesKasa() {
 	state.newkasadevices = newKasaDevices
 }
 
-def checkForDevicesHub() {
+def checkForDevicesHub()	{
 	def devices = state.hubdevices
 	def newHubDevices = [:]
 	def oldHubDevices = [:]
@@ -1215,7 +1222,7 @@ def checkForDevicesHub() {
 	state.newhubdevices = newHubDevices
 }
 
-def checkForBridgeHub() {
+def checkForBridgeHub()	{
 	def bridgeIP = state.bridgeIP
 	def strFoundBridge = [:]
 	def verBridges = state.bridges.findAll{ it.value.verified == true }
@@ -1225,7 +1232,7 @@ def checkForBridgeHub() {
 	state.strfoundbridge = strFoundBridge
 }
 
-def checkForUpdates() {
+def checkForUpdates()	{
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
 	def intMessage = 0
@@ -1336,7 +1343,7 @@ def checkForUpdates() {
 	}
 }
 
-def updatePreferences() {
+def updatePreferences()	{
 	userSelectedDevicesToUpdateKasa.each {
 		def child = getChildDevice(it)
 		child.setLightTransTime(userLightTransTime)
@@ -1367,7 +1374,7 @@ void settingRemove(name) {
 	if(name) { app?.deleteSetting("$name") }
 }
 
-def getDevices() {
+def getDevices()	{
 	def currentDevices = getDeviceData()
 	state.kasadevices = [:]
 	def devices = state.kasadevices
@@ -1387,8 +1394,25 @@ def getDevices() {
 	}
 }
 
-def removeDevices() {
+def removeDevicesKasa()	{
 	userSelectedDevicesRemoveKasa.each { dni ->
+		try{
+			def isChild = getChildDevice(dni)
+			if (isChild) {
+				def delete = isChild
+				delete.each { deleteChildDevice(it.deviceNetworkId, true) }
+			}
+			if (userSelectedNotification) {
+				sendPush("Successfully uninstalled TP-Link $deviceModel with alias ${device.value.alias}")
+			}
+		} catch (e) {
+			log.debug "Error deleting ${it.deviceNetworkId}: ${e}"
+		}
+	}
+}
+
+def removeDevicesHub()	{
+	userSelectedDevicesRemoveHub.each { dni ->
 		try{
 			def isChild = getChildDevice(dni)
 			if (isChild) {
@@ -1426,7 +1450,7 @@ def getWebData(params, desc, text=true) {
 }
 
 // ----- Add TP-Link Devices to STs --------------------------------
-def addDevicesHub() {
+def addDevicesHub()	{
 	def tpLinkModel = [:]
 	if (userSelectedDriverNamespace) {
 		//	Plug-Switch Devices (no energy monitor capability)
@@ -1498,7 +1522,7 @@ def addDevicesHub() {
 	}
 }
 
-def addDevicesKasa() {
+def addDevicesKasa()	{
 	def tpLinkModel = [:]
 	if (userSelectedDriverNamespace) {
 		//	Plug-Switch Devices (no energy monitor capability)
@@ -1576,7 +1600,7 @@ def addDevicesKasa() {
 }
 
 //	----- GET A NEW TOKEN FROM CLOUD -----
-def getToken() {
+def getToken()	{
 	def hub = location.hubs[0]
 	def cmdBody = [
 		method: "login",
@@ -1617,7 +1641,7 @@ def getToken() {
 }
 
 //	----- GET DEVICE DATA FROM THE CLOUD -----
-def getDeviceData() {
+def getDeviceData()	{
 	def currentDevices = ""
 	def cmdBody = [method: "getDeviceList"]
 	def getDevicesParams = [
@@ -1699,19 +1723,10 @@ def appInfoDesc()	{
 	return str
 }
 
-def uninstManagerApp() {
+def uninstManagerApp()	{
 	try {
-		//Revokes TP-Link Auth Token
-		state.TpLinkToken = null
-		state.currentError = null
-		state.errorCount = null
-		settingRemove("userName")
-		settingRemove("userPassword")
-		settingRemove("restrictedRecordPasswordPrompt")
-		if ("${userName}" =~ null || "${userPassword}" =~ null) {
-			if (userSelectedNotification) {
-				sendPush("${appLabel()} is uninstalled")
-			}
+		if (userSelectedNotification) {
+			sendPush("${appLabel()} is uninstalled")
 		}
 	} catch (ex) {
 		log.error "uninstManagerApp Exception: ", ex
@@ -1719,20 +1734,20 @@ def uninstManagerApp() {
 }
 
 //	----- INSTALL, UPDATE, INITIALIZE, UNINSTALLED -----
-def installed() {
+def installed()	{
 	initialize()
 }
 
-def updated() {
+def updated()	{
 	unsubscribe()
 	initialize()
 }
 
-def initialize() {
-	runEvery3Hours(cleanStorage)
-	runEvery3Hours(checkForUpdates)
+def initialize()	{
 	unsubscribe()
 	unschedule()
+	runEvery3Hours(cleanStorage)
+	runEvery3Hours(checkForUpdates)
 	if (!userSelectedManagerMode) {
 		runEvery5Minutes(checkError)
 		schedule("0 30 2 ? * WED", getToken)
@@ -1740,7 +1755,7 @@ def initialize() {
 			addDevicesKasa()
 		}
 		if (userSelectedDevicesRemoveKasa) {
-			removeDevices()
+			removeDevicesKasa()
 		}
 		if (userSelectedDevicesToUpdateKasa) {
 			updatePreferences()
@@ -1752,28 +1767,33 @@ def initialize() {
 			addBridges()
 		}
 		if (userSelectedDevicesAddHub) {
-			addDevicesKasa()
+			addDevicesHub()
+		}
+		if (userSelectedDevicesRemoveHub) {
+			removeDevicesHub()
+		}
+		if (userSelectedDevicesToUpdateHub) {
+			updatePreferences()
 		}
 	}
 }
 
-
-def uninstalled() {
+def uninstalled()	{
 	uninstManagerApp()
 }
 
 // ----- Child-called IP Refresh Function -------------------------
-def checkDeviceIPs() {
+def checkDeviceIPs()	{
 	ssdpDiscover()
 	runIn(30, discoverDevices)
 }
 
 // ----- Hub Discovery ---------------------------------------------
-void ssdpSubscribe() {
+void ssdpSubscribe()	{
 	def target = getSearchTarget()
 	subscribe(location, "ssdpTerm.$target", ssdpHandler)
 }
-void ssdpDiscover() {
+void ssdpDiscover()	{
 	def target = getSearchTarget()
 	sendHubCommand(new physicalgraph.device.HubAction("lan discovery $target", physicalgraph.device.Protocol.LAN))
 }
@@ -1792,7 +1812,7 @@ def ssdpHandler(evt) {
 			if (bridgeDNI == mac) {
 				state.bridgeIP = ip
 				def allDevices = getChildDevices()
-			  	allDevices.each {
+				allDevices.each {
 					it.syncBridgeIP(ip)
 					log.info "The Hub IP Address was updated to $d.bridgeIP"
 					discoverDevices()
@@ -1810,7 +1830,7 @@ def ssdpHandler(evt) {
 }
 
 // ----- Verify Discovered Devices as Hub --------------------------
-void verifyBridges() {
+void verifyBridges()	{
 	def bridges = state.bridges.findAll { it?.value?.verified != true }
 	def bridgePort = state.bridgePort
 	bridges.each {
@@ -1834,7 +1854,7 @@ void bridgeDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
 }
 
 // ----- Add Hub Device to ST --------------------------------------
-def addBridges() {
+def addBridges()	{
 	userSelectedBridgeAddHub.each { dni ->
 		def selectedBridge = state.bridges.find { it.value.bridgeMac == dni }
 		def d
@@ -1854,17 +1874,13 @@ def addBridges() {
 }
 
 // ----- TP-Link Device Discovery ----------------------------------
-void discoverDevices() {
+void discoverDevices()	{
 	def headers = [:]
 	def bridgePort = state.bridgePort
 	def bridgeIP = state.bridgeIP
 	headers.put("HOST", "$bridgeIP:$bridgePort")
 	headers.put("command", "pollForDevices")
-	sendHubCommand(new physicalgraph.device.HubAction(
-		[headers: headers],
- 		state.bridgeDNI,
- 		[callback: parseDiscoveredDevices]
-	))
+	sendHubCommand(new physicalgraph.device.HubAction([headers: headers], state.bridgeDNI, [callback: parseDiscoveredDevices]))
 }
 void parseDiscoveredDevices(response) {
 	def cmdResponse = response.headers["cmd-response"]
@@ -1891,14 +1907,14 @@ void parseDiscoveredDevices(response) {
 			def hub = response.hubId
 			def foundDevice = foundDevices."${foundDeviceMac}"
 			foundDevice << ["hub": hub]
-		  	devices << ["${foundDeviceMac}": foundDevice]
+			devices << ["${foundDeviceMac}": foundDevice]
 			log.info "Added potential device with MAC $foundDeviceMac"
 		}
 	}
 }
 
 //	----- PERIODIC CLOUD MX TASKS -----
-def checkError() {
+def checkError()	{
 	if (state.currentError == null || state.currentError == "none") {
 		log.info "${appLabel()} did not find any errors."
 		if (state.currentError == "none") {
@@ -1948,7 +1964,7 @@ private String convertHexToIP(hex) {
 }
 
 // ----- UPNP Search Target Definition -----------------------------
-def getSearchTarget() {
+def getSearchTarget()	{
 	def searchTarget = "upnp:rootdevice"
 }
 
