@@ -145,7 +145,7 @@ def welcomePage()	{
 					href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				} else {
-					href "hubAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+					href "hubAddDevicesPage", title: "Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				}
 			}
@@ -665,6 +665,7 @@ def developerPage()	{
 	cleanStorage()
 	checkForUpdates()
 	checkForDevicesKasa()
+	checkForDevicesHub()
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	def strLatestSmartAppVersion = textSmartAppVersion()
@@ -687,8 +688,10 @@ def developerPage()	{
 			paragraph title: "Device Handlers Namespace: ", "${driverNamespace()}", image: getAppImg("devices.png")
 			paragraph title: "Username: ", "${userName}", image: getAppImg("email.png")
 			paragraph title: "Password: ", "${userPassword}", image: getAppImg("password.png")
-			paragraph title: "Managed Devices: ", "${state.oldkasadevices}", image: getAppImg("devices.png")
-			paragraph title: "New Devices: ", "${state.newkasadevices}", image: getAppImg("devices.png")
+			paragraph title: "Managed Cloud Devices: ", "${state.oldkasadevices}", image: getAppImg("devices.png")
+			paragraph title: "New Cloud Devices: ", "${state.newkasadevices}", image: getAppImg("devices.png")
+			paragraph title: "Managed Hub Devices: ", "${state.oldhubdevices}", image: getAppImg("devices.png")
+			paragraph title: "New Hub Devices: ", "${state.newhubdevices}", image: getAppImg("devices.png")
 		}
 		section("Page Selector:") {
 			if (userSelectedTestingPage) {
@@ -699,17 +702,19 @@ def developerPage()	{
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "kasaInstallationAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
-			href "kasaInstallationTokenPage", title: "Token Manager Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
+			href "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
+			if (userSelectedTestingPage) {
+				href "kasaInstallationTokenPage", title: "Initial Token Setup Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
+			}
 			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
-			href "hubInstallationBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
+			href "hubInstallationBridgeDiscoveryPage", title: "Initial Bridge Setup Page - Hub Controller", description: "Tap to continue", image: getAppImg("samsunghub.png")
 			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "userAddDevicesPage", title: "Cloud Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "hubAddDevicesPage", title: "Hub Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "userRemoveDevicesPage", title: "Cloud Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
+			href "userAddDevicesPage", title: "Devices Installer Page - Cloud Controller", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "hubAddDevicesPage", title: "Devices Installer Page - Hub Controller", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 			href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
@@ -1073,13 +1078,15 @@ def checkForDevicesKasa()	{
 	def oldKasaDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		def isCloud = getChildDevice(it.value.installType)
+		if (isCloud == "Kasa Account") {
+			if (isChild) {
+				oldKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
+			if (!isChild) {
+				newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+			}
 		}
-		if (!isChild) {
-			newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-		}
-	}
 	state.oldkasadevices = oldKasaDevices
 	state.newkasadevices = newKasaDevices
 }
@@ -1090,11 +1097,14 @@ def checkForDevicesHub()	{
 	def oldHubDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		if (isChild) {
-			oldHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
-		}
-		if (!isChild) {
-			newHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+		def isHub = getChildDevice(it.value.installType)
+		if (isHub == "Node Applet") {
+			if (isChild) {
+				oldHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+			}
+			if (!isChild) {
+				newHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+			}
 		}
 	}
 	state.oldhubdevices = oldHubDevices
