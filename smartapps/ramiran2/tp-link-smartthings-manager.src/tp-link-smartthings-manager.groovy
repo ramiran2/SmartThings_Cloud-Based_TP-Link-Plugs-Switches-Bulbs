@@ -43,11 +43,13 @@ preferences {
 	page(name: "kasaUserSelectionAuthenticationPage")
 	page(name: "kasaComputerSelectionAuthenticationPage")
 	page(name: "kasaInstallationAuthenticationPage")
+	page(name: "kasaInstallationTokenPage")
 	page(name: "hubBridgeDiscoveryPage")
 	page(name: "hubInstallationBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "userAddDevicesPage")
+	page(name: "hubAddDevicesPage", content: "userAddDevicesPage", refreshTimeout: 5)
 	page(name: "userRemoveDevicesPage")
 	page(name: "userApplicationPreferencesPage")
 	page(name: "userDevicePreferencesPage")
@@ -62,7 +64,14 @@ preferences {
 }
 
 def startPage()	{
-	settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud (false) or Hub (true)
+	if (!userSelectedDeveloper) {
+		settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud (false) or Hub (true)
+		if (!userSelectedManagerMode) {
+			settingUpdate("userSelectedManagerMode", "false", "bool")
+		} else {
+			settingUpdate("userSelectedManagerMode", "true", "bool")
+		}
+	}
 	if (!userSelectedManagerMode) {
 		setInitialStatesKasa()
 		if (userSelectedAssistant) {
@@ -75,7 +84,7 @@ def startPage()	{
 		}
 	} else {
 		setInitialStatesHub()
-		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+		if (state.bridgeIP == "new") {
 			hubInstallationBridgeDiscoveryPage()
 		} else {
 			welcomePage()
@@ -253,7 +262,7 @@ def kasaInstallationAuthenticationPage()	{
 	def kasaInstallationAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
 		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
 		"action you want to complete."
-	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", nextPage: "kasaInstallationAddDevicesPage", install: false, uninstall: false) {
+	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", nextPage: "kasaInstallationTokenPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -266,6 +275,11 @@ def kasaInstallationAuthenticationPage()	{
 		}
 		section("${textCopyright()}")
 	}
+}
+
+def kasaInstallationTokenPage()	{
+	getToken()
+	userAddDevicesPage()
 }
 
 // ----- Page: Hub (Bridge) Discovery ------------------------------
@@ -965,7 +979,6 @@ def setInitialStatesKasa()	{
 	settingRemove("userSelectedDevicesRemoveKasa")
 	settingRemove("userSelectedDevicesAddKasa")
 	settingRemove("userSelectedDevicesToUpdateKasa")
-	settingRemove("userSelectedOptionThree")
 	if ("${userName}" =~ null || "${userPassword}" =~ null) {
 		settingRemove("userName")
 		settingRemove("userPassword")
