@@ -1087,6 +1087,7 @@ def checkForDevicesKasa()	{
 				newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 			}
 		}
+	}
 	state.oldkasadevices = oldKasaDevices
 	state.newkasadevices = newKasaDevices
 }
