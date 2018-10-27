@@ -319,7 +319,7 @@ def kasaUserSelectionAuthenticationPage() {
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionTwo != null) {
@@ -464,7 +464,7 @@ def kasaUserSelectionPage() {
 			paragraph title: "Communication Error: ", errorMsgCom, image: getAppImg("error.png")
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 		}
 		section("Page Selector:") {
 			if (userSelectedOptionOne != null) {
@@ -543,7 +543,7 @@ def kasaAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: "${state.newkasadevices}"], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -578,7 +578,7 @@ def kasaInstallationAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: "${state.newkasadevices}"], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -598,7 +598,7 @@ def hubAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: "${state.newkasadevices}"], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -634,7 +634,7 @@ def kasaRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -654,7 +654,7 @@ def hubRemoveDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveKasaHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -788,9 +788,9 @@ def kasaUserDevicePreferencesPage() {
 			paragraph title: "Information: ", kasaUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration:") {
-			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldhubdevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -810,11 +810,11 @@ def hubUserDevicePreferencesPage() {
 			paragraph title: "Information: ", hubUserDevicePreferencesPageText, image: getAppImg("information.png")
 		}
 		section("Device Configuration:") {
-			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldhubdevices], image: getAppImg("devices.png"))
 			input ("deviceIPAddress", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
 			input ("gatewayIPAddress", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -850,7 +850,7 @@ def kasaUserSelectionTokenPage() {
 			}
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Command Status:") {
 			if (userSelectedOptionThree != null) {
@@ -1003,13 +1003,13 @@ def developerTestingPage() {
 			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
 		}
 		section("User Configuration:") {
-			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
-			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
-			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
+			input ("userSelectedOptionTwo", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Update Account", "Activate Account", "Delete Account"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
+			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values: "${state.newkasadevices}"], image: getAppImg("adddevices.png"))
-			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration:") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
@@ -1025,9 +1025,9 @@ def developerTestingPage() {
 			input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 		}
 		section("Device Configuration:") {
-			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: oldDevices], image: getAppImg("devices.png"))
-			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values:["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
-			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values:["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
+			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldhubdevices], image: getAppImg("devices.png"))
+			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
+			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
 		section("${textCopyright()}")
 	}
