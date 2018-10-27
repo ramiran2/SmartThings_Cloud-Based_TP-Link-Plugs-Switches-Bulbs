@@ -123,15 +123,15 @@ def setInitialStatesHub()	{
 }
 
 def cleanStorage()	{
-	atomicState?.devManVer = null
-	atomicState?.devTWBVer = null
-	atomicState?.devSWBVer = null
-	atomicState?.devCBVer = null
-	atomicState?.devPGVer = null
-	atomicState?.devEMPGVer = null
-	atomicState?.devSHVer = null
-	atomicState?.devDSHVer = null
-	atomicState?.devVerLnk = null
+	state.devManVer = null
+	state.devTWBVer = null
+	state.devSWBVer = null
+	state.devCBVer = null
+	state.devPGVer = null
+	state.devEMPGVer = null
+	state.devSHVer = null
+	state.devDSHVer = null
+	state.devVerLnk = null
 }
 
 def setRecommendedOptions()	{
@@ -169,7 +169,7 @@ def setRecommendedOptions()	{
 }
 
 def startPage()	{
-	settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud or Hub
+	settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud (false) or Hub (true)
 	if (!userSelectedManagerMode) {
 		setInitialStatesKasa()
 		if (userSelectedAssistant) {
@@ -182,6 +182,11 @@ def startPage()	{
 		}
 	} else {
 		setInitialStatesHub()
+		if ("${userName}" =~ null || "${userPassword}" =~ null) {
+			hubInstallationBridgeDiscoveryPage()
+		} else {
+			hubWelcomePage()
+		}
 	}
 }
 
@@ -647,6 +652,7 @@ def kasaRemoveDevicesPage()	{
 
 //	----- REMOVE DEVICES PAGE -----
 def hubRemoveDevicesPage()	{
+	checkForDevicesHub()
 	def errorMsgDev = "None"
 	def hubRemoveDevicesPageText = "Devices that have been installed "
 	return dynamicPage (name: "hubRemoveDevicesPage", title: "Device Uninstaller Page", install: false, uninstall: false) {
@@ -658,7 +664,7 @@ def hubRemoveDevicesPage()	{
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesRemoveHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Remove (${state.oldhubdevices.size() ?: 0} found)", metadata: [values: state.oldhubdevices], image: getAppImg("removedevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -802,9 +808,7 @@ def kasaUserDevicePreferencesPage()	{
 
 //	----- USER DEVICE PREFERENCES PAGE -----
 def hubUserDevicePreferencesPage()	{
-	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" +
-		"Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" +
-		"After that you may procide to save by clicking the save button."
+	def hubUserDevicePreferencesPageText = "Welcome to the Device Preferences page. \n" + "Enter a value for Transition Time and Refresh Rate then select the devices that you want to update. \n" + "After that you may procide to save by clicking the save button."
 	return dynamicPage (name: "hubUserDevicePreferencesPage", title: "Device Preferences Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -888,7 +892,7 @@ def developerPage()	{
 	def hubId = hub.id
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
-	def strLoadedDriverVersion = "Tunable White Bulb: ${atomicState?.devTWBVer}, Soft White Bulb: ${atomicState?.devSWBVer}, Color Bulb: ${atomicState?.devCBVer}, Plug: ${atomicState?.devPGVer}, Energy Monitor Plug: ${atomicState?.devEMPGVer}, Switch: ${atomicState?.devSHVer}, Dimming Switch: ${atomicState?.devDSHVer}"
+	def strLoadedDriverVersion = "Tunable White Bulb: ${state.devTWBVer}, Soft White Bulb: ${state.devSWBVer}, Color Bulb: ${state.devCBVer}, Plug: ${state.devPGVer}, Energy Monitor Plug: ${state.devEMPGVer}, Switch: ${state.devSHVer}, Dimming Switch: ${state.devDSHVer}"
 	return dynamicPage (name: "developerPage", title: "Developer Page", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -1135,16 +1139,16 @@ def changeLogPage()	{
 		}
 		section("Check for Updates:") {
 			if (childDevices) {
-				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+				if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${state.devManVer}" =~ "${state.devVerLnk}") {
 					paragraph upToDate, image: getAppImg("success.png")
 				} else {
-					if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+					if ("${strLatestSmartAppVersion}" =~ "${appVersion()}" && "${state.devManVer}" =~ "${state.devVerLnk}") {
 						if ("${strLatestSmartAppVersion}" != "${appVersion()}") {
 							paragraph smartAppUpdateNeeded, image: getAppImg("issue.png")
 						} else {
 							intUpdateCheckOne = 1
 						}
-						if ("${atomicState?.devManVer}" != "${atomicState?.devVerLnk}") {
+						if ("${state.devManVer}" != "${state.devVerLnk}") {
 							paragraph driverUpdateNeeded, image: getAppImg("issue.png")
 						} else {
 							intUpdateCheckTwo = 1
@@ -1236,94 +1240,94 @@ def checkForUpdates()	{
 	def strLatestSmartAppVersion = textSmartAppVersion()
 	def strLatestDriverVersion = textDriverVersion()
 	def intMessage = 0
-	def strDevVersion = atomicState?.devManVer ?: [:]
+	def strDevVersion = state.devManVer ?: [:]
 	strDevVersion["devVer"] = strLatestDriverVersion ?: ""
-	atomicState?.devManVer = strDevVersion
+	state.devManVer = strDevVersion
 	def childDevices = app.getChildDevices(true)
 	childDevices?.each {
 		def strTypRawData = it?.currentState("devTyp")?.value?.toString()
-		def strDeviceType = atomicState?.devTyp ?: [:]
+		def strDeviceType = state.devTyp ?: [:]
 		strDeviceType["devTyp"] = strTypRawData ?: ""
-		atomicState?.devTyp = strDeviceType
-		if (atomicState?.devTyp =~ "Tunable White Bulb") {
+		state.devTyp = strDeviceType
+		if (state.devTyp =~ "Tunable White Bulb") {
 			def strTWBRawData = it?.currentState("devVer")?.value?.toString()
-			def strTWB = atomicState?.devTWBVer ?: [:]
+			def strTWB = state.devTWBVer ?: [:]
 			strTWB["devVer"] = strTWBRawData ?: ""
-			atomicState?.devTWBVer = strTWB
+			state.devTWBVer = strTWB
 		}
-		if (atomicState?.devTyp =~ "Soft White Bulb") {
+		if (state.devTyp =~ "Soft White Bulb") {
 			def strSWBRawData = it?.currentState("devVer")?.value?.toString()
-			def strSWB = atomicState?.devSWBVer ?: [:]
+			def strSWB = state.devSWBVer ?: [:]
 			strSWB["devVer"] = strSWBRawData ?: ""
-			atomicState?.devSWBVer = strSWB
+			state.devSWBVer = strSWB
 		}
-		if (atomicState?.devTyp =~ "Color Bulb") {
+		if (state.devTyp =~ "Color Bulb") {
 			def strCBRawData = it?.currentState("devVer")?.value?.toString()
-			def strCB = atomicState?.devCBVer ?: [:]
+			def strCB = state.devCBVer ?: [:]
 			strCB["devVer"] = strCBRawData ?: ""
-			atomicState?.devCBVer = strCB
+			state.devCBVer = strCB
 		}
-		if (atomicState?.devTyp =~ "Plug") {
+		if (state.devTyp =~ "Plug") {
 			def strPGRawData = it?.currentState("devVer")?.value?.toString()
-			def strPG = atomicState?.devPGVer ?: [:]
+			def strPG = state.devPGVer ?: [:]
 			strPG["devVer"] = strPGRawData ?: ""
-			atomicState?.devPGVer = strPG
+			state.devPGVer = strPG
 		}
-		if (atomicState?.devTyp =~ "Energy Monitor Plug") {
+		if (state.devTyp =~ "Energy Monitor Plug") {
 			def strEMPGRawData = it?.currentState("devVer")?.value?.toString()
-			def strEMPG = atomicState?.devEMPGVer ?: [:]
+			def strEMPG = state.devEMPGVer ?: [:]
 			strEMPG["devVer"] = strEMPGRawData ?: ""
-			atomicState?.devEMPGVer = strEMPG
+			state.devEMPGVer = strEMPG
 		}
-		if (atomicState?.devTyp =~ "Switch") {
+		if (state.devTyp =~ "Switch") {
 			def strSHRawData = it?.currentState("devVer")?.value?.toString()
-			def strSH = atomicState?.devSHVer ?: [:]
+			def strSH = state.devSHVer ?: [:]
 			strSH["devVer"] = strSHRawData ?: ""
-			atomicState?.devSHVer = strSH
+			state.devSHVer = strSH
 		}
-		if (atomicState?.devTyp =~ "Dimming Switch") {
+		if (state.devTyp =~ "Dimming Switch") {
 			def strDSHRawData = it?.currentState("devVer")?.value?.toString()
-			def strDSH = atomicState?.devDSHVer ?: [:]
+			def strDSH = state.devDSHVer ?: [:]
 			strDSH["devVer"] = strDSHRawData ?: ""
-			atomicState?.devDSHVer = strDSH
+			state.devDSHVer = strDSH
 		}
 	}
-	if (atomicState?.devTWBVer =~ null) {
-		atomicState?.devTWBVer = strDevVersion
+	if (state.devTWBVer =~ null) {
+		state.devTWBVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devTWBVer
+		state.devVerLnk = state.devTWBVer
 	}
-	if (atomicState?.devSWBVer =~ null) {
-		atomicState?.devSWBVer = strDevVersion
+	if (state.devSWBVer =~ null) {
+		state.devSWBVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devSWBVer
+		state.devVerLnk = state.devSWBVer
 	}
-	if (atomicState?.devCBVer =~ null) {
-		atomicState?.devCBVer = strDevVersion
+	if (state.devCBVer =~ null) {
+		state.devCBVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devCBVer
+		state.devVerLnk = state.devCBVer
 	}
-	if (atomicState?.devPGVer =~ null) {
-		atomicState?.devPGVer = strDevVersion
+	if (state.devPGVer =~ null) {
+		state.devPGVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devPGVer
+		state.devVerLnk = state.devPGVer
 	}
-	if (atomicState?.devEMPGVer =~ null) {
-		atomicState?.devEMPGVer = strDevVersion
+	if (state.devEMPGVer =~ null) {
+		state.devEMPGVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devEMPGVer
+		state.devVerLnk = state.devEMPGVer
 	}
-	if (atomicState?.devSHVer =~ null) {
-		atomicState?.devSHVer = strDevVersion
+	if (state.devSHVer =~ null) {
+		state.devSHVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devSHVer
+		state.devVerLnk = state.devSHVer
 	}
-	if (atomicState?.devDSHVer =~ null) {
-		atomicState?.devDSHVer = strDevVersion
+	if (state.devDSHVer =~ null) {
+		state.devDSHVer = strDevVersion
 	} else {
-		atomicState?.devVerLnk = atomicState?.devDSHVer
+		state.devVerLnk = state.devDSHVer
 	}
-	if ("${atomicState?.devManVer}" =~ "${atomicState?.devVerLnk}") {
+	if ("${state.devManVer}" =~ "${state.devVerLnk}") {
 		intMessage = 3
 	} else {
 		if (userSelectedNotification) {
@@ -1673,20 +1677,8 @@ def getDeviceData()	{
 //	----- SEND DEVICE COMMAND TO CLOUD FOR DH -----
 def sendDeviceCmd(appServerUrl, deviceId, command) {
 	def cmdResponse = ""
-	def cmdBody = [
-		method: "passthrough",
-		params: [
-			deviceId: deviceId,
-			requestData: "${command}"
-		]
-	]
-	def sendCmdParams = [
-		uri: "${appServerUrl}/?token=${state.TpLinkToken}",
-		requestContentType: 'application/json',
-		contentType: 'application/json',
-		headers: ['Accept':'application/json; version=1, */*; q=0.01'],
-		body : new groovy.json.JsonBuilder(cmdBody).toString()
-	]
+	def cmdBody = [method: "passthrough", params: [deviceId: deviceId, requestData: "${command}"]]
+	def sendCmdParams = [uri: "${appServerUrl}/?token=${state.TpLinkToken}", requestContentType: 'application/json', contentType: 'application/json', headers: ['Accept':'application/json; version=1, */*; q=0.01'], body : new groovy.json.JsonBuilder(cmdBody).toString()]
 	httpPostJson(sendCmdParams) {resp ->
 		if (resp.status == 200 && resp.data.error_code == 0) {
 			def jsonSlurper = new groovy.json.JsonSlurper()
@@ -1857,13 +1849,11 @@ void bridgeDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
 def addBridges()	{
 	userSelectedBridgeAddHub.each { dni ->
 		def selectedBridge = state.bridges.find { it.value.bridgeMac == dni }
-		def d
+		def strDevices
 		if (selectedBridge) {
-			d = getChildDevices()?.find {
-				it.deviceNetworkId == selectedBridge.value.bridgeMac
-			}
+			strDevices = getChildDevices()?.find {it.deviceNetworkId == selectedBridge.value.bridgeMac}
 		}
-		if (!d) {
+		if (!strDevices) {
 			state.bridgeIP = selectedBridge.value.bridgeIP
 			state.bridgeDNI = selectedBridge.value.bridgeMac
 			addChildDevice("${driverNamespace()}", "TP-Link Bridge", selectedBridge.value.bridgeMac, selectedBridge?.value.hub, ["label": "TP-Link SmartThings Bridge", "name": "PC Bridge for TP-Link Devices", "data": ["bridgeIP": state.bridgeIP, "bridgePort": state.bridgePort, "connectStatus": "ok"]])
