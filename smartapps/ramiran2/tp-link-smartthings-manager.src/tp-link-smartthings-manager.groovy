@@ -108,7 +108,7 @@ def setInitialStatesHub() {
 	if (!state.hubdevices) {state.hubdevices = [:]}
 	if (!state.bridgePort) {state.bridgePort = 8082}
 	if (!userSelectedDeveloper) {
-		if (state.bridgeIP = "new") {
+		if (state.bridgeIP == "new") {
 			settingUpdate("userSelectedLauncher", "false", "bool")
 			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
