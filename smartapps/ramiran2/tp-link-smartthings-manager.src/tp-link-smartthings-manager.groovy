@@ -91,10 +91,8 @@ def setInitialStatesKasa() {
 			state.TpLinkToken = null
 			state.currentError = null
 			state.errorCount = 0
-			settingUpdate("userSelectedLauncher", "false", "bool")
 			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
-			settingUpdate("userSelectedLauncher", "true", "bool")
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
@@ -109,10 +107,8 @@ def setInitialStatesHub() {
 	if (!state.bridgePort) {state.bridgePort = 8082}
 	if (!userSelectedDeveloper) {
 		if (state.bridgeIP == "new") {
-			settingUpdate("userSelectedLauncher", "false", "bool")
 			settingUpdate("userSelectedQuickControl", "false", "bool")
 		} else {
-			settingUpdate("userSelectedLauncher", "true", "bool")
 			settingUpdate("userSelectedQuickControl", "true", "bool")
 		}
 		settingUpdate("userSelectedDriverNamespace", "false", "bool")	//	If true the DaveGut is set as default
@@ -547,7 +543,7 @@ def kasaAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:"${state.newkasadevices)"], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -582,7 +578,7 @@ def kasaInstallationAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:"${state.newkasadevices)"], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -602,7 +598,7 @@ def hubAddDevicesPage() {
 			paragraph title: "Device Error: ", errorMsgDev, image: getAppImg("error.png")
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newkasadevices.size() ?: 0} found)", metadata: [values:"${state.newkasadevices)"], image: getAppImg("adddevices.png"))
 		}
 		section("${textCopyright()}")
 	}
@@ -696,6 +692,7 @@ def kasaUserApplicationPreferencesPage() {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
+			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png")
 			if (!userSelectedLauncher) {
 				input ("userSelectedAssistant", "bool", title: "Do you want to enable recommended options?", submitOnChange: false, image: getAppImg("ease.png"))
 			}
@@ -705,8 +702,7 @@ def kasaUserApplicationPreferencesPage() {
 				hiddenDeveloperInput = 1
 				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			}
-			if (userSelectedDeveloper) {
-				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
+			if (userSelectedDeveloper) {)
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
 				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
@@ -753,13 +749,13 @@ def hubUserApplicationPreferencesPage() {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
 			input ("userSelectedAppIcons", "bool", title: "Do you want to disable application icons?", submitOnChange: false, image: getAppImg("noicon.png"))
 			input ("userSelectedManagerMode", "bool", title: "Do you want to switch to hub controller mode?", submitOnChange: false, image: getAppImg("samsunghub.png"))
+			input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png")
 			input ("userSelectedBrowserMode", "bool", title: "Do you want to open all external links within the SmartThings app?", submitOnChange: false, image: getAppImg("browsermode.png"))
 			if (userSelectedAppIcons && userSelectedBrowserMode && userSelectedNotification || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
 				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
 			}
 			if (userSelectedDeveloper) {
-				input ("userSelectedLauncher", "bool", title: "Do you want to disable the launcher page?", submitOnChange: false, image: getAppImg("launcher.png"))
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
 				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
 				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
@@ -1012,7 +1008,7 @@ def developerTestingPage() {
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values:["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
 		section("Device Controller:") {
-			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values:state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values:"${state.newkasadevices)"], image: getAppImg("adddevices.png"))
 			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values:state.oldkasadevices], image: getAppImg("removedevices.png"))
 		}
 		section("Application Configuration:") {
