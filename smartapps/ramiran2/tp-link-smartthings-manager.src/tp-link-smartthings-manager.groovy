@@ -1756,15 +1756,15 @@ def initialize() {
 	} else {
 		runEvery5Minutes(discoverDevices)
 		ssdpSubscribe()
-			if (selectedBridges) {
-				addBridges()
-			}
-			if (selectedDevices) {
-				addDevicesKasa()
-			}
+		if (selectedBridges) {
+			addBridges()
+		}
+		if (selectedDevices) {
+			addDevicesKasa()
 		}
 	}
 }
+
 
 def uninstalled() {
 	uninstManagerApp()
