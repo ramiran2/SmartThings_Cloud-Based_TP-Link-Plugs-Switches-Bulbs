@@ -1078,14 +1078,11 @@ def checkForDevicesKasa()	{
 	def oldKasaDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		def isCloud = getChildDevice(it.value.installType)
-		if (isCloud == "Kasa Account") {
-			if (isChild) {
-				oldKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
-			if (!isChild) {
-				newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
-			}
+		if (isChild) {
+			oldKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newKasaDevices["${it.value.deviceMac}"] = "${it.value.alias} model ${it.value.deviceModel}"
 		}
 	}
 	state.oldkasadevices = oldKasaDevices
@@ -1098,14 +1095,11 @@ def checkForDevicesHub()	{
 	def oldHubDevices = [:]
 	devices.each {
 		def isChild = getChildDevice(it.value.deviceMac)
-		def isHub = getChildDevice(it.value.installType)
-		if (isHub == "Node Applet") {
-			if (isChild) {
-				oldHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
-			}
-			if (!isChild) {
-				newHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
-			}
+		if (isChild) {
+			oldHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
+		}
+		if (!isChild) {
+			newHubDevices["${it.value.deviceMac}"] = "$it.value.deviceIP : ${it.value.deviceAlias} model ${it.value.deviceModel}"
 		}
 	}
 	state.oldhubdevices = oldHubDevices
