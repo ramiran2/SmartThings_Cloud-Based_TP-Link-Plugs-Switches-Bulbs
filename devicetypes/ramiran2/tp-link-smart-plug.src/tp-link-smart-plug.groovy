@@ -39,7 +39,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }									//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }																	//	Ramiran2: Repository Name
 //	======== Device Name =================================================================================================
-//	def devName()	{ return "TP-Link Smart ${deviceType()}" }																//	Device Name
+	def devName()	{ return "TP-Link Smart ${deviceType()}" }																//	Device Name
 //	======== Other System Values =========================================================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }															//	Device Handler Author
 	def devVer()	{ return "3.5.0" }																					//	Device Handler Version
