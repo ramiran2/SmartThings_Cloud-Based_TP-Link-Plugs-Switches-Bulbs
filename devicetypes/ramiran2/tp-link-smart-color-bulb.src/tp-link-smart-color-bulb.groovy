@@ -23,8 +23,8 @@ TP-Link devices; primarily various users on GitHub.com.
 
 	======== Device Type Identifier - Do Not Change These Values =============================*/
 //	def deviceType()	{ return "Soft White Bulb" }										//	Soft White
-	def deviceType()	{ return "Tunable White Bulb" }										//	Tunable White
-//	def deviceType()	{ return "Color Bulb" }												//	Color
+//	def deviceType()	{ return "Tunable White Bulb" }										//	Tunable White
+	def deviceType()	{ return "Color Bulb" }												//	Color
 //	======== TP-Link Account or Local Server Installation ====================================
 //	def installType()	{ return "Cloud" }													//	Davegut: Cloud
 //	def installType()	{ return "Hub" }													//	Davegut: Hub
@@ -37,8 +37,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }		//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }										//	Ramiran2: Repository Name
 //	======== Device Name =====================================================================
-//	def devName()	{ return "(${installType()}) TP-Link ${deviceType()}" }					//	Davegut: Device Name
-	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }			//	Ramiran2: Device Name
+//	def devName()	{ return "TP-Link Smart ${deviceType()}" }									//	Device Name
 //	======== Other System Values =============================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }								//	Device Handler Author
 	def devVer()	{ return "3.5.0" }														//	Device Handler Version
@@ -119,8 +118,8 @@ metadata {
 	}
 	preferences {
 		if (installType() == "Node Applet") {
-			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
+			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("devices.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("samsunghub.png"))
 		}
 		input ("transitionTime", "enum", title: "Lighting Transition Time", options: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"], image: getDevImg("transition.png"))
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))

@@ -22,9 +22,9 @@ All development is based upon open-source data on the
 TP-Link devices; primarily various users on GitHub.com.
 
 	======== Device Type Identifier - Do Not Change These Values =========================================================*/
-//	def deviceType()	{ return "Plug" }																				//	Plug
+	def deviceType()	{ return "Plug" }																				//	Plug
 //	def deviceType()	{ return "Switch" }																				//	Switch
-	def deviceType()	{ return "Dimming Switch" }																		//	HS220 Only
+//	def deviceType()	{ return "Dimming Switch" }																		//	HS220 Only
 //	======== Device Handler Icon =========================================================================================
 	def deviceIcon()	{ return (deviceType() == "Plug") ? "st.Appliances.appliances17" : "st.Home.home30" }			//	Device Handler Icon
 //	======== TP-Link Account or Local Server Installation ================================================================
@@ -39,15 +39,14 @@ TP-Link devices; primarily various users on GitHub.com.
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }									//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }																	//	Ramiran2: Repository Name
 //	======== Device Name =================================================================================================
-//	def devName()	{ return "(${installType()}) TP-Link ${deviceType()}" }												//	Davegut: Device Name
-	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }										//	Ramiran2: Device Name
+//	def devName()	{ return "TP-Link Smart ${deviceType()}" }																//	Device Name
 //	======== Other System Values =========================================================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }															//	Device Handler Author
 	def devVer()	{ return "3.5.0" }																					//	Device Handler Version
-//	def ocfValue()	{ return "oic.d.smartplug" }																		//	Open Connectivity Foundation Device Type: Smart Plug
-	def ocfValue()	{ return "oic.d.switch" }																			//	Open Connectivity Foundation Device Type: Switch
-//	def vidValue()	{ return "generic-switch-power" }																	//	Vendor ID: Switch
-	def vidValue()	{ return "generic-dimmer-power" }																	//	Vendor ID: Dimmer
+	def ocfValue()	{ return "oic.d.smartplug" }																		//	Open Connectivity Foundation Device Type: Smart Plug
+//	def ocfValue()	{ return "oic.d.switch" }																			//	Open Connectivity Foundation Device Type: Switch
+	def vidValue()	{ return "generic-switch-power" }																	//	Vendor ID: Switch
+//	def vidValue()	{ return "generic-dimmer-power" }																	//	Vendor ID: Dimmer
 //	======================================================================================================================
 
 metadata {
@@ -85,8 +84,8 @@ metadata {
 	}
 	preferences {
 		if (installType() == "Node Applet") {
-			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
+			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("devices.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("samsunghub.png"))
 		}
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
 	}

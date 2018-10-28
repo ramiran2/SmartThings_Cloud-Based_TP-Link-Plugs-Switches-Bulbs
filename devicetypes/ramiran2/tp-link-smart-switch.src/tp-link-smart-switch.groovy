@@ -39,8 +39,7 @@ TP-Link devices; primarily various users on GitHub.com.
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }									//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }																	//	Ramiran2: Repository Name
 //	======== Device Name =================================================================================================
-//	def devName()	{ return "(${installType()}) TP-Link ${deviceType()}" }												//	Davegut: Device Name
-	def devName()	{ return "TP-Link Smart ${deviceType()} - ${installType()}" }										//	Ramiran2: Device Name
+//	def devName()	{ return "TP-Link Smart ${deviceType()}" }																//	Device Name
 //	======== Other System Values =========================================================================================
 	def devAuthor()	{ return "Dave Gutheinz, Anthony Ramirez" }															//	Device Handler Author
 	def devVer()	{ return "3.5.0" }																					//	Device Handler Version
@@ -85,8 +84,8 @@ metadata {
 	}
 	preferences {
 		if (installType() == "Node Applet") {
-			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("samsunghub.png"))
-			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("router.png"))
+			input ("deviceIP", "text", title: "Device IP", required: true, image: getDevImg("devices.png"))
+			input ("gatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("samsunghub.png"))
 		}
 		input ("refreshRate", "enum", title: "Device Refresh Rate", options: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"], image: getDevImg("refresh.png"))
 	}
