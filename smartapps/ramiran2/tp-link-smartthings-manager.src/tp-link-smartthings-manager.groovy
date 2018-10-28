@@ -1,5 +1,5 @@
 /*
-TP-Link SmartThings Manager and TP-Link Cloud Connect, 2018 Version 4
+TP-Link SmartThings Manager, 2018 Version 4
 
 	Copyright 2018 Dave Gutheinz, Anthony Ramirez
 
@@ -27,7 +27,6 @@ primarily various users on GitHub.com.*/
 //	def gitName()	{ return "SmartThings_Cloud-Based_TP-Link-Plugs-Switches-Bulbs" }		//	Davegut: Repository Name
 	def gitName()	{ return "TP-Link-SmartThings" }										//	Ramiran2: Repository Name
 //	======== Application Name ================================================================
-//	def appLabel()	{ return "TP-Link Cloud Connect" }										//	Davegut: Application Name
 	def appLabel()	{ return "TP-Link SmartThings Manager" }								//	Ramiran2: Application Name
 //	======== Application Information =========================================================
 	def appVersion()	{ return "4.2.0" }													//	Application Version
@@ -486,11 +485,11 @@ def userApplicationPreferencesPage()	{
 			}
 			if (userSelectedAppIcons && userSelectedBrowserMode && userSelectedNotification || hiddenDeveloperInput == 1) {
 				hiddenDeveloperInput = 1
-				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: true, image: getAppImg("developer.png"))
+				input ("userSelectedDeveloper", "bool", title: "Do you want to enable developer mode?", submitOnChange: false, image: getAppImg("developer.png"))
 			}
 			if (userSelectedDeveloper) {
 				input ("userSelectedQuickControl", "bool", title: "Do you want to enable post install features?", submitOnChange: false, image: getAppImg("quickcontrol.png"))
-				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: true, image: getAppImg("developertesting.png"))
+				input ("userSelectedTestingPage", "bool", title: "Do you want to enable developer testing mode?", submitOnChange: false, image: getAppImg("developertesting.png"))
 				input ("userSelectedDriverNamespace", "bool", title: "Do you want to switch the device handlers namespace?", submitOnChange: false, image: getAppImg("drivernamespace.png"))
 			}
 			if (userSelectedTestingPage && !userSelectedNotification  || hiddenRecordInput == 1) {
@@ -702,6 +701,12 @@ def developerPage()	{
 //	----- DEVELOPER TESTING PAGE -----
 def developerTestingPage()	{
 	checkForDevicesKasa()
+	checkForDevicesHub()
+	discoverDevices()
+	checkForBridgeHub()
+	ssdpSubscribe()
+	ssdpDiscover()
+	verifyBridges()
 	def errorMsgCom = "None"
 	def errorMsgDev = "None"
 	def errorMsgNew = "None"
@@ -757,9 +762,14 @@ def developerTestingPage()	{
 			input ("userSelectedOptionOne", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Add Devices", "Remove Devices", "Update Token", "Initial Installation"]], image: getAppImg("userinput.png"))
 			input ("userSelectedOptionThree", "enum", title: "What do you want to do?", required: true, multiple: false, submitOnChange: true, metadata: [values: ["Update Token", "Recheck Token", "Delete Token"]], image: getAppImg("token.png"))
 		}
+		section("Bridge Controller:") {
+			input ("userSelectedBridgeAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Bridges to Add (${state.strfoundbridge.size() ?: 0} found)", metadata: [values: state.strfoundbridge], image: getAppImg("adddevices.png"))
+		}
 		section("Device Controller:") {
 			input ("userSelectedDevicesAddKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.newkasadevices.size() ?: 0} found)", metadata: [values: state.newkasadevices], image: getAppImg("adddevices.png"))
+			input ("userSelectedDevicesAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newhubdevices.size() ?: 0} found)", metadata: [values: state.newhubdevices], image: getAppImg("adddevices.png"))
 			input ("userSelectedDevicesRemoveKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("removedevices.png"))
+			input ("userSelectedDevicesRemoveHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Add (${state.newhubdevices.size() ?: 0} found)", metadata: [values: state.newhubdevices], image: getAppImg("adddevices.png"))
 		}
 		section("Application Configuration:") {
 			input ("userSelectedNotification", "bool", title: "Do you want to enable notification?", submitOnChange: false, image: getAppImg("notification.png"))
@@ -776,6 +786,9 @@ def developerTestingPage()	{
 		}
 		section("Device Configuration:") {
 			input ("userSelectedDevicesToUpdateKasa", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("devices.png"))
+			input ("userSelectedDevicesToUpdateHub", "enum", required: true, multiple: true, submitOnChange: true, title: "Select Devices to Update (${state.oldkasadevices.size() ?: 0} found)", metadata: [values: state.oldkasadevices], image: getAppImg("devices.png"))
+			input ("deviceIPAddress", "text", title: "Device IP", required: true, image: getDevImg("devices.png"))
+			input ("userGatewayIP", "text", title: "Gateway IP", required: true, image: getDevImg("samsunghub.png"))
 			input ("userLightTransTime", "enum", required: true, multiple: false, submitOnChange: false, title: "Lighting Transition Time", metadata: [values: ["500" : "0.5 second", "1000" : "1 second", "1500" : "1.5 second", "2000" : "2 seconds", "2500" : "2.5 seconds", "5000" : "5 seconds", "10000" : "10 seconds", "20000" : "20 seconds", "40000" : "40 seconds", "60000" : "60 seconds"]], image: getAppImg("transition.png"))
 			input ("userRefreshRate", "enum", required: true, multiple: false, submitOnChange: false, title: "Device Refresh Rate", metadata: [values: ["1" : "Refresh every minute", "5" : "Refresh every 5 minutes", "10" : "Refresh every 10 minutes", "15" : "Refresh every 15 minutes", "30" : "Refresh every 30 minutes"]], image: getAppImg("refresh.png"))
 		}
