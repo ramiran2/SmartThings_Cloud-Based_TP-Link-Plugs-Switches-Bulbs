@@ -45,7 +45,7 @@ preferences {
 	page(name: "kasaInstallationAuthenticationPage")
 	page(name: "kasaInstallationTokenPage")
 	page(name: "hubBridgeDiscoveryPage")
-	page(name: "hubInstallationBridgeDiscoveryPage", content: "hubBridgeDiscoveryPage", nextPage: "hubAddDevicesPage", refreshTimeout: 5)
+	page(name: "hubInstallationBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "userAddDevicesPage")
@@ -294,6 +294,26 @@ def hubBridgeDiscoveryPage()	{
 		}
 		section("Information and Diagnostics: ", hideable: true, hidden: true) {
 			paragraph title: "Information: ", hubBridgeDiscoveryPageText, image: getAppImg("information.png")
+		}
+		section("Bridge Controller:") {
+			input ("userSelectedBridgeAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Bridges to Add (${state.strfoundbridge.size() ?: 0} found)", metadata: [values: state.strfoundbridge], image: getAppImg("adddevices.png"))
+		}
+	}
+}
+
+// ----- Page: Hub (Bridge) Discovery ------------------------------
+def hubInstallationBridgeDiscoveryPage()	{
+	checkForBridgeHub()
+	ssdpSubscribe()
+	ssdpDiscover()
+	verifyBridges()
+	def hubInstallationBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Initial Bridge Discovery Page", nextPage: "hubAddDevicesPage", refreshInterval: 5, install: false, uninstall: false){
+		section("") {
+			paragraph appInfoDesc(), image: getAppImg("kasa.png")
+		}
+		section("Information and Diagnostics: ", hideable: true, hidden: true) {
+			paragraph title: "Information: ", hubInstallationBridgeDiscoveryPageText, image: getAppImg("information.png")
 		}
 		section("Bridge Controller:") {
 			input ("userSelectedBridgeAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Bridges to Add (${state.strfoundbridge.size() ?: 0} found)", metadata: [values: state.strfoundbridge], image: getAppImg("adddevices.png"))
