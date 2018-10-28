@@ -88,10 +88,10 @@ def welcomePage()	{
 	def welcomePageText = "None"
 	def strPageName = null
 	if (!userSelectedManagerMode) {
-		strPageName = "Dashboard - Cloud Controller"
+		strPageName = "Dashboard Page - Cloud Controller"
 		welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
 	} else {
-		strPageName = "Dashboard - Hub Controller"
+		strPageName = "Dashboard Page - Hub Controller"
 		welcomePageText = "This SA installs and manages TP-Link bulbs, plugs, and switches DHs as well as " + "the associated Bridge. You will encounter other pages in the following order. " + "NEXT goes to Bridge Discovery (no bridge detected) or Device Discovery. " + "Bridge Discovery - Does the initial discover and user selection of the Bridge " + "between SmartThings and the TP-Link Devices. Entered only on initial " + " installation. DONE installs the selected bridge and exits the program." + "Device Discovery - Discovers and installs the TP-Link Devices. Also used for " + "updating IP addresses and for discovering added devices. DONE installs the " + "selected devices then exits the program."
 	}
 	def driverVersionText = "Current Driver Version: ${strLatestDriverVersion}"
@@ -208,7 +208,7 @@ def kasaUserSelectionAuthenticationPage()	{
 				settingRemove("userName")
 				settingRemove("userPassword")
 				state.TpLinkToken = null
-				href "welcomePage", title: "Dashboard - Cloud Controller", description: "Tap to view", image: getAppImg("welcomepage.png")
+				href "welcomePage", title: "Dashboard Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			}
 		}
 		section("${textCopyright()}")
@@ -633,8 +633,12 @@ def developerPage()	{
 	cleanStorage()
 	checkForUpdates()
 	checkForDevicesKasa()
-	checkForBridgeHub()
 	checkForDevicesHub()
+	discoverDevices()
+	checkForBridgeHub()
+	ssdpSubscribe()
+	ssdpDiscover()
+	verifyBridges()
 	def hub = location.hubs[0]
 	def hubId = hub.id
 	def strLatestSmartAppVersion = textSmartAppVersion()
@@ -667,12 +671,12 @@ def developerPage()	{
 			if (userSelectedTestingPage) {
 				href "startPage", title: "Initialization Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "welcomePage", title: "Dashboard - Cloud/Hub Controller", description: "Tap to view", image: getAppImg("welcomepage.png")
+			href "welcomePage", title: "Dashboard Page", description: "Tap to view", image: getAppImg("welcomepage.png")
 			href "kasaUserSelectionAuthenticationPage", title: "Login Page", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
+			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to view", image: getAppImg("samsunghub.png")
 			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
