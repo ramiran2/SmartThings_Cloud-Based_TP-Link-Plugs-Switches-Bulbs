@@ -49,7 +49,6 @@ preferences {
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "userAddDevicesPage")
-	page(name: "hubAddDevicesPage", content: "userAddDevicesPage")
 	page(name: "userRemoveDevicesPage")
 	page(name: "userApplicationPreferencesPage")
 	page(name: "userDevicePreferencesPage")
@@ -145,7 +144,7 @@ def welcomePage()	{
 					href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				} else {
-					href "hubAddDevicesPage", title: "Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+					href "userAddDevicesPage", title: "Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 				}
 			}
@@ -308,7 +307,7 @@ def hubInstallationBridgeDiscoveryPage()	{
 	ssdpDiscover()
 	verifyBridges()
 	def hubInstallationBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
-	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Initial Bridge Discovery Page", nextPage: "hubAddDevicesPage", refreshInterval: 5, install: false, uninstall: false){
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Initial Bridge Discovery Page", nextPage: "userAddDevicesPage", refreshInterval: 5, install: false, uninstall: false){
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -737,8 +736,7 @@ def developerPage()	{
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "userAddDevicesPage", title: "Devices Installer Page - Cloud Controller", description: "Tap to view", image: getAppImg("adddevicespage.png")
-			href "hubAddDevicesPage", title: "Devices Installer Page - Hub Controller", description: "Tap to view", image: getAppImg("adddevicespage.png")
+			href "userAddDevicesPage", title: "Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
 			href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
