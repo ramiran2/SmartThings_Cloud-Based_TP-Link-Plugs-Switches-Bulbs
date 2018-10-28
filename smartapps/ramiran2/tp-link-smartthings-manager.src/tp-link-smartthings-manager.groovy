@@ -417,7 +417,7 @@ def userRemoveDevicesPage()	{
 	} else {
 		userRemoveDevicesPageText = "None"
 	}
-	return dynamicPage (name: "userRemoveDevicesPage", title: "Device Uninstaller Page", install: false, uninstall: false) {
+	return dynamicPage (name: "userRemoveDevicesPage", title: "Device Uninstaller Page", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
