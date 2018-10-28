@@ -404,11 +404,11 @@ def userAddDevicesPage()	{
 		checkForDevicesHub()
 		discoverDevices()
 	}
-	int intRefeshTimeout = null
+	def strRefeshTimeout = null
 	def errorMsgDev = "None"
 	def userAddDevicesPageText = "None"
 	if (!userSelectedManagerMode) {
-		intRefeshTimeout = null
+		strRefeshTimeout = null
 		if (state.kasadevices == [:]) {
 			errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+ "that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 		}
@@ -416,7 +416,7 @@ def userAddDevicesPage()	{
 			errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 		}
 	} else {
-		intRefeshTimeout = 5
+		strRefeshTimeout = 5
 		if (state.kasadevices == [:]) {
 			errorMsgDev = "We were unable to find any TP-Link Kasa devices on your network."
 		}
@@ -429,7 +429,7 @@ def userAddDevicesPage()	{
 	} else {
 		userAddDevicesPageText = "Discovering TP-Link Devices on your LAN. This may take several minutes. " + "You can follow the process by looking at the count of devices below. " + "When you are ready to select devices to install, touch the area below."
 	}
-	return dynamicPage (name: "userAddDevicesPage", title: "Device Installer Page", refreshTimeout: "${intRefeshTimeout}", install: false, uninstall: false) {
+	return dynamicPage (name: "userAddDevicesPage", title: "Device Installer Page", refreshTimeout: "${strRefeshTimeout}", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
