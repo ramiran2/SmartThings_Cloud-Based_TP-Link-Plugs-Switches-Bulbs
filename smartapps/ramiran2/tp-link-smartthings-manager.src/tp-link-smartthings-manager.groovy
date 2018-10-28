@@ -45,7 +45,7 @@ preferences {
 	page(name: "kasaInstallationAuthenticationPage")
 	page(name: "kasaInstallationTokenPage")
 	page(name: "hubBridgeDiscoveryPage")
-	page(name: "hubInstallationBridgeDiscoveryPage")
+	page(name: "hubInstallationBridgeDiscoveryPage", content: "hubBridgeDiscoveryPage", nextPage: "hubAddDevicesPage", refreshTimeout: 5)
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "userAddDevicesPage")
@@ -155,8 +155,8 @@ def welcomePage()	{
 			if (userSelectedQuickControl) {
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				if (!userSelectedManagerMode) {
-					href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 					href "kasaUserSelectionTokenPage", title: "Token Settings Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
+					href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 				}
 			}
 		}
@@ -288,7 +288,7 @@ def hubBridgeDiscoveryPage()	{
 	ssdpDiscover()
 	verifyBridges()
 	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
-	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery", nextPage: "", refreshInterval: 5, install: false, uninstall: false){
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", refreshInterval: 5, install: false, uninstall: false){
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
