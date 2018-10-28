@@ -42,17 +42,14 @@ preferences {
 	page(name: "welcomePage")
 	page(name: "kasaUserSelectionAuthenticationPage")
 	page(name: "kasaComputerSelectionAuthenticationPage")
-	page(name: "kasaInstallationAuthenticationPage")
-	page(name: "kasaInstallationTokenPage")
 	page(name: "hubBridgeDiscoveryPage")
-	page(name: "hubInstallationBridgeDiscoveryPage")
 	page(name: "kasaUserSelectionPage")
 	page(name: "kasaComputerSelectionPage")
 	page(name: "userAddDevicesPage")
 	page(name: "userRemoveDevicesPage")
 	page(name: "userApplicationPreferencesPage")
 	page(name: "userDevicePreferencesPage")
-	page(name: "kasaUserAuthenticationPreferencesPage")
+	page(name: "kasaUserAuthenticationPage")
 	page(name: "kasaUserSelectionTokenPage")
 	page(name: "developerPage")
 	page(name: "developerTestingPage")
@@ -63,13 +60,8 @@ preferences {
 }
 
 def startPage()	{
-	if (!userSelectedDeveloper) {
+	if (state.installationLoaded == "No") {
 		settingUpdate("userSelectedManagerMode", "false", "bool")	//	Cloud (false) or Hub (true)
-		if (!userSelectedManagerMode) {
-			settingUpdate("userSelectedManagerMode", "false", "bool")
-		} else {
-			settingUpdate("userSelectedManagerMode", "true", "bool")
-		}
 	}
 	if (!userSelectedManagerMode) {
 		setInitialStatesKasa()
@@ -77,14 +69,14 @@ def startPage()	{
 			setRecommendedOptions()
 		}
 		if ("${userName}" =~ null || "${userPassword}" =~ null) {
-			kasaInstallationAuthenticationPage()
+			kasaUserAuthenticationPage()
 		} else {
 			welcomePage()
 		}
 	} else {
 		setInitialStatesHub()
 		if (state.bridgeIP == "new") {
-			hubInstallationBridgeDiscoveryPage()
+			hubBridgeDiscoveryPage()
 		} else {
 			welcomePage()
 		}
@@ -95,7 +87,7 @@ def startPage()	{
 def welcomePage()	{
 	def strLatestDriverVersion = textDriverVersion()
 	def welcomePageText = "None"
-	def strPageName = "None"
+	def strPageName = null
 	if (!userSelectedManagerMode) {
 		strPageName = "Dashboard - Cloud Controller"
 		welcomePageText = "Welcome to the new SmartThings application for TP-Link Kasa Devices. If you want to check for updates you can now do that in the changelog page."
@@ -140,13 +132,8 @@ def welcomePage()	{
 		}
 		if (userSelectedQuickControl) {
 			section("Device Manager:") {
-				if (!userSelectedManagerMode) {
-					href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-				} else {
-					href "userAddDevicesPage", title: "Devices Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
-					href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
-				}
+				href "userAddDevicesPage", title: "Device Installer Page", description: "Tap to view", image: getAppImg("adddevicespage.png")
+				href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			}
 		}
 		section("Settings:") {
@@ -155,7 +142,7 @@ def welcomePage()	{
 				href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
 				if (!userSelectedManagerMode) {
 					href "kasaUserSelectionTokenPage", title: "Token Settings Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
-					href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
+					href "kasaUserAuthenticationPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 				}
 			}
 		}
@@ -181,12 +168,7 @@ def welcomePage()	{
 
 //	----- USER SELECTION AUTHENTICATION PAGE -----
 def kasaUserSelectionAuthenticationPage()	{
-	def kasaUserSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
-		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete. " + "\nAvailable actions: \n" +
-		"Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n" +
-		"Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n" +
-		"Delete Account: Deletes your credentials to login into your TP-Link Kasa Account."
+	def kasaUserSelectionAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " + "enter your Username and Password for TP-Link (same as Kasa app) and the " + "action you want to complete. " + "\nAvailable actions: \n" + "Activate Account: You will be required to login into TP-Link Kasa Account and you will be required to adds devices to SmartThings Account. \n" + "Update Account: You will be required to update your credentials to login into your TP-Link Kasa Account. \n" + "Delete Account: Deletes your credentials to login into your TP-Link Kasa Account."
 	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "Login Page", nextPage: "kasaComputerSelectionAuthenticationPage", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
@@ -255,39 +237,23 @@ def kasaComputerSelectionAuthenticationPage()	{
 	}
 }
 
-//	----- USER AUTHENTICATION PREFERENCES PAGE -----
-def kasaInstallationAuthenticationPage()	{
-	def kasaInstallationAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " +
-		"enter your Username and Password for TP-Link (same as Kasa app) and the "+
-		"action you want to complete."
-	return dynamicPage (name: "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", nextPage: "kasaInstallationTokenPage", install: false, uninstall: false) {
-		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa.png")
-		}
-		section("Information and Diagnostics: ", hideable: true, hidden: true) {
-			paragraph title: "Information: ", kasaUserAuthenticationPreferencesPageText, image: getAppImg("information.png")
-		}
-		section("Account Configuration:") {
-			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
-			input ("userPassword", "password", title: "TP-Link Kasa Account Password", required: true, submitOnChange: false, image: getAppImg("password.png"))
-		}
-		section("${textCopyright()}")
-	}
-}
-
-def kasaInstallationTokenPage()	{
-	getToken()
-	userAddDevicesPage()
-}
-
 // ----- Page: Hub (Bridge) Discovery ------------------------------
 def hubBridgeDiscoveryPage()	{
 	checkForBridgeHub()
 	ssdpSubscribe()
 	ssdpDiscover()
 	verifyBridges()
-	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
-	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", refreshInterval: 5, install: false, uninstall: false){
+	def hubBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take " + "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
+	def strPageName = null
+	def strNextPage = null
+	if (state.installationLoaded == "No") {
+		strPageName = "Initial Bridge Discovery Page - Hub Controller"
+		strNextPage = "userAddDevicesPage"
+	} else {
+		strPageName = "Bridge Discovery Page"
+		strNextPage = null
+	}
+	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "${strPageName}", nextPage: "${strNextPage}", refreshInterval: 5, install: false, uninstall: false){
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -300,33 +266,9 @@ def hubBridgeDiscoveryPage()	{
 	}
 }
 
-// ----- Page: Hub (Bridge) Discovery ------------------------------
-def hubInstallationBridgeDiscoveryPage()	{
-	checkForBridgeHub()
-	ssdpSubscribe()
-	ssdpDiscover()
-	verifyBridges()
-	def hubInstallationBridgeDiscoveryPageText = "Please wait while we discover your TP-Link Bridge. Discovery can take "+ "several minutes\n" + "If no bridges are discovered after several minutes, press DONE. This " + "will install the app. Then re-run the application."
-	return dynamicPage(name: "hubBridgeDiscoveryPage", title: "Initial Bridge Discovery Page", nextPage: "userAddDevicesPage", refreshInterval: 5, install: false, uninstall: false){
-		section("") {
-			paragraph appInfoDesc(), image: getAppImg("kasa.png")
-		}
-		section("Information and Diagnostics: ", hideable: true, hidden: true) {
-			paragraph title: "Information: ", hubInstallationBridgeDiscoveryPageText, image: getAppImg("information.png")
-		}
-		section("Bridge Controller:") {
-			input ("userSelectedBridgeAddHub", "enum", required: true, multiple: true, submitOnChange: false, title: "Select Bridges to Add (${state.strfoundbridge.size() ?: 0} found)", metadata: [values: state.strfoundbridge], image: getAppImg("adddevices.png"))
-		}
-	}
-}
-
 //	----- USER SELECTION PAGE -----
 def kasaUserSelectionPage()	{
-	def kasaUserSelectionPageText = "Available actions: \n" +
-		"Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n" +
-		"Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n" +
-		"Update Token: You will be able to request for a new token or delete your current token from the application. \n" +
-		"Initial Installation: You will be asked to login into TP-Link Account and you may be asked to adds devices if you have not done so already."
+	def kasaUserSelectionPageText = "Available actions: \n" + "Add Devices: You will be able to add devices to your SmartThings Hub so you can control them from the SmartThings application. \n" + "Remove Devices: You will be able to remove any device from your SmartThings Hub that is controlled by this application. \n" + "Update Token: You will be able to request for a new token or delete your current token from the application. \n" + "Initial Installation: You will be asked to login into TP-Link Account and you may be asked to adds devices if you have not done so already."
 	def errorMsgCom = "None"
 	if (state.currentError != null) {
 		errorMsgCom = "Error communicating with cloud: \n" + "${state.currentError} " +
@@ -406,10 +348,11 @@ def userAddDevicesPage()	{
 	def strRefeshTimeout = null
 	def errorMsgDev = "None"
 	def userAddDevicesPageText = "None"
+	state.installationLoaded = "Yes"
 	if (!userSelectedManagerMode) {
 		strRefeshTimeout = null
 		if (state.kasadevices == [:]) {
-			errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+ "that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
+			errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means " + "that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 		}
 		if (state.newkasadevices == [:]) {
 			errorMsgDev = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
@@ -464,8 +407,7 @@ def userRemoveDevicesPage()	{
 		checkForDevicesHub()
 	}
 	if (state.kasadevices == [:]) {
-		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
-		"that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means " + "that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
 	if (state.oldkasadevices == [:]) {
 		errorMsgDev = "There are no devices to remove from the SmartThings app at this time."
@@ -604,9 +546,18 @@ def userDevicePreferencesPage()	{
 }
 
 //	----- USER AUTHENTICATION PREFERENCES PAGE -----
-def kasaUserAuthenticationPreferencesPage()	{
-	def kasaUserAuthenticationPreferencesPageText = "If possible, open the IDE and select Live Logging. Then, " + "enter your Username and Password for TP-Link (same as Kasa app) and the " + "action you want to complete."
-	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "Login Settings Page", install: false, uninstall: false) {
+def kasaUserAuthenticationPage()	{
+	def kasaUserAuthenticationPageText = "If possible, open the IDE and select Live Logging. Then, " + "enter your Username and Password for TP-Link (same as Kasa app) and the " + "action you want to complete."
+	def strPageName = null
+	def strNextPage = null
+	if (state.installationLoaded == "No") {
+		strPageName = "Initial Login Page - Cloud Controller"
+		strNextPage = "userAddDevicesPage"
+	} else {
+		strPageName = "Login Settings Page"
+		strNextPage = null
+	}
+	return dynamicPage (name: "kasaUserSelectionAuthenticationPage", title: "${strPageName}", nextPage: "${strNextPage}", install: false, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
@@ -616,7 +567,7 @@ def kasaUserAuthenticationPreferencesPage()	{
 			} else {
 				paragraph tokenInfoOffline(), image: getAppImg("error.png")
 			}
-			paragraph title: "Information: ", kasaUserAuthenticationPreferencesPageText, image: getAppImg("information.png")
+			paragraph title: "Information: ", kasaUserAuthenticationPageText, image: getAppImg("information.png")
 		}
 		section("Account Configuration:") {
 			input ("userName", "email", title: "TP-Link Kasa Email Address", required: true, submitOnChange: false, image: getAppImg("email.png"))
@@ -628,11 +579,7 @@ def kasaUserAuthenticationPreferencesPage()	{
 
 //	----- Token Settings Page -----
 def kasaUserSelectionTokenPage()	{
-	def kasaUserSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" +
-		"\nAvailable actions:\n" +
-		"Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
-		"Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n" +
-		"Recheck Token: This will attempt to check if the token is valid as well as check for errors."
+	def kasaUserSelectionTokenPageText = "Your current token: ${state.TpLinkToken}" + "\nAvailable actions:\n" + "Update Token: Updates the token on your SmartThings Account from your TP-Link Kasa Account. \n" + "Remove Token: Removes the token on your SmartThings Account from your TP-Link Kasa Account. \n" + "Recheck Token: This will attempt to check if the token is valid as well as check for errors."
 		def errorMsgTok = "None"
 		if (state.TpLinkToken == null) {
 			errorMsgTok = "You will be unable to control your devices until you get a new token."
@@ -726,12 +673,7 @@ def developerPage()	{
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionAuthenticationPage", title: "Computer Login Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
 			}
-			href "kasaInstallationAuthenticationPage", title: "Initial Login Page - Cloud Controller", description: "Tap to view", image: getAppImg("userselectionauthenticationpage.png")
-			if (userSelectedTestingPage) {
-				href "kasaInstallationTokenPage", title: "Initial Token Setup Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
-			}
 			href "hubBridgeDiscoveryPage", title: "Bridge Discovery Page", description: "Tap to continue", image: getAppImg("samsunghub.png")
-			href "hubInstallationBridgeDiscoveryPage", title: "Initial Bridge Setup Page - Hub Controller", description: "Tap to continue", image: getAppImg("samsunghub.png")
 			href "kasaUserSelectionPage", title: "Launcher Page", description: "Tap to view", image: getAppImg("userselectionpage.png")
 			if (userSelectedTestingPage) {
 				href "kasaComputerSelectionPage", title: "Computer Launcher Page", description: "This page is not viewable", image: getAppImg("computerpages.png")
@@ -740,7 +682,7 @@ def developerPage()	{
 			href "userRemoveDevicesPage", title: "Device Uninstaller Page", description: "Tap to view", image: getAppImg("removedevicespage.png")
 			href "userApplicationPreferencesPage", title: "Application Settings Page", description: "Tap to view", image: getAppImg("userapplicationpreferencespage.png")
 			href "userDevicePreferencesPage", title: "Device Preferences Page", description: "Tap to view", image: getAppImg("userdevicepreferencespage.png")
-			href "kasaUserAuthenticationPreferencesPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
+			href "kasaUserAuthenticationPage", title: "Login Settings Page", description: "Tap to view", image: getAppImg("userauthenticationpreferencespage.png")
 			href "kasaUserSelectionTokenPage", title: "Token Settings Page", description: "Tap to view", image: getAppImg("userselectiontokenpage.png")
 			if (userSelectedTestingPage) {
 				href "developerPage", title: "Developer Page", description: "You are currently on this page", image: getAppImg("developerpage.png")
@@ -773,13 +715,10 @@ def developerTestingPage()	{
 			"\nPlease resolve the error and try again."
 	}
 	if (state.kasadevices == [:]) {
-		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means "+
-		"that all devices are in 'Local Control Only'. Correct them then " +
-		"rerun the application."
+		errorMsgDev = "We were unable to find any TP-Link Kasa devices on your account. This usually means " + "that all devices are in 'Local Control Only'. Correct them then " + "rerun the application."
 	}
 	if (state.newkasadevices == [:]) {
-		errorMsgNew = "No new devices to add. Are you sure they are in Remote " +
-		"Control Mode?"
+		errorMsgNew = "No new devices to add. Are you sure they are in Remote " + "Control Mode?"
 	}
 	if (state.oldkasadevices == [:]) {
 		errorMsgOld = "No current devices to remove from SmartThings."
@@ -1000,6 +939,7 @@ def setInitialStatesKasa()	{
 	if (!state.kasadevices) {state.kasadevices = [:]}
 	if (!state.currentError) {state.currentError = null}
 	if (!state.errorCount) {state.errorCount = 0}
+	if (!state.installationLoaded) {state.installationLoaded = "No"}
 	settingUpdate("userSelectedReload", "false", "bool")
 	settingRemove("userSelectedDevicesRemoveKasa")
 	settingRemove("userSelectedDevicesAddKasa")
@@ -1034,6 +974,7 @@ def setInitialStatesHub()	{
 	if (!state.bridges) {state.bridges = [:]}
 	if (!state.hubdevices) {state.hubdevices = [:]}
 	if (!state.bridgePort) {state.bridgePort = 8082}
+	if (!state.installationLoaded) {state.installationLoaded = "No"}
 	settingRemove("userSelectedDevicesRemoveHub")
 	settingRemove("userSelectedDevicesAddHub")
 	settingRemove("userSelectedDevicesToUpdateHub")
