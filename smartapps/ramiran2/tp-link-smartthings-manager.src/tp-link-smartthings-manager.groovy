@@ -371,7 +371,7 @@ def userAddDevicesPage()	{
 	} else {
 		userAddDevicesPageText = "Discovering TP-Link Devices on your LAN. This may take several minutes. " + "You can follow the process by looking at the count of devices below. " + "When you are ready to select devices to install, touch the area below."
 	}
-	return dynamicPage (name: "userAddDevicesPage", title: "Device Installer Page", refreshTimeout: "${strRefeshTimeout}", install: false, uninstall: false) {
+	return dynamicPage (name: "userAddDevicesPage", title: "Device Installer Page", refreshTimeout: "${strRefeshTimeout}", install: true, uninstall: false) {
 		section("") {
 			paragraph appInfoDesc(), image: getAppImg("kasa.png")
 		}
