@@ -1776,7 +1776,7 @@ def getSearchTarget()	{
 
 //	======== Other Application Values ==========================================================================================================================================================================
 	def gitBranch()	{ return betaMarker() ? "beta" : "master" }
-	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "" }
+	def getAppImg(imgName, on = null)	{ return (!userSelectedAppIcons || on) ? "https://raw.githubusercontent.com/${gitPath()}/images/$imgName" : "https://raw.githubusercontent.com/${gitPath()}/images/disabled.png" }
 	def getWikiPageUrl()	{ return "https://github.com/${gitRepo()}/wiki" }
 	def getIssuePageUrl()	{ return "https://github.com/${gitRepo()}/issues" }
 	def strBrowserMode()	{ return (userSelectedBrowserMode) ? "embedded" : "external" }
